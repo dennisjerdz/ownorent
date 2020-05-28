@@ -1,0 +1,253 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
+using System.Web;
+
+namespace Ownorent.Models
+{
+    public class Warehouse {
+        public Warehouse() {
+            DateCreated = DateTime.UtcNow.AddHours(8);
+        }
+        public int WarehouseId { get; set; }
+        public string WarehouseName { get; set; }
+        public string Location { get; set; }
+        public bool IsDefault { get; set; }
+        public DateTime DateCreated { get; set; }
+    }
+
+    public class UserAttachment {
+        public UserAttachment() {
+            DateCreated = DateTime.UtcNow.AddHours(8);
+        }
+
+        public int UserAttachmentId { get; set; }
+
+        public string UserId { get; set; }
+        [ForeignKey("UserId")]
+        public ApplicationUser User { get; set; }
+        public string Location { get; set; }
+        public DateTime DateCreated { get; set; }
+    }
+
+    public class Category {
+        public Category() {
+            DateCreated = DateTime.UtcNow.AddHours(8);
+        }
+
+        public int CategoryId { get; set; }
+        public string CategoryName { get; set; }
+        public float UsefulLifeSpan { get; set; }
+
+        public string LastModifiedBy { get; set; }
+        public DateTime DateCreated { get; set; }
+        public DateTime DateLastModified { get; set; }
+
+        public List<ProductTemplate> ProductTemplates { get; set; }
+    }
+
+    public class ProductTemplate {
+        public ProductTemplate() {
+            DateCreated = DateTime.UtcNow.AddHours(8);
+            DateLastModified = DateTime.UtcNow.AddHours(8);
+        }
+
+        public int ProductTemplateId { get; set; }
+        public string ProductName { get; set; }
+        public string ProductDescription { get; set; }
+
+        public byte ProductTemplateStatus { get; set; }
+        public byte ProductPriceToUse { get; set; }
+
+        public int Quantity { get; set; }
+        public float Price { get; set; }
+        public float? DailyRentPrice { get; set; }
+        public float? ComputedPrice { get; set; } // use setting percentage, based on category
+        public float? ComputedDailyRentPrice { get; set; } // use setting percentage, 0.2% daily. Sample: 20k*0.2%=40php, 40*30days=1200, 20k/12months=1666.67
+        public float? AdminDefinedPrice { get; set; }
+        public float? AdminDefinedDailyRentPrice { get; set; }
+
+        public string LastModifiedBy { get; set; }
+        public DateTime DateCreated { get; set; }
+        public DateTime DateLastModified { get; set; }
+
+        public int CategoryId { get; set; }
+        [ForeignKey("CategoryId")]
+        public virtual Category Category { get; set; }
+
+        public int WarehouseId { get; set; }
+        [ForeignKey("WarehouseId")]
+        public virtual Warehouse Warehouse { get; set; }
+
+        public string UserId { get; set; }
+        [ForeignKey("UserId")]
+        public virtual ApplicationUser User { get; set; }
+
+        // don't lazy load, need to be fast in search results
+        public List<ProductTemplateAttachment> Attachment { get; set; }
+        public List<Product> Products { get; set; }
+        public List<ProductTemplateNote> Notes { get; set; }
+    }
+
+    public class ProductTemplateNote
+    {
+        public ProductTemplateNote()
+        {
+            DateCreated = DateTime.UtcNow.AddHours(8);
+        }
+
+        public int ProductTemplateNoteId { get; set; }
+        public string NoteBody { get; set; }
+        public byte NoteType { get; set; }
+        public DateTime DateCreated { get; set; }
+    }
+
+    public class ProductTemplateAttachment
+    {
+        public ProductTemplateAttachment()
+        {
+            DateCreated = DateTime.UtcNow.AddHours(8);
+        }
+
+        public int ProductTemplateAttachmentId { get; set; }
+        public string Name { get; set; }
+        public string Location { get; set; }
+        public bool IsThumbnail { get; set; }
+        public DateTime DateCreated { get; set; }
+    }
+
+    public class Product {
+        public Product()
+        {
+            DateCreated = DateTime.UtcNow.AddHours(8);
+            DateLastModified = DateTime.UtcNow.AddHours(8);
+        }
+
+        public int ProductId { get; set; }
+        public string ProductName { get; set; }
+        public string ProductDescription { get; set; }
+        public string ProductSerialNumber { get; set; }
+
+        public byte ProductStatus { get; set; }
+
+        public float? CustomPrice { get; set; }
+        public float? CustomDailyRentPrice { get; set; }
+
+        public string LastModifiedBy { get; set; }
+        public DateTime DateCreated { get; set; }
+        public DateTime DateLastModified { get; set; }
+
+        public int ProductTemplateId { get; set; }
+        [ForeignKey("ProductTemplateId")]
+        public virtual ProductTemplate ProductTemplate { get; set; }
+        public List<ProductAttachment> Attachments { get; set; }
+        public List<ProductNote> Notes { get; set; }
+    }
+
+    public class ProductAttachment
+    {
+        public ProductAttachment()
+        {
+            DateCreated = DateTime.UtcNow.AddHours(8);
+        }
+
+        public int ProductAttachmentId { get; set; }
+        public string Name { get; set; }
+        public string Location { get; set; }
+        public bool IsThumbnail { get; set; }
+        public DateTime DateCreated { get; set; }
+    }
+    
+    public class ProductNote
+    {
+        public ProductNote()
+        {
+            DateCreated = DateTime.UtcNow.AddHours(8);
+        }
+
+        public int ProductNoteId { get; set; }
+        public string NoteBody { get; set; }
+        public byte NoteType { get; set; }
+        public DateTime DateCreated { get; set; }
+    }
+
+    public class Transaction {
+        public Transaction()
+        {
+            DateCreated = DateTime.UtcNow.AddHours(8);
+            DateLastModified = DateTime.UtcNow.AddHours(8);
+        }
+
+        public int TransactionId { get; set; }
+        public string TransactionDescription { get; set; } // put details of payment terms here
+
+        public byte TransactionType { get; set; }
+
+        public DateTime? RentStartDate { get; set; }
+        public DateTime? RentEndDate { get; set; }
+
+        public int RentToOwnPaymentTermId { get; set; }
+        [ForeignKey("RentToOwnPaymentTermId")]
+        public virtual RentToOwnPaymentTerm RentToOwnPaymentTerm { get; set; }
+
+        public float PlatformTaxBuy { get; set; }
+        public float PlatformTaxDailyRent { get; set; }
+        public float PlatformTaxRentToOwn { get; set; }
+
+        public int ProductId { get; set; }
+        [ForeignKey("ProductId")]
+        public virtual Product Product { get; set; }
+
+        public string UserId { get; set; }
+        [ForeignKey("UserId")]
+        public virtual ApplicationUser User { get; set; }
+
+        public List<Payment> Payments { get; set; }
+
+        public string LastModifiedBy { get; set; }
+        public DateTime DateCreated { get; set; }
+        public DateTime DateLastModified { get; set; }
+    }
+
+    public class Payment {
+        public Payment()
+        {
+            DateCreated = DateTime.UtcNow.AddHours(8);
+            DateLastModified = DateTime.UtcNow.AddHours(8);
+        }
+
+        public int PaymentId { get; set; }
+        public float Amount { get; set; }
+
+        public string PaypalTransactionId { get; set; }
+
+        public string LastModifiedBy { get; set; }
+        public DateTime DateCreated { get; set; }
+        public DateTime DateLastModified { get; set; }
+
+        public int TransactionId { get; set; }
+        [ForeignKey("TransactionId")]
+        public virtual Transaction Transaction { get; set; }
+    }
+
+    public class RentToOwnPaymentTerm {
+        public int RentToOwnPaymentTermId { get; set; }
+        public int Months { get; set; }
+        public float InterestRate { get; set; } // copy payment terms/interest rate of BDO
+    }
+
+    public class Setting {
+        public Setting() {
+            DateCreated = DateTime.UtcNow.AddHours(8);
+        }
+
+        // populate settings for Warehouse, RentToOwnPaymentTerm, Categories, DailyRentComputationPercentage, PlatformTaxBuy, PlatformTaxDailyRent, PlatformTaxRentToOwn, PlatformTaxCashout
+        public int SettingId { get; set; }
+        public string Code { get; set; }
+        public string Value { get; set; }
+        public bool IsActive { get; set; }
+        
+        public DateTime DateCreated { get; set; }
+    }
+}
