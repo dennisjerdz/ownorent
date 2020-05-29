@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Web;
@@ -34,9 +35,12 @@ namespace Ownorent.Models
     public class Category {
         public Category() {
             DateCreated = DateTime.UtcNow.AddHours(8);
+            DateLastModified = DateTime.UtcNow.AddHours(8);
         }
 
         public int CategoryId { get; set; }
+
+        [Required]
         public string CategoryName { get; set; }
         public float UsefulLifeSpan { get; set; }
 
@@ -67,6 +71,9 @@ namespace Ownorent.Models
         public float? ComputedDailyRentPrice { get; set; } // use setting percentage, 0.2% daily. Sample: 20k*0.2%=40php, 40*30days=1200, 20k/12months=1666.67
         public float? AdminDefinedPrice { get; set; }
         public float? AdminDefinedDailyRentPrice { get; set; }
+
+        [Required]
+        public DateTime DatePurchased { get; set; }
 
         public string LastModifiedBy { get; set; }
         public DateTime DateCreated { get; set; }
@@ -101,6 +108,10 @@ namespace Ownorent.Models
         public string NoteBody { get; set; }
         public byte NoteType { get; set; }
         public DateTime DateCreated { get; set; }
+
+        public int ProductTemplateId { get; set; }
+        [ForeignKey("ProductTemplateId")]
+        public ProductTemplate ProductTemplate { get; set; }
     }
 
     public class ProductTemplateAttachment
@@ -115,6 +126,10 @@ namespace Ownorent.Models
         public string Location { get; set; }
         public bool IsThumbnail { get; set; }
         public DateTime DateCreated { get; set; }
+
+        public int ProductTemplateId { get; set; }
+        [ForeignKey("ProductTemplateId")]
+        public ProductTemplate ProductTemplate { get; set; }
     }
 
     public class Product {
@@ -157,6 +172,10 @@ namespace Ownorent.Models
         public string Location { get; set; }
         public bool IsThumbnail { get; set; }
         public DateTime DateCreated { get; set; }
+
+        public int ProductId { get; set; }
+        [ForeignKey("ProductId")]
+        public Product Product { get; set; }
     }
     
     public class ProductNote
@@ -170,6 +189,10 @@ namespace Ownorent.Models
         public string NoteBody { get; set; }
         public byte NoteType { get; set; }
         public DateTime DateCreated { get; set; }
+
+        public int ProductId { get; set; }
+        [ForeignKey("ProductId")]
+        public Product Product { get; set; }
     }
 
     public class Transaction {
@@ -180,9 +203,11 @@ namespace Ownorent.Models
         }
 
         public int TransactionId { get; set; }
+        public string PaypalTransactionId { get; set; }
         public string TransactionDescription { get; set; } // put details of payment terms here
 
         public byte TransactionType { get; set; }
+        public byte TransactionStatus { get; set; }
 
         public DateTime? RentStartDate { get; set; }
         public DateTime? RentEndDate { get; set; }
@@ -190,6 +215,10 @@ namespace Ownorent.Models
         public int RentToOwnPaymentTermId { get; set; }
         [ForeignKey("RentToOwnPaymentTermId")]
         public virtual RentToOwnPaymentTerm RentToOwnPaymentTerm { get; set; }
+
+        public float? ProductPrice { get; set; }
+        public float? ProductDailyRentPrice { get; set; }
+        public float? RentToOwnInterestRate { get; set; }
 
         public float PlatformTaxBuy { get; set; }
         public float PlatformTaxDailyRent { get; set; }
@@ -226,15 +255,21 @@ namespace Ownorent.Models
         public DateTime DateCreated { get; set; }
         public DateTime DateLastModified { get; set; }
 
+        public DateTime? DateDue { get; set; }
+
         public int TransactionId { get; set; }
         [ForeignKey("TransactionId")]
         public virtual Transaction Transaction { get; set; }
     }
 
     public class RentToOwnPaymentTerm {
+        public RentToOwnPaymentTerm() {
+            DateCreated = DateTime.UtcNow.AddHours(8);
+        }
         public int RentToOwnPaymentTermId { get; set; }
         public int Months { get; set; }
         public float InterestRate { get; set; } // copy payment terms/interest rate of BDO
+        public DateTime DateCreated { get; set; }
     }
 
     public class Setting {
@@ -246,6 +281,7 @@ namespace Ownorent.Models
         public int SettingId { get; set; }
         public string Code { get; set; }
         public string Value { get; set; }
+        public string Description { get; set; }
         public bool IsActive { get; set; }
         
         public DateTime DateCreated { get; set; }

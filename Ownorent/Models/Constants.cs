@@ -79,4 +79,10 @@ namespace Ownorent.Models
         public const int RENT = 1;
         public const int RENT_TO_OWN = 2;
     }
+
+    public class TransactionStatusConstant {
+        public const int PENDING = 0;
+        public const int SUCCESS = 1;
+        public const int FAILED = 2;
+    }
 }
