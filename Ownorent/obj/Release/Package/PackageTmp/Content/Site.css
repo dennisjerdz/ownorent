@@ -50,6 +50,7 @@ textarea {
     text-align:center;
     border:1px solid rgba(0,0,0,0.2);
     border-radius:4px;
+    margin-bottom:12px;
 }
 
 .frontpage-card h5 {
@@ -172,5 +173,9 @@ footer .right {
 
     footer .right, footer .left {
         text-align:center;
+    }
+
+    .main-banner h1{
+        font-size:1em !important;
     }
 }
