@@ -239,6 +239,9 @@
     <Content Include="Content\Icons\font\Flaticon.woff" />
     <Content Include="Content\Icons\font\Flaticon.woff2" />
     <Content Include="Content\Icons\font\_flaticon.scss" />
+    <None Include="Properties\PublishProfiles\ownorent - FTP.pubxml" />
+    <None Include="Properties\PublishProfiles\ownorent - ReadOnly - FTP.pubxml" />
+    <None Include="Properties\PublishProfiles\ownorent - Web Deploy.pubxml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
     <Content Include="Scripts\jquery-1.10.2.min.js" />
