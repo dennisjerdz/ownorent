@@ -32,6 +32,31 @@ namespace Ownorent.Models
         public DateTime DateCreated { get; set; }
     }
 
+    public class Address {
+        public Address() {
+            DateCreated = DateTime.UtcNow.AddHours(8);
+            DateLastModified = DateTime.UtcNow.AddHours(8);
+        }
+
+        public int AddressId { get; set; }
+        public byte AddressType { get; set; }
+        public string Line1 { get; set; }
+        public string Line2 { get; set; }
+        public string Line3 { get; set; }
+        public string City { get; set; }
+        public string Zip { get; set; }
+        public string Country { get; set; }
+        public bool IsDefault { get; set; }
+
+        public string LastModifiedBy { get; set; }
+        public DateTime DateCreated { get; set; }
+        public DateTime DateLastModified { get; set; }
+
+        public string UserId { get; set; }
+        [ForeignKey("UserId")]
+        public ApplicationUser User { get; set; }
+    }
+
     public class Category {
         public Category() {
             DateCreated = DateTime.UtcNow.AddHours(8);
@@ -71,6 +96,9 @@ namespace Ownorent.Models
         public float? ComputedDailyRentPrice { get; set; } // use setting percentage, 0.2% daily. Sample: 20k*0.2%=40php, 40*30days=1200, 20k/12months=1666.67
         public float? AdminDefinedPrice { get; set; }
         public float? AdminDefinedDailyRentPrice { get; set; }
+
+        public float ShippingFee { get; set; }
+        public float ShippingFeeProvincial { get; set; }
 
         [Required]
         public DateTime DatePurchased { get; set; }
@@ -208,6 +236,21 @@ namespace Ownorent.Models
 
         public byte TransactionType { get; set; }
         public byte TransactionStatus { get; set; }
+
+        public int AddressId { get; set; }
+        [ForeignKey("AddressId")]
+        public virtual Address Address { get; set; }
+
+        public byte AddressType { get; set; }
+        public string Line1 { get; set; }
+        public string Line2 { get; set; }
+        public string Line3 { get; set; }
+        public string City { get; set; }
+        public string Zip { get; set; }
+        public string Country { get; set; }
+
+        public byte? ShippingType { get; set; }
+        public float? ShippingFee { get; set; }
 
         public DateTime? RentStartDate { get; set; }
         public DateTime? RentEndDate { get; set; }

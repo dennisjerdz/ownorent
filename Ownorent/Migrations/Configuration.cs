@@ -110,6 +110,17 @@ namespace Ownorent.Migrations
                 });
             }
 
+            if (!context.Settings.Any(c => c.Code == "SHIPPING_LOCAL_ZIP_CODES"))
+            {
+                context.Settings.Add(new Setting()
+                {
+                    Code = "SHIPPING_LOCAL_ZIP_CODES",
+                    Value = "1000,1001",
+                    Description = "Used in shipping, zip codes in this array are considered LOCAL, otherwise PROVINCIAL.",
+                    IsActive = true
+                });
+            }
+
             /* Separator Separator Separator Separator Separator Separator Separator */
 
             if (!context.RentToOwnPaymentTerms.Any(c => c.Months == 3))

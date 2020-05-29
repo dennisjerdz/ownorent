@@ -13,7 +13,7 @@ namespace Ownorent.Migrations
         
         string IMigrationMetadata.Id
         {
-            get { return "202005290244163_initial"; }
+            get { return "202005290313568_initial"; }
         }
         
         string IMigrationMetadata.Source

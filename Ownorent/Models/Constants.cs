@@ -85,4 +85,9 @@ namespace Ownorent.Models
         public const int SUCCESS = 1;
         public const int FAILED = 2;
     }
+
+    public class ShippingTypeConstant {
+        public const int LOCAL = 0;
+        public const int PROVINCIAL = 1;
+    }
 }

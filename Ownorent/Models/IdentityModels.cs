@@ -31,6 +31,7 @@ namespace Ownorent.Models
         public virtual List<UserAttachment> Attachments { get; set; }
         public virtual List<ProductTemplate> Products { get; set; }
         public virtual List<Transaction> Transactions { get; set; }
+        public virtual List<Address> Addresses { get; set; }
 
         public async Task<ClaimsIdentity> GenerateUserIdentityAsync(UserManager<ApplicationUser> manager)
         {
@@ -61,6 +62,7 @@ namespace Ownorent.Models
         public DbSet<Payment> Payments { get; set; }
         public DbSet<RentToOwnPaymentTerm> RentToOwnPaymentTerms { get; set; }
         public DbSet<Setting> Settings { get; set; }
+        public DbSet<Address> Addresses { get; set; }
 
         public static ApplicationDbContext Create()
         {

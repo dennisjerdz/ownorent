@@ -8,127 +8,26 @@ namespace Ownorent.Migrations
         public override void Up()
         {
             CreateTable(
-                "dbo.Categories",
+                "dbo.Addresses",
                 c => new
                     {
-                        CategoryId = c.Int(nullable: false, identity: true),
-                        CategoryName = c.String(nullable: false),
-                        UsefulLifeSpan = c.Single(nullable: false),
+                        AddressId = c.Int(nullable: false, identity: true),
+                        AddressType = c.Byte(nullable: false),
+                        Line1 = c.String(),
+                        Line2 = c.String(),
+                        Line3 = c.String(),
+                        City = c.String(),
+                        Zip = c.String(),
+                        Country = c.String(),
+                        IsDefault = c.Boolean(nullable: false),
                         LastModifiedBy = c.String(),
                         DateCreated = c.DateTime(nullable: false),
                         DateLastModified = c.DateTime(nullable: false),
-                    })
-                .PrimaryKey(t => t.CategoryId);
-            
-            CreateTable(
-                "dbo.ProductTemplates",
-                c => new
-                    {
-                        ProductTemplateId = c.Int(nullable: false, identity: true),
-                        ProductName = c.String(),
-                        ProductDescription = c.String(),
-                        ProductTemplateStatus = c.Byte(nullable: false),
-                        ProductPriceToUse = c.Byte(nullable: false),
-                        Quantity = c.Int(nullable: false),
-                        Price = c.Single(nullable: false),
-                        DailyRentPrice = c.Single(),
-                        ComputedPrice = c.Single(),
-                        ComputedDailyRentPrice = c.Single(),
-                        AdminDefinedPrice = c.Single(),
-                        AdminDefinedDailyRentPrice = c.Single(),
-                        DatePurchased = c.DateTime(nullable: false),
-                        LastModifiedBy = c.String(),
-                        DateCreated = c.DateTime(nullable: false),
-                        DateLastModified = c.DateTime(nullable: false),
-                        CategoryId = c.Int(nullable: false),
-                        WarehouseId = c.Int(nullable: false),
                         UserId = c.String(maxLength: 128),
                     })
-                .PrimaryKey(t => t.ProductTemplateId)
-                .ForeignKey("dbo.Categories", t => t.CategoryId, cascadeDelete: true)
+                .PrimaryKey(t => t.AddressId)
                 .ForeignKey("dbo.AspNetUsers", t => t.UserId)
-                .ForeignKey("dbo.Warehouses", t => t.WarehouseId, cascadeDelete: true)
-                .Index(t => t.CategoryId)
-                .Index(t => t.WarehouseId)
                 .Index(t => t.UserId);
-            
-            CreateTable(
-                "dbo.ProductTemplateAttachments",
-                c => new
-                    {
-                        ProductTemplateAttachmentId = c.Int(nullable: false, identity: true),
-                        Name = c.String(),
-                        Location = c.String(),
-                        IsThumbnail = c.Boolean(nullable: false),
-                        DateCreated = c.DateTime(nullable: false),
-                        ProductTemplateId = c.Int(nullable: false),
-                    })
-                .PrimaryKey(t => t.ProductTemplateAttachmentId)
-                .ForeignKey("dbo.ProductTemplates", t => t.ProductTemplateId, cascadeDelete: true)
-                .Index(t => t.ProductTemplateId);
-            
-            CreateTable(
-                "dbo.ProductTemplateNotes",
-                c => new
-                    {
-                        ProductTemplateNoteId = c.Int(nullable: false, identity: true),
-                        NoteBody = c.String(),
-                        NoteType = c.Byte(nullable: false),
-                        DateCreated = c.DateTime(nullable: false),
-                        ProductTemplateId = c.Int(nullable: false),
-                    })
-                .PrimaryKey(t => t.ProductTemplateNoteId)
-                .ForeignKey("dbo.ProductTemplates", t => t.ProductTemplateId, cascadeDelete: true)
-                .Index(t => t.ProductTemplateId);
-            
-            CreateTable(
-                "dbo.Products",
-                c => new
-                    {
-                        ProductId = c.Int(nullable: false, identity: true),
-                        ProductName = c.String(),
-                        ProductDescription = c.String(),
-                        ProductSerialNumber = c.String(),
-                        ProductStatus = c.Byte(nullable: false),
-                        CustomPrice = c.Single(),
-                        CustomDailyRentPrice = c.Single(),
-                        LastModifiedBy = c.String(),
-                        DateCreated = c.DateTime(nullable: false),
-                        DateLastModified = c.DateTime(nullable: false),
-                        ProductTemplateId = c.Int(nullable: false),
-                    })
-                .PrimaryKey(t => t.ProductId)
-                .ForeignKey("dbo.ProductTemplates", t => t.ProductTemplateId, cascadeDelete: true)
-                .Index(t => t.ProductTemplateId);
-            
-            CreateTable(
-                "dbo.ProductAttachments",
-                c => new
-                    {
-                        ProductAttachmentId = c.Int(nullable: false, identity: true),
-                        Name = c.String(),
-                        Location = c.String(),
-                        IsThumbnail = c.Boolean(nullable: false),
-                        DateCreated = c.DateTime(nullable: false),
-                        ProductId = c.Int(nullable: false),
-                    })
-                .PrimaryKey(t => t.ProductAttachmentId)
-                .ForeignKey("dbo.Products", t => t.ProductId, cascadeDelete: true)
-                .Index(t => t.ProductId);
-            
-            CreateTable(
-                "dbo.ProductNotes",
-                c => new
-                    {
-                        ProductNoteId = c.Int(nullable: false, identity: true),
-                        NoteBody = c.String(),
-                        NoteType = c.Byte(nullable: false),
-                        DateCreated = c.DateTime(nullable: false),
-                        ProductId = c.Int(nullable: false),
-                    })
-                .PrimaryKey(t => t.ProductNoteId)
-                .ForeignKey("dbo.Products", t => t.ProductId, cascadeDelete: true)
-                .Index(t => t.ProductId);
             
             CreateTable(
                 "dbo.AspNetUsers",
@@ -197,6 +96,143 @@ namespace Ownorent.Migrations
                 .Index(t => t.UserId);
             
             CreateTable(
+                "dbo.ProductTemplates",
+                c => new
+                    {
+                        ProductTemplateId = c.Int(nullable: false, identity: true),
+                        ProductName = c.String(),
+                        ProductDescription = c.String(),
+                        ProductTemplateStatus = c.Byte(nullable: false),
+                        ProductPriceToUse = c.Byte(nullable: false),
+                        Quantity = c.Int(nullable: false),
+                        Price = c.Single(nullable: false),
+                        DailyRentPrice = c.Single(),
+                        ComputedPrice = c.Single(),
+                        ComputedDailyRentPrice = c.Single(),
+                        AdminDefinedPrice = c.Single(),
+                        AdminDefinedDailyRentPrice = c.Single(),
+                        ShippingFee = c.Single(nullable: false),
+                        ShippingFeeProvincial = c.Single(nullable: false),
+                        DatePurchased = c.DateTime(nullable: false),
+                        LastModifiedBy = c.String(),
+                        DateCreated = c.DateTime(nullable: false),
+                        DateLastModified = c.DateTime(nullable: false),
+                        CategoryId = c.Int(nullable: false),
+                        WarehouseId = c.Int(nullable: false),
+                        UserId = c.String(maxLength: 128),
+                    })
+                .PrimaryKey(t => t.ProductTemplateId)
+                .ForeignKey("dbo.Categories", t => t.CategoryId, cascadeDelete: true)
+                .ForeignKey("dbo.AspNetUsers", t => t.UserId)
+                .ForeignKey("dbo.Warehouses", t => t.WarehouseId, cascadeDelete: true)
+                .Index(t => t.CategoryId)
+                .Index(t => t.WarehouseId)
+                .Index(t => t.UserId);
+            
+            CreateTable(
+                "dbo.ProductTemplateAttachments",
+                c => new
+                    {
+                        ProductTemplateAttachmentId = c.Int(nullable: false, identity: true),
+                        Name = c.String(),
+                        Location = c.String(),
+                        IsThumbnail = c.Boolean(nullable: false),
+                        DateCreated = c.DateTime(nullable: false),
+                        ProductTemplateId = c.Int(nullable: false),
+                    })
+                .PrimaryKey(t => t.ProductTemplateAttachmentId)
+                .ForeignKey("dbo.ProductTemplates", t => t.ProductTemplateId, cascadeDelete: true)
+                .Index(t => t.ProductTemplateId);
+            
+            CreateTable(
+                "dbo.Categories",
+                c => new
+                    {
+                        CategoryId = c.Int(nullable: false, identity: true),
+                        CategoryName = c.String(nullable: false),
+                        UsefulLifeSpan = c.Single(nullable: false),
+                        LastModifiedBy = c.String(),
+                        DateCreated = c.DateTime(nullable: false),
+                        DateLastModified = c.DateTime(nullable: false),
+                    })
+                .PrimaryKey(t => t.CategoryId);
+            
+            CreateTable(
+                "dbo.ProductTemplateNotes",
+                c => new
+                    {
+                        ProductTemplateNoteId = c.Int(nullable: false, identity: true),
+                        NoteBody = c.String(),
+                        NoteType = c.Byte(nullable: false),
+                        DateCreated = c.DateTime(nullable: false),
+                        ProductTemplateId = c.Int(nullable: false),
+                    })
+                .PrimaryKey(t => t.ProductTemplateNoteId)
+                .ForeignKey("dbo.ProductTemplates", t => t.ProductTemplateId, cascadeDelete: true)
+                .Index(t => t.ProductTemplateId);
+            
+            CreateTable(
+                "dbo.Products",
+                c => new
+                    {
+                        ProductId = c.Int(nullable: false, identity: true),
+                        ProductName = c.String(),
+                        ProductDescription = c.String(),
+                        ProductSerialNumber = c.String(),
+                        ProductStatus = c.Byte(nullable: false),
+                        CustomPrice = c.Single(),
+                        CustomDailyRentPrice = c.Single(),
+                        LastModifiedBy = c.String(),
+                        DateCreated = c.DateTime(nullable: false),
+                        DateLastModified = c.DateTime(nullable: false),
+                        ProductTemplateId = c.Int(nullable: false),
+                    })
+                .PrimaryKey(t => t.ProductId)
+                .ForeignKey("dbo.ProductTemplates", t => t.ProductTemplateId, cascadeDelete: true)
+                .Index(t => t.ProductTemplateId);
+            
+            CreateTable(
+                "dbo.ProductAttachments",
+                c => new
+                    {
+                        ProductAttachmentId = c.Int(nullable: false, identity: true),
+                        Name = c.String(),
+                        Location = c.String(),
+                        IsThumbnail = c.Boolean(nullable: false),
+                        DateCreated = c.DateTime(nullable: false),
+                        ProductId = c.Int(nullable: false),
+                    })
+                .PrimaryKey(t => t.ProductAttachmentId)
+                .ForeignKey("dbo.Products", t => t.ProductId, cascadeDelete: true)
+                .Index(t => t.ProductId);
+            
+            CreateTable(
+                "dbo.ProductNotes",
+                c => new
+                    {
+                        ProductNoteId = c.Int(nullable: false, identity: true),
+                        NoteBody = c.String(),
+                        NoteType = c.Byte(nullable: false),
+                        DateCreated = c.DateTime(nullable: false),
+                        ProductId = c.Int(nullable: false),
+                    })
+                .PrimaryKey(t => t.ProductNoteId)
+                .ForeignKey("dbo.Products", t => t.ProductId, cascadeDelete: true)
+                .Index(t => t.ProductId);
+            
+            CreateTable(
+                "dbo.Warehouses",
+                c => new
+                    {
+                        WarehouseId = c.Int(nullable: false, identity: true),
+                        WarehouseName = c.String(),
+                        Location = c.String(),
+                        IsDefault = c.Boolean(nullable: false),
+                        DateCreated = c.DateTime(nullable: false),
+                    })
+                .PrimaryKey(t => t.WarehouseId);
+            
+            CreateTable(
                 "dbo.AspNetUserRoles",
                 c => new
                     {
@@ -218,6 +254,16 @@ namespace Ownorent.Migrations
                         TransactionDescription = c.String(),
                         TransactionType = c.Byte(nullable: false),
                         TransactionStatus = c.Byte(nullable: false),
+                        AddressId = c.Int(nullable: false),
+                        AddressType = c.Byte(nullable: false),
+                        Line1 = c.String(),
+                        Line2 = c.String(),
+                        Line3 = c.String(),
+                        City = c.String(),
+                        Zip = c.String(),
+                        Country = c.String(),
+                        ShippingType = c.Byte(),
+                        ShippingFee = c.Single(),
                         RentStartDate = c.DateTime(),
                         RentEndDate = c.DateTime(),
                         RentToOwnPaymentTermId = c.Int(nullable: false),
@@ -234,9 +280,11 @@ namespace Ownorent.Migrations
                         DateLastModified = c.DateTime(nullable: false),
                     })
                 .PrimaryKey(t => t.TransactionId)
+                .ForeignKey("dbo.Addresses", t => t.AddressId, cascadeDelete: true)
                 .ForeignKey("dbo.Products", t => t.ProductId, cascadeDelete: true)
                 .ForeignKey("dbo.RentToOwnPaymentTerms", t => t.RentToOwnPaymentTermId, cascadeDelete: true)
                 .ForeignKey("dbo.AspNetUsers", t => t.UserId)
+                .Index(t => t.AddressId)
                 .Index(t => t.RentToOwnPaymentTermId)
                 .Index(t => t.ProductId)
                 .Index(t => t.UserId);
@@ -270,18 +318,6 @@ namespace Ownorent.Migrations
                 .PrimaryKey(t => t.RentToOwnPaymentTermId);
             
             CreateTable(
-                "dbo.Warehouses",
-                c => new
-                    {
-                        WarehouseId = c.Int(nullable: false, identity: true),
-                        WarehouseName = c.String(),
-                        Location = c.String(),
-                        IsDefault = c.Boolean(nullable: false),
-                        DateCreated = c.DateTime(nullable: false),
-                    })
-                .PrimaryKey(t => t.WarehouseId);
-            
-            CreateTable(
                 "dbo.AspNetRoles",
                 c => new
                     {
@@ -309,33 +345,32 @@ namespace Ownorent.Migrations
         public override void Down()
         {
             DropForeignKey("dbo.AspNetUserRoles", "RoleId", "dbo.AspNetRoles");
-            DropForeignKey("dbo.ProductTemplates", "WarehouseId", "dbo.Warehouses");
             DropForeignKey("dbo.Transactions", "UserId", "dbo.AspNetUsers");
             DropForeignKey("dbo.Transactions", "RentToOwnPaymentTermId", "dbo.RentToOwnPaymentTerms");
             DropForeignKey("dbo.Transactions", "ProductId", "dbo.Products");
             DropForeignKey("dbo.Payments", "TransactionId", "dbo.Transactions");
+            DropForeignKey("dbo.Transactions", "AddressId", "dbo.Addresses");
             DropForeignKey("dbo.AspNetUserRoles", "UserId", "dbo.AspNetUsers");
+            DropForeignKey("dbo.ProductTemplates", "WarehouseId", "dbo.Warehouses");
             DropForeignKey("dbo.ProductTemplates", "UserId", "dbo.AspNetUsers");
-            DropForeignKey("dbo.AspNetUserLogins", "UserId", "dbo.AspNetUsers");
-            DropForeignKey("dbo.AspNetUserClaims", "UserId", "dbo.AspNetUsers");
-            DropForeignKey("dbo.UserAttachments", "UserId", "dbo.AspNetUsers");
             DropForeignKey("dbo.Products", "ProductTemplateId", "dbo.ProductTemplates");
             DropForeignKey("dbo.ProductNotes", "ProductId", "dbo.Products");
             DropForeignKey("dbo.ProductAttachments", "ProductId", "dbo.Products");
             DropForeignKey("dbo.ProductTemplateNotes", "ProductTemplateId", "dbo.ProductTemplates");
             DropForeignKey("dbo.ProductTemplates", "CategoryId", "dbo.Categories");
             DropForeignKey("dbo.ProductTemplateAttachments", "ProductTemplateId", "dbo.ProductTemplates");
+            DropForeignKey("dbo.AspNetUserLogins", "UserId", "dbo.AspNetUsers");
+            DropForeignKey("dbo.AspNetUserClaims", "UserId", "dbo.AspNetUsers");
+            DropForeignKey("dbo.UserAttachments", "UserId", "dbo.AspNetUsers");
+            DropForeignKey("dbo.Addresses", "UserId", "dbo.AspNetUsers");
             DropIndex("dbo.AspNetRoles", "RoleNameIndex");
             DropIndex("dbo.Payments", new[] { "TransactionId" });
             DropIndex("dbo.Transactions", new[] { "UserId" });
             DropIndex("dbo.Transactions", new[] { "ProductId" });
             DropIndex("dbo.Transactions", new[] { "RentToOwnPaymentTermId" });
+            DropIndex("dbo.Transactions", new[] { "AddressId" });
             DropIndex("dbo.AspNetUserRoles", new[] { "RoleId" });
             DropIndex("dbo.AspNetUserRoles", new[] { "UserId" });
-            DropIndex("dbo.AspNetUserLogins", new[] { "UserId" });
-            DropIndex("dbo.AspNetUserClaims", new[] { "UserId" });
-            DropIndex("dbo.UserAttachments", new[] { "UserId" });
-            DropIndex("dbo.AspNetUsers", "UserNameIndex");
             DropIndex("dbo.ProductNotes", new[] { "ProductId" });
             DropIndex("dbo.ProductAttachments", new[] { "ProductId" });
             DropIndex("dbo.Products", new[] { "ProductTemplateId" });
@@ -344,24 +379,30 @@ namespace Ownorent.Migrations
             DropIndex("dbo.ProductTemplates", new[] { "UserId" });
             DropIndex("dbo.ProductTemplates", new[] { "WarehouseId" });
             DropIndex("dbo.ProductTemplates", new[] { "CategoryId" });
+            DropIndex("dbo.AspNetUserLogins", new[] { "UserId" });
+            DropIndex("dbo.AspNetUserClaims", new[] { "UserId" });
+            DropIndex("dbo.UserAttachments", new[] { "UserId" });
+            DropIndex("dbo.AspNetUsers", "UserNameIndex");
+            DropIndex("dbo.Addresses", new[] { "UserId" });
             DropTable("dbo.Settings");
             DropTable("dbo.AspNetRoles");
-            DropTable("dbo.Warehouses");
             DropTable("dbo.RentToOwnPaymentTerms");
             DropTable("dbo.Payments");
             DropTable("dbo.Transactions");
             DropTable("dbo.AspNetUserRoles");
-            DropTable("dbo.AspNetUserLogins");
-            DropTable("dbo.AspNetUserClaims");
-            DropTable("dbo.UserAttachments");
-            DropTable("dbo.AspNetUsers");
+            DropTable("dbo.Warehouses");
             DropTable("dbo.ProductNotes");
             DropTable("dbo.ProductAttachments");
             DropTable("dbo.Products");
             DropTable("dbo.ProductTemplateNotes");
+            DropTable("dbo.Categories");
             DropTable("dbo.ProductTemplateAttachments");
             DropTable("dbo.ProductTemplates");
-            DropTable("dbo.Categories");
+            DropTable("dbo.AspNetUserLogins");
+            DropTable("dbo.AspNetUserClaims");
+            DropTable("dbo.UserAttachments");
+            DropTable("dbo.AspNetUsers");
+            DropTable("dbo.Addresses");
         }
     }
 }
