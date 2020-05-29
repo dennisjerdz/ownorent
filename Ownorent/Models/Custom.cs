@@ -231,7 +231,6 @@ namespace Ownorent.Models
         }
 
         public int TransactionId { get; set; }
-        public string PaypalTransactionId { get; set; }
         public string TransactionDescription { get; set; } // put details of payment terms here
 
         public byte TransactionType { get; set; }
@@ -241,16 +240,13 @@ namespace Ownorent.Models
         [ForeignKey("AddressId")]
         public virtual Address Address { get; set; }
 
-        public byte AddressType { get; set; }
+        public byte? AddressType { get; set; }
         public string Line1 { get; set; }
         public string Line2 { get; set; }
         public string Line3 { get; set; }
         public string City { get; set; }
         public string Zip { get; set; }
         public string Country { get; set; }
-
-        public byte? ShippingType { get; set; }
-        public float? ShippingFee { get; set; }
 
         public DateTime? RentStartDate { get; set; }
         public DateTime? RentEndDate { get; set; }
@@ -291,6 +287,8 @@ namespace Ownorent.Models
 
         public int PaymentId { get; set; }
         public float Amount { get; set; }
+        public byte ShippingType { get; set; }
+        public float ShippingFee { get; set; }
 
         public string PaypalTransactionId { get; set; }
 

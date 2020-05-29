@@ -89,5 +89,6 @@ namespace Ownorent.Models
     public class ShippingTypeConstant {
         public const int LOCAL = 0;
         public const int PROVINCIAL = 1;
+        public const int NONE_ALREADY_DELIVERED = 2; // if payment isn't initial
     }
 }
