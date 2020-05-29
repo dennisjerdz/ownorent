@@ -217,6 +217,12 @@
   <ItemGroup>
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
+    <Content Include="Content\Icons\backup.txt" />
+    <Content Include="Content\Icons\font\flaticon.css" />
+    <Content Include="Content\Icons\font\flaticon.html" />
+    <Content Include="Content\Icons\font\Flaticon.svg" />
+    <Content Include="Content\Icons\license\license.html" />
+    <Content Include="Content\Images\logo.png" />
     <Content Include="favicon.ico" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
@@ -228,6 +234,11 @@
     <Content Include="ApplicationInsights.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Content\Icons\font\Flaticon.eot" />
+    <Content Include="Content\Icons\font\Flaticon.ttf" />
+    <Content Include="Content\Icons\font\Flaticon.woff" />
+    <Content Include="Content\Icons\font\Flaticon.woff2" />
+    <Content Include="Content\Icons\font\_flaticon.scss" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
     <Content Include="Scripts\jquery-1.10.2.min.js" />

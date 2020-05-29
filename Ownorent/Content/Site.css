@@ -1,12 +1,10 @@
 ﻿body {
-    padding-top: 50px;
     padding-bottom: 20px;
 }
 
 /* Set padding to keep content from hitting the edges */
 .body-content {
-    padding-left: 15px;
-    padding-right: 15px;
+    margin-top:0px;
 }
 
 /* Override the default bootstrap behavior where horizontal description lists 
@@ -20,5 +18,159 @@
 input,
 select,
 textarea {
-    max-width: 280px;
+    max-width: 100%;
+}
+
+.main-banner {
+    margin-top:15px;
+    height:450px !important;
+    background-size:cover !important;
+    background-repeat:no-repeat !important;
+    background-position: 0% 54% !important;
+}
+
+.main-banner h4 {
+    margin-top:100px;
+    font-weight:800;
+    color:white;
+    text-shadow:1px 2px 1px black;
+}
+
+.main-banner h1 {
+    font-weight:800;
+    font-size:2em;
+    font-family: 'Roboto', sans-serif !important;
+    color:white;
+    text-shadow:1px 2px 7px black;
+    box-shadow: 10px rgba(0,0,0,0.1) !important;
+}
+
+.frontpage-card {
+    padding:10px 0px 17px 0px;
+    text-align:center;
+    border:1px solid rgba(0,0,0,0.2);
+    border-radius:4px;
+}
+
+.frontpage-card h5 {
+    margin-bottom:7px !important;
+    font-weight:600;
+    color:#71cd14;
+}
+
+ .frontpage-card .icon:before {
+    font-size:35px;
+    margin-left:12px;
+ }
+
+.main-banner h1 span{
+    color:#71cd14;
+    font-family: 'Roboto', sans-serif !important;
+}
+
+.main-banner .btn {
+    font-weight: 600;
+    text-shadow:none !important;
+    font-size:0.6em;
+    letter-spacing:0.6px;
+    padding: 10px 35px
+}
+
+.main-banner .btn-success {
+    background-color:#71cd14;
+    border:none;
+}
+
+.btn {
+    font-family: 'Roboto', sans-serif !important;
+    border-radius:3px;
+}
+
+.main-banner p {
+    color:white;
+    text-shadow:1px 2px 1px black;
+}
+
+.navbar {
+    background-color:white !important;
+    border-bottom:none;
+    margin-bottom:5px;
+}
+
+.navbar-overhead {
+    display:block;
+    width:100%;
+    background-color:#e6e6e6;
+    line-height:40px;
+    font-size:0.9em;
+}
+
+.navbar-toggle {
+    margin-top:18px;
+    color:black;
+    border-color:black !important;
+}
+
+.navbar-brand {
+    padding-top:0px !important;
+    padding-bottom:0px !important;
+}
+
+.navbar-logo {
+     width:160px;
+     transform: translate(-15px);
+}
+
+html * {
+    font-family: 'Heebo', sans-serif;
+}
+
+.navbar-default .navbar-nav > li > a {
+    line-height:45px;
+}
+
+.navbar-default .navbar-nav {
+    padding-left:13%;
+}
+
+.overhead-content {
+    width:40%;
+}
+
+.login-info {
+    text-align:right;
+    width:59%;
+}
+
+.login-info a {
+    color:black;
+    padding-right:10px;
+}
+
+.login-info a:hover {
+    color:#71cd14;
+    font-weight:800;
+}
+
+.navbar-overhead .login-info, .navbar-overhead .overhead-content {
+    display:inline-block !important;
+}
+
+footer .right {
+    text-align:right;
+}
+
+@media(max-width:767px) {
+    .navbar-overhead .overhead-content {
+        display:none !important;
+    }
+
+    .login-info {
+        text-align:left;
+        width:100%;
+    }
+
+    footer .right, footer .left {
+        text-align:center;
+    }
 }
