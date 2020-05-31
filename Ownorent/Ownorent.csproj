@@ -205,6 +205,10 @@
     <Compile Include="Migrations\202005290332179_initial.Designer.cs">
       <DependentUpon>202005290332179_initial.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202005312230501_Add Email Confirmation code to User.cs" />
+    <Compile Include="Migrations\202005312230501_Add Email Confirmation code to User.Designer.cs">
+      <DependentUpon>202005312230501_Add Email Confirmation code to User.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\Constants.cs" />
@@ -254,7 +258,9 @@
     <Content Include="Scripts\respond.js" />
     <Content Include="Scripts\respond.min.js" />
     <Content Include="Scripts\_references.js" />
-    <Content Include="Web.config" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </Content>
@@ -303,6 +309,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Migrations\202005290332179_initial.resx">
       <DependentUpon>202005290332179_initial.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202005312230501_Add Email Confirmation code to User.resx">
+      <DependentUpon>202005312230501_Add Email Confirmation code to User.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

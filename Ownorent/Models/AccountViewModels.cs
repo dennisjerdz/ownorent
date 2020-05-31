@@ -65,9 +65,36 @@ namespace Ownorent.Models
     public class RegisterViewModel
     {
         [Required]
+        [Display(Name="First Name")]
+        public string FirstName { get; set; }
+        public string MiddleName { get; set; }
+        [Required]
+        [Display(Name = "Last Name")]
+        public string LastName { get; set; }
+
+        [Display(Name = "Mobile Number (Optional)")]
+        public string MobileNumber { get; set; }
+
+        [Required]
         [EmailAddress]
         [Display(Name = "Email")]
         public string Email { get; set; }
+        
+        [Required]
+        [Display(Name = "Address Line 1")]
+        public string Line1 { get; set; }
+        [Display(Name = "Address Line 2")]
+        public string Line2 { get; set; }
+        [Display(Name = "Address Line 3")]
+        public string Line3 { get; set; }
+        [Required]
+        public string City { get; set; }
+        [Required]
+        public string Zip { get; set; }
+        [Required]
+        public string Country { get; set; }
+
+        public int AccountType { get; set; }
 
         [Required]
         [StringLength(100, ErrorMessage = "The {0} must be at least {2} characters long.", MinimumLength = 6)]

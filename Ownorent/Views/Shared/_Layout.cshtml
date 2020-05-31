@@ -12,7 +12,10 @@
 
     <link rel="stylesheet" href="@Url.Content("~/Content/Icons/font/flaticon.css")" />
 </head>
-<body>
+@{
+    string bgColor = ViewBag.bgColor ?? "white";
+}
+<body style="background-color:@bgColor;">
     <div class="navbar navbar-default">
         <div class="navbar-overhead">
             <div class="container">

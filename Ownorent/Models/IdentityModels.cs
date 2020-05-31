@@ -33,6 +33,8 @@ namespace Ownorent.Models
         public virtual List<Transaction> Transactions { get; set; }
         public virtual List<Address> Addresses { get; set; }
 
+        public string ConfirmationCode { get; set; }
+
         public async Task<ClaimsIdentity> GenerateUserIdentityAsync(UserManager<ApplicationUser> manager)
         {
             // Note the authenticationType must match the one defined in CookieAuthenticationOptions.AuthenticationType

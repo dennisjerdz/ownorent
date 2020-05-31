@@ -9,6 +9,7 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using Ownorent.Models;
+using System.Net.Mail;
 
 namespace Ownorent.Controllers
 {
@@ -17,6 +18,8 @@ namespace Ownorent.Controllers
     {
         private ApplicationSignInManager _signInManager;
         private ApplicationUserManager _userManager;
+
+        private ApplicationDbContext db = new ApplicationDbContext();
 
         public AccountController()
         {
@@ -139,7 +142,9 @@ namespace Ownorent.Controllers
         [AllowAnonymous]
         public ActionResult Register()
         {
-            return View();
+            RegisterViewModel rvm = new RegisterViewModel();
+            rvm.Country = "Philippines";
+            return View(rvm);
         }
 
         //
@@ -151,19 +156,66 @@ namespace Ownorent.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
+                var user = new ApplicationUser {
+                    FirstName = model.FirstName,
+                    MiddleName = model.MiddleName,
+                    LastName = model.LastName,
+                    MobileNumber = model.MobileNumber,
+                    UserName = model.Email,
+                    Email = model.Email,
+                    EmailConfirmed = false
+                };
+
                 var result = await UserManager.CreateAsync(user, model.Password);
+
                 if (result.Succeeded)
                 {
                     await SignInManager.SignInAsync(user, isPersistent:false, rememberBrowser:false);
-                    
+
                     // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=320771
                     // Send an email with this link
                     // string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
-                    // var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
-                    // await UserManager.SendEmailAsync(user.Id, "Confirm your account", "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>");
 
-                    return RedirectToAction("Index", "Home");
+                    string emailCode = new Guid().ToString();
+                    var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = emailCode }, protocol: Request.Url.Scheme);
+                    string body = "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>";
+
+                    MailAddress fromAddress = new MailAddress("Ownorent Registration Service", "ownorent@gmail.com");
+                    MailAddress toAddress = new MailAddress(model.Email, model.FirstName);
+                    string fromPassword = "ownorent$123456";
+                    string subject = "Ownorent Account Confirmation - " + DateTime.UtcNow.AddHours(8).ToString("MM-dd-yy");
+
+                    SmtpClient smtp = new SmtpClient()
+                    {
+                        Host = "smtp.gmail.com",
+                        Port = 587,
+                        EnableSsl = true,
+                        DeliveryMethod = SmtpDeliveryMethod.Network,
+                        UseDefaultCredentials = false,
+                        Credentials = new System.Net.NetworkCredential(fromAddress.Address, fromPassword)
+                    };
+
+                    MailMessage message = new MailMessage(fromAddress, toAddress)
+                    {
+                        Subject = subject,
+                        Body = body
+                    };
+                    message.CC.Add(new MailAddress(model.Email));
+
+                    try
+                    {
+                        smtp.Send(message);
+                    }
+                    catch (Exception e) {
+                        return Content(e.Message);
+                    }
+
+                    var findUser = db.Users.FirstOrDefault(u => u.Email == model.Email);
+                    findUser.ConfirmationCode = emailCode;
+                    await db.SaveChangesAsync();
+                    
+                    ViewBag.Message = "<strong>Registration Success!</strong> To proceed, please click the confirmation link sent to "+model.Email+".";
+                    return RedirectToAction("Register", "Account");
                 }
                 AddErrors(result);
             }

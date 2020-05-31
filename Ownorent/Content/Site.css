@@ -1,4 +1,6 @@
-﻿body {
+﻿/* Official Color: #71cd14, #38c172 */
+
+body {
     padding-bottom: 20px;
 }
 
@@ -159,6 +161,38 @@ html * {
 
 footer .right {
     text-align:right;
+}
+
+.account-card {
+    background-color:white;
+    border-radius:3px;
+    border:1px solid rgba(0,0,0,0.2);
+    margin-top:10px;
+}
+
+.account-header {
+    background-color:#38c172;
+    line-height:50px;
+    margin-bottom:20px;
+    text-align:center;
+    color:white;
+}
+
+.account-card .form-horizontal{
+    padding:0px 20px 0px 20px;
+}
+
+.account-card .form-horizontal .form-group, .account-card .form-horizontal .form-group label {
+    margin-bottom:4px;
+}
+
+.form-control {
+    box-shadow:none !important;
+}
+
+.form-control:active,.form-control:focus{
+    box-shadow:none !important;
+    border-color:#71cd14;
 }
 
 @media(max-width:767px) {
