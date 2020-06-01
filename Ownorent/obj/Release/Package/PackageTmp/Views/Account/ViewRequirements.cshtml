@@ -1,0 +1,99 @@
+﻿@model List<Ownorent.Models.UserAttachment>
+@{
+    ViewBag.Title = "Requirements";
+    ViewBag.bgColor = "#f8fafc";
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="ownorent-panel ownorent-panel-white marginTop15">
+            <div class="ownorent-panel-header" style="background-color:#71cd14; color:white;">
+
+            </div>
+
+            <div class="ownorent-panel-body ownorent-panel-tools">
+                <div class="row">
+                    <div class="col-md-9">
+                        <p>
+                            ACCOUNTS / VIEW REQUIREMENTS
+                            
+                            <br class="visible-xs"/>
+
+                            @Html.ActionLink("Approve", "ActivateAccount", "Account", new { email = ViewBag.Email }, new { @class = "btn btn-success btn-xs" })
+
+                            @Html.ActionLink("Reject - Revise", "RejectReviseAccount", "Account", new { email = ViewBag.Email }, new { @class = "btn btn-warning btn-xs" })
+
+                            @Html.ActionLink("Reject", "RejectAccount", "Account", new { email = ViewBag.Email }, new { @class = "btn btn-danger btn-xs" })
+                        </p>
+                    </div>
+                    <div class="col-md-3">
+                        <input class="form-control all-search width100" placeholder="Search ..." />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="ownorent-panel ownorent-panel-white marginTop15">
+            <div class="ownorent-panel-header" style="background-color:#71cd14; color:white;">
+
+            </div>
+
+            <div class="ownorent-panel-body ownorent-panel-table">
+                <table class="table table-condensed table-hover">
+                    <thead>
+                        <tr>
+                            <th>
+                                FILE
+                            </th>
+                            <th>
+                                DATE CREATED
+                            </th>
+                            <th></th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @{
+                            int i = 1;
+                        }
+                        @foreach (var item in Model)
+                        {
+
+                            <tr>
+                                <td>File @i</td>
+                                <td>
+                                    @item.DateCreated.ToString("MM-dd-yyyy")
+                                </td>
+                                <td style="text-align:right;">
+                                    <a class="btn btn-xs btn-info" href="@Url.Content("~/Content/Uploads/Requirements/"+item.Location)" download>Download</a>
+                                </td>
+                            </tr>
+
+                            i++;
+                        }
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script>
+        $(document).ready(function () {
+            var datatable = $("table").DataTable({
+                paging: true,
+                "pageLength": 10,
+                "dom": "<'table-window'<'table-responsive'rt>><'window-footer'<'col-md-6'i><'col-md-6'p>>",
+                "columnDefs": [
+                    { "orderable": false, "targets": 2 }
+                ]
+            });
+
+            $(".all-search").keyup(function () {
+                datatable.search($(this).val()).draw();
+            })
+        });
+    </script>
+}

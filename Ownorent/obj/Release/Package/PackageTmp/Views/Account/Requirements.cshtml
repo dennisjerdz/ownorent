@@ -1,0 +1,180 @@
+﻿@model List<Ownorent.Models.UserAttachment>
+@{
+    ViewBag.Title = "Requirements";
+    ViewBag.bgColor = "#f8fafc";
+}
+
+@*
+    @if (ViewBag.Error != null)
+    {
+        if (ViewBag.Error == "1")
+        {
+            <div class="row">
+                <div class="col-md-12">
+                    <br />
+                    <div class="ownorent-alert alert alert-danger">
+                        @Html.Raw(ViewBag.Message)
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else if (ViewBag.Message != null)
+    {
+        <div class="row">
+            <div class="col-md-12">
+                <br />
+                <div class="ownorent-alert alert alert-success">
+                    @Html.Raw(ViewBag.Message)
+                </div>
+            </div>
+        </div>
+    }
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="ownorent-panel">
+                <div class="ownorent-panel-header">
+
+                </div>
+                <div class="ownorent-panel-body">
+
+                </div>
+            </div>
+        </div>
+    </div>
+*@
+
+@if (ViewBag.Error != null)
+{
+    if (ViewBag.Error == "1")
+    {
+        <div class="row">
+            <div class="col-md-12">
+                <br />
+                <div class="ownorent-alert alert alert-danger">
+                    @Html.Raw(ViewBag.Message)
+                </div>
+            </div>
+        </div>
+    }
+}
+else if (ViewBag.Message != null)
+{
+    <div class="row">
+        <div class="col-md-12">
+            <br />
+            <div class="ownorent-alert alert alert-success">
+                @Html.Raw(ViewBag.Message)
+            </div>
+        </div>
+    </div>
+}
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="ownorent-panel ownorent-panel-white marginTop15">
+            <div class="ownorent-panel-header" style="background-color:#71cd14; color:white;">
+                Seller Requirements Verification
+            </div>
+
+            <div class="ownorent-panel-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        @using (Html.BeginForm(null, null, FormMethod.Post, new { @enctype = "multipart/form-data", @class = "form-horizontal" }))
+                        {
+                            <label class="control-label">Upload File:</label>
+                            <input name="Files" type="file" multiple class="form-control" />
+                            <br />
+                            if (ViewBag.VerificationStatus != null)
+                            {
+                                if (ViewBag.VerificationStatus == "Verified")
+                                {
+                                    <center>
+                                        <p class="text-greyed-out">User already verified.</p>
+                                    </center>
+                                    <input type="submit" class="btn btn-block btn-primary" value="Submit" disabled/>
+                                }
+                                else
+                                {
+                                    <input type="submit" class="btn btn-block btn-primary" value="Submit" />
+                                }
+                            }
+
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        @if (ViewBag.VerificationStatus != null)
+        {
+            <h5 class="marginTop15">Verification Status: <strong>@ViewBag.VerificationStatus</strong></h5>
+        }
+        
+        <div class="ownorent-panel ownorent-panel-white marginTop15">
+            <div class="ownorent-panel-header" style="background-color:#71cd14; color:white;">
+                
+            </div>
+
+            <div class="ownorent-panel-body ownorent-panel-table">
+                <table class="table table-condensed table-hover">
+                    <thead>
+                        <tr>
+                            <th>
+                                FILE
+                            </th>
+                            <th>
+                                DATE CREATED
+                            </th>
+                            <th></th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @{
+                            int i = 1;
+                        }
+                        @foreach (var item in Model)
+                        {
+
+                            <tr>
+                                <td>File @i</td>
+                                <td>
+                                    @item.DateCreated.ToString("MM-dd-yyyy")
+                                </td>
+                                <td style="text-align:right;">
+                                    <a class="btn btn-xs btn-info" href="@Url.Content("~/Content/Uploads/Requirements/"+item.Location)" download>Download</a>
+                                </td>
+                            </tr>
+
+                            i++;
+                        }
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script>
+        $(document).ready(function () {
+            var datatable = $("table").DataTable({
+                paging: true,
+                "pageLength": 10,
+                "dom": "<'table-window'<'table-responsive'rt>><'window-footer'<'col-md-6'i><'col-md-6'p>>",
+                "columnDefs": [
+                    { "orderable": false, "targets": 2 }
+                ]
+            });
+
+            $(".all-search").keyup(function () {
+                datatable.search($(this).val()).draw();
+            })
+        });
+    </script>
+}
