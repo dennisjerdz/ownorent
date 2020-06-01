@@ -58,6 +58,179 @@ namespace Ownorent.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin")]
+        public ActionResult Accounts()
+        {
+            if (TempData["Error"] != null)
+            {
+                ViewBag.Error = TempData["Error"];
+            }
+            if (TempData["Message"] != null)
+            {
+                ViewBag.Message = TempData["Message"];
+            }
+
+            var users = db.Users.ToList();
+            return View(users);
+        }
+
+        public ActionResult ViewRequirements(string email)
+        {
+            var user = db.Users.Include(u=>u.Attachments).FirstOrDefault(u => u.Email == email);
+            ViewBag.Email = user.Email;
+            return View(user.Attachments.ToList());
+        }
+
+        public ActionResult ActivateAccount(string email)
+        {
+            var user = db.Users.FirstOrDefault(u => u.Email == email);
+            if (user != null)
+            {
+                user.AccountStatus = AccountStatusConstant.APPROVED;
+            }
+            db.SaveChanges();
+
+            string body = "Your account has been activated. Please login <a href='http://ownorent.azurewebsites.net/Account/Login/'>here.</a>";
+
+            MailAddress fromAddress = new MailAddress("ownorent@gmail.com", "Ownorent Registration Service");
+            MailAddress toAddress = new MailAddress(user.Email, user.FirstName);
+            string fromPassword = "ownorent$123456";
+            string subject = "Ownorent Account Activation - " + DateTime.UtcNow.AddHours(8).ToString("MM-dd-yy");
+
+            SmtpClient smtp = new SmtpClient()
+            {
+                Host = "smtp.gmail.com",
+                Port = 587,
+                EnableSsl = true,
+                DeliveryMethod = SmtpDeliveryMethod.Network,
+                UseDefaultCredentials = false,
+                Credentials = new System.Net.NetworkCredential(fromAddress.Address, fromPassword)
+            };
+
+            MailMessage message = new MailMessage(fromAddress, toAddress)
+            {
+                Subject = subject,
+                Body = body
+            };
+            message.CC.Add(new MailAddress(user.Email));
+
+            try
+            {
+                smtp.Send(message);
+            }
+            catch (Exception e)
+            {
+                return Content(e.Message);
+            }
+
+            TempData["Message"] = "<strong>Account activation successful.</strong> "+user.Email+" has been notified.";
+            return RedirectToAction("Accounts");
+        }
+
+        public ActionResult DisableAccount(string email)
+        {
+            var user = db.Users.FirstOrDefault(u => u.Email == email);
+            if (user != null)
+            {
+                user.AccountStatus = AccountStatusConstant.DISABLED;
+            }
+            db.SaveChanges();
+            TempData["Message"] = "<strong>Account modification (Disabled) successful.</strong> " + user.Email + " has been <strong>Disabled</strong>.";
+            return RedirectToAction("Accounts");
+        }
+
+        public ActionResult RejectReviseAccount(string email)
+        {
+            var user = db.Users.FirstOrDefault(u => u.Email == email);
+            if (user != null)
+            {
+                user.AccountStatus = AccountStatusConstant.REJECTED_RESUBMIT_REQUIREMENTS;
+            }
+            db.SaveChanges();
+
+            string body = "Your account has been rejected. An admin will contact you for additional requirements. Please see your request by logging in <a href='http://ownorent.azurewebsites.net/Account/Login/'>here.</a>";
+
+            MailAddress fromAddress = new MailAddress("ownorent@gmail.com", "Ownorent Registration Service");
+            MailAddress toAddress = new MailAddress(user.Email, user.FirstName);
+            string fromPassword = "ownorent$123456";
+            string subject = "Ownorent Requirements Revision - " + DateTime.UtcNow.AddHours(8).ToString("MM-dd-yy");
+
+            SmtpClient smtp = new SmtpClient()
+            {
+                Host = "smtp.gmail.com",
+                Port = 587,
+                EnableSsl = true,
+                DeliveryMethod = SmtpDeliveryMethod.Network,
+                UseDefaultCredentials = false,
+                Credentials = new System.Net.NetworkCredential(fromAddress.Address, fromPassword)
+            };
+
+            MailMessage message = new MailMessage(fromAddress, toAddress)
+            {
+                Subject = subject,
+                Body = body
+            };
+            message.CC.Add(new MailAddress(user.Email));
+
+            try
+            {
+                smtp.Send(message);
+            }
+            catch (Exception e)
+            {
+                return Content(e.Message);
+            }
+
+            TempData["Message"] = "<strong>Account modified (Rejected - Resubmit Requirements) successful.</strong> " + user.Email + " has been notified.";
+            return RedirectToAction("Accounts");
+        }
+
+        public ActionResult RejectAccount(string email)
+        {
+            var user = db.Users.FirstOrDefault(u => u.Email == email);
+            if (user != null)
+            {
+                user.AccountStatus = AccountStatusConstant.REJECTED;
+            }
+            db.SaveChanges();
+
+            string body = "Your account registration request has been rejected.</a>";
+
+            MailAddress fromAddress = new MailAddress("ownorent@gmail.com", "Ownorent Registration Service");
+            MailAddress toAddress = new MailAddress(user.Email, user.FirstName);
+            string fromPassword = "ownorent$123456";
+            string subject = "Ownorent Account Rejected - " + DateTime.UtcNow.AddHours(8).ToString("MM-dd-yy");
+
+            SmtpClient smtp = new SmtpClient()
+            {
+                Host = "smtp.gmail.com",
+                Port = 587,
+                EnableSsl = true,
+                DeliveryMethod = SmtpDeliveryMethod.Network,
+                UseDefaultCredentials = false,
+                Credentials = new System.Net.NetworkCredential(fromAddress.Address, fromPassword)
+            };
+
+            MailMessage message = new MailMessage(fromAddress, toAddress)
+            {
+                Subject = subject,
+                Body = body
+            };
+            message.CC.Add(new MailAddress(user.Email));
+
+            try
+            {
+                smtp.Send(message);
+            }
+            catch (Exception e)
+            {
+                return Content(e.Message);
+            }
+
+            TempData["Message"] = "<strong>Account modification (Rejected) successful.</strong> " + user.Email + " has been notified.";
+            return RedirectToAction("Accounts");
+        }
+
         //
         // GET: /Account/Login
         [AllowAnonymous]

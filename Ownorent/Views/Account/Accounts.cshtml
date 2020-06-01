@@ -1,0 +1,170 @@
+﻿@model List<Ownorent.Models.ApplicationUser>
+@using Ownorent.Models
+@{
+    ViewBag.Title = "Accounts";
+    ViewBag.bgColor = "#f8fafc";
+}
+
+@if (ViewBag.Error != null)
+{
+    if (ViewBag.Error == "1")
+    {
+        <div class="row">
+            <div class="col-md-12">
+                <br />
+                <div class="ownorent-alert alert alert-danger">
+                    @Html.Raw(ViewBag.Message)
+                </div>
+            </div>
+        </div>
+    }
+}
+else if (ViewBag.Message != null)
+{
+    <div class="row">
+        <div class="col-md-12">
+            <br />
+            <div class="ownorent-alert alert alert-success">
+                @Html.Raw(ViewBag.Message)
+            </div>
+        </div>
+    </div>
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="ownorent-panel ownorent-panel-white marginTop15">
+            <div class="ownorent-panel-header" style="background-color:#71cd14; color:white;">
+
+            </div>
+
+            <div class="ownorent-panel-body ownorent-panel-tools">
+                <div class="row">
+                    <div class="col-md-4">
+                        <p>ACCOUNTS</p>
+                    </div>
+                    <div class="col-md-3 col-md-offset-5">
+                        <input class="form-control all-search width100" placeholder="Search ..."/>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="ownorent-panel ownorent-panel-white marginTop10">
+            <div class="ownorent-panel-header" style="background-color:#71cd14; color:white;">
+
+            </div>
+
+            <div class="ownorent-panel-body ownorent-panel-table">
+                <table class="table table-condensed table-hover">
+                    <thead>
+                        <tr>
+                            <th>
+                                NAME
+                            </th>
+                            <th>
+                                EMAIL
+                            </th>
+                            <th>
+                                TYPE
+                            </th>
+                            <th>
+                                STATUS
+                            </th>
+                            <th></th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    @item.FirstName
+
+                                    @if (item.MiddleName != null)
+                                    {
+                                        @item.MiddleName.FirstOrDefault()
+                                        <text>.</text>
+                                    }
+                                    
+                                    @item.LastName</td>
+                                <td>
+                                    @item.Email
+                                </td>
+                                <td>
+                                    @switch (item.AccountType)
+                                    {
+                                        case AccountTypeConstant.ADMIN:
+                                            <span>Admin</span>
+                                            break;
+                                        case AccountTypeConstant.SELLER:
+                                            <span>Seller</span>
+                                            break;
+                                        case AccountTypeConstant.CUSTOMER:
+                                            <span>Customer</span>
+                                            break;
+                                    }
+                                </td>
+                                <td>
+                                    @switch (item.AccountStatus)
+                                    {
+                                        case AccountStatusConstant.APPROVED:
+                                            <span>Active</span>
+                                            break;
+                                        case AccountStatusConstant.DISABLED:
+                                            <span>Disabled</span>
+                                            break;
+                                        case AccountStatusConstant.PENDING_REQUIREMENTS:
+                                            <span>Pending Requirements</span>
+                                            break;
+                                        case AccountStatusConstant.PENDING_REVIEW:
+                                            <span>For Review</span>
+                                            break;
+                                        case AccountStatusConstant.REJECTED_RESUBMIT_REQUIREMENTS:
+                                            <span>Rejected - Resubmit Requirements</span>
+                                            break;
+                                        case AccountStatusConstant.REJECTED:
+                                            <span>Rejected</span>
+                                            break;
+                                    }
+                                </td>
+                                <td style="text-align:right;">
+                                    <a class="btn btn-xs btn-info" href="@Url.Action("ViewRequirements", new { email = item.Email })">Requirements</a>
+                                    @if (item.AccountStatus == AccountStatusConstant.APPROVED)
+                                    {
+                                        <a class="btn btn-xs btn-danger" href="@Url.Action("DisableAccount", new { email = item.Email })">Disable</a>
+                                    }
+                                    else if (item.AccountStatus == AccountStatusConstant.DISABLED)
+                                    {
+                                        <a class="btn btn-xs btn-success" href="@Url.Action("ActivateAccount", new { email = item.Email })">Activate</a>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script>
+        $(document).ready(function () {
+            var datatable = $("table").DataTable({
+                paging: true,
+                "pageLength": 10,
+                "dom": "<'table-window'<'table-responsive'rt>><'window-footer'<'col-md-6'i><'col-md-6'p>>",
+                "columnDefs": [
+                    { "orderable": false, "targets": 4 }
+                ]
+            });
+
+            $(".all-search").keyup(function () {
+                datatable.search($(this).val()).draw();
+            })
+        });
+    </script>
+}

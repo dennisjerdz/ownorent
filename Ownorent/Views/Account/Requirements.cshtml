@@ -86,7 +86,21 @@ else if (ViewBag.Message != null)
                             <label class="control-label">Upload File:</label>
                             <input name="Files" type="file" multiple class="form-control" />
                             <br />
-                            <input type="submit" class="btn btn-block btn-primary" value="Submit" />
+                            if (ViewBag.VerificationStatus != null)
+                            {
+                                if (ViewBag.VerificationStatus == "Verified")
+                                {
+                                    <center>
+                                        <p class="text-greyed-out">User already verified.</p>
+                                    </center>
+                                    <input type="submit" class="btn btn-block btn-primary" value="Submit" disabled/>
+                                }
+                                else
+                                {
+                                    <input type="submit" class="btn btn-block btn-primary" value="Submit" />
+                                }
+                            }
+
                         }
                     </div>
                 </div>
@@ -95,8 +109,11 @@ else if (ViewBag.Message != null)
     </div>
 
     <div class="col-md-8">
-        <h4>Verification Status: </h4>
-
+        @if (ViewBag.VerificationStatus != null)
+        {
+            <h5 class="marginTop15">Verification Status: <strong>@ViewBag.VerificationStatus</strong></h5>
+        }
+        
         <div class="ownorent-panel ownorent-panel-white marginTop15">
             <div class="ownorent-panel-header" style="background-color:#71cd14; color:white;">
                 

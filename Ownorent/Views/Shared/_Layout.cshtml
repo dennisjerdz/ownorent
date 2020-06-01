@@ -3,7 +3,7 @@
     <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>@ViewBag.Title - My ASP.NET Application</title>
+        <title>@ViewBag.Title - Ownorent</title>
     
         <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300&family=Roboto&display=swap" rel="stylesheet">
 
@@ -39,9 +39,14 @@
                 <div class="navbar-collapse collapse">
                     <ul class="nav navbar-nav">
                         <li>@Html.ActionLink("HOME", "Index", "Home")</li>
+                        @if (!User.Identity.IsAuthenticated)
+                        {
+                            <li>@Html.ActionLink("PRODUCTS", "Index", "Home")</li>
+                            <li>@Html.ActionLink("CONTACT", "Contact", "Home")</li>
+                        }
                         @if (User.IsInRole("Admin"))
                         {
-
+                            <li>@Html.ActionLink("ACCOUNTS", "Accounts", "Account")</li>
                         }
                         @if (User.IsInRole("Seller"))
                         {
@@ -54,6 +59,7 @@
                             <li>@Html.ActionLink("CONTACT", "Contact", "Home")</li>
                         }
                     </ul>
+
                 </div>
             </div>
         </div>
