@@ -201,6 +201,7 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="OwnorentHelper.cs" />
     <Compile Include="Migrations\202005290332179_initial.cs" />
     <Compile Include="Migrations\202005290332179_initial.Designer.cs">
       <DependentUpon>202005290332179_initial.cs</DependentUpon>
@@ -221,6 +222,14 @@
   <ItemGroup>
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
+    <Content Include="Content\DataTables-1.10.18\images\favicon.ico" />
+    <Content Include="Content\DataTables-1.10.18\images\sort_asc.png" />
+    <Content Include="Content\DataTables-1.10.18\images\sort_asc_disabled.png" />
+    <Content Include="Content\DataTables-1.10.18\images\sort_both.png" />
+    <Content Include="Content\DataTables-1.10.18\images\sort_desc.png" />
+    <Content Include="Content\DataTables-1.10.18\images\sort_desc_disabled.png" />
+    <Content Include="Content\datatables.min.css" />
+    <Content Include="Content\datatables.min.js" />
     <Content Include="Content\Icons\backup.txt" />
     <Content Include="Content\Icons\font\flaticon.css" />
     <Content Include="Content\Icons\font\flaticon.html" />
@@ -243,6 +252,7 @@
     <Content Include="Content\Icons\font\Flaticon.woff" />
     <Content Include="Content\Icons\font\Flaticon.woff2" />
     <Content Include="Content\Icons\font\_flaticon.scss" />
+    <Content Include="Content\DataTables-1.10.18\images\Sorting icons.psd" />
     <None Include="Properties\PublishProfiles\ownorent - FTP.pubxml" />
     <None Include="Properties\PublishProfiles\ownorent - ReadOnly - FTP.pubxml" />
     <None Include="Properties\PublishProfiles\ownorent - Web Deploy.pubxml" />
@@ -294,9 +304,11 @@
     <Content Include="Views\Manage\VerifyPhoneNumber.cshtml" />
     <Content Include="Views\Shared\Lockout.cshtml" />
     <Content Include="Views\Shared\_LoginPartial.cshtml" />
+    <Content Include="Views\Account\Requirements.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Content\Uploads\Requirements\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />

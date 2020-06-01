@@ -67,6 +67,7 @@ namespace Ownorent.Models
         [Required]
         [Display(Name="First Name")]
         public string FirstName { get; set; }
+        [Display(Name = "Middle Name")]
         public string MiddleName { get; set; }
         [Required]
         [Display(Name = "Last Name")]
@@ -94,6 +95,7 @@ namespace Ownorent.Models
         [Required]
         public string Country { get; set; }
 
+        [Display(Name = "Account Type")]
         public int AccountType { get; set; }
 
         [Required]

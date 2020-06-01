@@ -2,6 +2,18 @@
     ViewBag.Title = "Home Page";
 }
 
+@if (ViewBag.Message != null)
+{
+    <div class="row">
+        <div class="col-md-12">
+            <br />
+            <div class="ownorent-alert alert alert-success">
+                @Html.Raw(ViewBag.Message)
+            </div>
+        </div>
+    </div>
+}
+
 <div class="main-banner jumbotron" style="background:url(https://images.unsplash.com/photo-1521791136064-7986c2920216?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1050&q=60);">
     <h4>JOIN OUR ONLINE SELLING PLATFORM</h4>
     <h1>

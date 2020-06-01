@@ -19,6 +19,7 @@ namespace Ownorent.Models
         public const int REJECTED_NOT_ACCEPTING_NEW = 3;
         public const int APPROVED = 4;
         public const int DISABLED = 5;
+        public const int REJECTED = 6;
     }
 
     public class NoteTypeConstant {

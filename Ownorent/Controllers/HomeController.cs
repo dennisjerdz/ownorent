@@ -15,6 +15,11 @@ namespace Ownorent.Controllers
         {
             var settings = db.Settings.ToList();
 
+            if (TempData["Message"] != null)
+            {
+                ViewBag.Message = TempData["Message"];
+            }
+
             return View();
         }
 

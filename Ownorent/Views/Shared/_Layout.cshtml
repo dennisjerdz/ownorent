@@ -1,67 +1,78 @@
 ﻿<!DOCTYPE html>
 <html>
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@ViewBag.Title - My ASP.NET Application</title>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>@ViewBag.Title - My ASP.NET Application</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300&family=Roboto&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300&family=Roboto&display=swap" rel="stylesheet">
 
-    @Styles.Render("~/Content/css")
-    @Scripts.Render("~/bundles/modernizr")
+        @Styles.Render("~/Content/css")
+        @Scripts.Render("~/bundles/modernizr")
 
-    <link rel="stylesheet" href="@Url.Content("~/Content/Icons/font/flaticon.css")" />
-</head>
-@{
-    string bgColor = ViewBag.bgColor ?? "white";
-}
-<body style="background-color:@bgColor;">
-    <div class="navbar navbar-default">
-        <div class="navbar-overhead">
+        <link href="~/Content/datatables.min.css" rel="stylesheet" />
+        <link rel="stylesheet" href="@Url.Content("~/Content/Icons/font/flaticon.css")" />
+    </head>
+    @{
+        string bgColor = ViewBag.bgColor ?? "white";
+    }
+    <body style="background-color:@bgColor;">
+        <div class="navbar navbar-default">
+            <div class="navbar-overhead">
+                <div class="container">
+                    <div class="overhead-content">PHONE: (02) 8891 0827 &emsp;|&emsp; EMAIL: oadmin@mailinator.com</div>
+
+                    @Html.Partial("_LoginPartial")
+                </div>
+            </div>
             <div class="container">
-                <div class="overhead-content">PHONE: (02) 8891 0827 &emsp;|&emsp; EMAIL: oadmin@mailinator.com</div>
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a href="@Url.Action("Index", "Home", new { })" class="navbar-brand">
+                        <img class="navbar-logo" src="~/Content/Images/logo.png"/>
+                    </a>
+                </div>
+                <div class="navbar-collapse collapse">
+                    <ul class="nav navbar-nav">
+                        <li>@Html.ActionLink("HOME", "Index", "Home")</li>
+                        @if (User.IsInRole("Admin"))
+                        {
 
-                @Html.Partial("_LoginPartial")
+                        }
+                        @if (User.IsInRole("Seller"))
+                        {
+                            <li>@Html.ActionLink("PRODUCTS", "Index", "Products")</li>
+                            <li>@Html.ActionLink("REQUIREMENTS", "Requirements", "Account")</li>
+                        }
+                        @if (User.IsInRole("Customer"))
+                        {
+                            <li>@Html.ActionLink("PRODUCTS", "About", "Home")</li>
+                            <li>@Html.ActionLink("CONTACT", "Contact", "Home")</li>
+                        }
+                    </ul>
+                </div>
             </div>
         </div>
-        <div class="container">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                <a href="@Url.Action("Index", "Home", new { })" class="navbar-brand">
-                    <img class="navbar-logo" src="~/Content/Images/logo.png"/>
-                </a>
-            </div>
-            <div class="navbar-collapse collapse">
-                <ul class="nav navbar-nav">
-                    <li>@Html.ActionLink("HOME", "Index", "Home")</li>
-                    <li>@Html.ActionLink("PRODUCTS", "About", "Home")</li>
-                    <li>@Html.ActionLink("CONTACT", "Contact", "Home")</li>
-                    <li>@Html.ActionLink("TEST1", "Index", "Home")</li>
-                    <li>@Html.ActionLink("TEST2", "About", "Home")</li>
-                    <li>@Html.ActionLink("TEST3", "Contact", "Home")</li>
-                </ul>
-            </div>
+        <div class="container body-content">
+            @RenderBody()
+            <hr />
+            <footer>
+                <div class="col-md-6 left">
+                    <p>&copy; @DateTime.Now.Year - OwnOrent</p>
+                </div>
+                <div class="col-md-6 right">
+                    <p>Icons made by <a href="https://www.flaticon.com/authors/good-ware" title="Good Ware">Good Ware</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></p>
+                </div>
+            </footer>
         </div>
-    </div>
-    <div class="container body-content">
-        @RenderBody()
-        <hr />
-        <footer>
-            <div class="col-md-6 left">
-                <p>&copy; @DateTime.Now.Year - OwnOrent</p>
-            </div>
-            <div class="col-md-6 right">
-                <p>Icons made by <a href="https://www.flaticon.com/authors/good-ware" title="Good Ware">Good Ware</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></p>
-            </div>
-        </footer>
-    </div>
 
-    @Scripts.Render("~/bundles/jquery")
-    @Scripts.Render("~/bundles/bootstrap")
-    @RenderSection("scripts", required: false)
-</body>
+        @Scripts.Render("~/bundles/jquery")
+        @Scripts.Render("~/bundles/bootstrap")
+        <script src="~/Content/datatables.min.js"></script>
+        @RenderSection("scripts", required: false)
+    </body>
 </html>

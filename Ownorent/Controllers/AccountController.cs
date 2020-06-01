@@ -10,6 +10,9 @@ using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using Ownorent.Models;
 using System.Net.Mail;
+using System.Collections.Generic;
+using System.IO;
+using System.Data.Entity;
 
 namespace Ownorent.Controllers
 {
@@ -61,7 +64,109 @@ namespace Ownorent.Controllers
         public ActionResult Login(string returnUrl)
         {
             ViewBag.ReturnUrl = returnUrl;
+
+            if (TempData["Message"] != null)
+            {
+                ViewBag.Message = TempData["Message"];
+            }
+
             return View();
+        }
+        
+        public ActionResult Requirements()
+        {
+            if (TempData["Error"] != null)
+            {
+                ViewBag.Error = TempData["Error"];
+            }
+            if (TempData["Message"] != null)
+            {
+                ViewBag.Message = TempData["Message"];
+            }
+
+            string username = User.Identity.Name;
+            var user = db.Users.Include(u => u.Attachments).FirstOrDefault(u => u.Email == username);
+            var files = user.Attachments.ToList();
+
+            if (user.AccountStatus == AccountStatusConstant.PENDING_REQUIREMENTS || user.AccountStatus == AccountStatusConstant.PENDING_REVIEW)
+            {
+                ViewBag.VerificationStatus = "Pending Verification";
+            }else if (user.AccountStatus == AccountStatusConstant.REJECTED_RESUBMIT_REQUIREMENTS)
+            {
+                ViewBag.VerificationStatus = "Please resubmit requirements based on email sent to you";
+            }else if (user.AccountStatus == AccountStatusConstant.REJECTED_NOT_ACCEPTING_NEW || user.AccountStatus == AccountStatusConstant.REJECTED)
+            {
+                ViewBag.VerificationStatus = "Rejected";
+            }else if (user.AccountStatus == AccountStatusConstant.APPROVED)
+            {
+                ViewBag.VerificationStatus = "Verified";
+            }
+
+            return View(files);
+        }
+
+        [HttpPost]
+        public ActionResult Requirements(List<HttpPostedFileBase> files)
+        {
+            string username = User.Identity.Name;
+
+            if (ModelState.IsValid)
+            {
+                if (files.Count > 10)
+                {
+                    TempData["Error"] = "1";
+                    TempData["Message"] = "<strong>Failed to save files</strong>, the number of files should not exceed 10.";
+                    return RedirectToAction("Requirements");
+                }
+
+                foreach (var file in files)
+                {
+                    if (file != null && file.ContentLength > 0)
+                    {
+                        if (file.ContentLength > 5000000)
+                        {
+                            TempData["Error"] = "1";
+                            TempData["Message"] = "<strong>Failed to save files</strong>, one file is more than 5MB.";
+                            return RedirectToAction("Requirements");
+                        }
+                    }
+                }
+
+                foreach (var file in files)
+                {
+                    if (file != null && file.ContentLength > 0)
+                    {
+                        if(file.ContentLength <= 5000000)
+                        {
+                            // extract only the filename
+                            string fileName = Path.GetFileName(file.FileName);
+                            string fileExt = Path.GetExtension(file.FileName);
+                            string newName = OwnorentHelper.RandomString(24)+fileExt;
+                            string path = Path.Combine(Server.MapPath("~/Content/Uploads/Requirements/"), newName);
+
+                            try
+                            {
+                                file.SaveAs(path);
+                            }
+                            catch (Exception ex)
+                            {
+                                TempData["Error"] = "1";
+                                TempData["Message"] = "<strong>Failed to save files</strong>, error: " + ex.Message;
+                                return RedirectToAction("Requirements");
+                            }
+
+                            db.UserAttachments.Add(new UserAttachment()
+                            {
+                                Location = newName,
+                                UserId = User.Identity.GetUserId()
+                            });
+                        }
+                    }
+                }
+            }
+
+            db.SaveChanges();
+            return RedirectToAction("Requirements");
         }
 
         //
@@ -82,6 +187,25 @@ namespace Ownorent.Controllers
             switch (result)
             {
                 case SignInStatus.Success:
+                    var user = db.Users.FirstOrDefault(u => u.UserName == model.Email);
+
+                    if (user!=null)
+                    {
+                        if (user.AccountType == AccountTypeConstant.SELLER)
+                        {
+                            if (user.AccountStatus == AccountStatusConstant.PENDING_REQUIREMENTS || user.AccountStatus == AccountStatusConstant.PENDING_REVIEW)
+                            {
+                                return RedirectToAction("Requirements");
+                            }
+                        }
+
+                        if (user.AccountStatus == AccountStatusConstant.DISABLED || user.EmailConfirmed == false)
+                        {
+                            ViewBag.Error = "1";
+                            ViewBag.Message = "The account you're trying to access either not Verified or has been disabled by the Admin.";
+                            return View(model);
+                        }
+                    }
                     return RedirectToLocal(returnUrl);
                 case SignInStatus.LockedOut:
                     return View("Lockout");
@@ -144,6 +268,12 @@ namespace Ownorent.Controllers
         {
             RegisterViewModel rvm = new RegisterViewModel();
             rvm.Country = "Philippines";
+
+            if (TempData["Message"] != null)
+            {
+                ViewBag.Message = TempData["Message"];
+            }
+
             return View(rvm);
         }
 
@@ -163,24 +293,26 @@ namespace Ownorent.Controllers
                     MobileNumber = model.MobileNumber,
                     UserName = model.Email,
                     Email = model.Email,
-                    EmailConfirmed = false
+                    EmailConfirmed = false,
+                    AccountType = model.AccountType,
+                    AccountStatus = AccountStatusConstant.DISABLED
                 };
 
                 var result = await UserManager.CreateAsync(user, model.Password);
 
                 if (result.Succeeded)
                 {
-                    await SignInManager.SignInAsync(user, isPersistent:false, rememberBrowser:false);
+                    // await SignInManager.SignInAsync(user, isPersistent:false, rememberBrowser:false);
 
                     // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=320771
                     // Send an email with this link
                     // string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
 
-                    string emailCode = new Guid().ToString();
-                    var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = emailCode }, protocol: Request.Url.Scheme);
+                    string emailCode = Guid.NewGuid().ToString();
+                    var callbackUrl = Url.Action("ConfirmEmail", "Account", new { code = emailCode }, protocol: Request.Url.Scheme);
                     string body = "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>";
 
-                    MailAddress fromAddress = new MailAddress("Ownorent Registration Service", "ownorent@gmail.com");
+                    MailAddress fromAddress = new MailAddress("ownorent@gmail.com", "Ownorent Registration Service");
                     MailAddress toAddress = new MailAddress(model.Email, model.FirstName);
                     string fromPassword = "ownorent$123456";
                     string subject = "Ownorent Account Confirmation - " + DateTime.UtcNow.AddHours(8).ToString("MM-dd-yy");
@@ -212,10 +344,23 @@ namespace Ownorent.Controllers
 
                     var findUser = db.Users.FirstOrDefault(u => u.Email == model.Email);
                     findUser.ConfirmationCode = emailCode;
+
+                    db.Addresses.Add(new Address
+                    {
+                        Line1 = model.Line1,
+                        Line2 = model.Line2,
+                        Line3 = model.Line3,
+                        City = model.City,
+                        Zip = model.Zip,
+                        Country = model.Country,
+                        UserId = findUser.Id,
+                        IsDefault = true
+                    });
+
                     await db.SaveChangesAsync();
                     
-                    ViewBag.Message = "<strong>Registration Success!</strong> To proceed, please click the confirmation link sent to "+model.Email+".";
-                    return RedirectToAction("Register", "Account");
+                    TempData["Message"] = "<strong>Registration Success!</strong> To proceed, please click the confirmation link sent to <strong>"+model.Email+"</strong>.";
+                    return RedirectToAction("Index", "Home");
                 }
                 AddErrors(result);
             }
@@ -227,14 +372,40 @@ namespace Ownorent.Controllers
         //
         // GET: /Account/ConfirmEmail
         [AllowAnonymous]
-        public async Task<ActionResult> ConfirmEmail(string userId, string code)
+        public async Task<ActionResult> ConfirmEmail(string code)
         {
-            if (userId == null || code == null)
+            if (code == null)
             {
                 return View("Error");
             }
-            var result = await UserManager.ConfirmEmailAsync(userId, code);
-            return View(result.Succeeded ? "ConfirmEmail" : "Error");
+
+            var user = db.Users.FirstOrDefault(u => u.ConfirmationCode == code);
+
+            if (user == null)
+            {
+                return Content("Error: Invalid code.");
+            }else
+            {
+                user.EmailConfirmed = true;
+                user.AccountStatus = (user.AccountType == AccountTypeConstant.CUSTOMER) ? AccountStatusConstant.APPROVED : AccountStatusConstant.PENDING_REQUIREMENTS;
+            }
+
+            await db.SaveChangesAsync();
+
+            if (user.AccountType == AccountTypeConstant.CUSTOMER)
+            {
+                UserManager.AddToRole(user.Id, "Customer");
+            }
+            else if (user.AccountType == AccountTypeConstant.SELLER)
+            {
+                UserManager.AddToRole(user.Id, "Seller");
+            }
+
+            TempData["Message"] = (user.AccountType == AccountTypeConstant.CUSTOMER)
+                ? "<strong>Verification successful!</strong> Please login."
+                : "<strong>Verification successful!</strong> Please login to proceed with Requirements submission.";
+
+            return RedirectToAction("Login","Account");
         }
 
         //
