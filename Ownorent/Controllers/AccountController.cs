@@ -315,7 +315,15 @@ namespace Ownorent.Controllers
                             string fileName = Path.GetFileName(file.FileName);
                             string fileExt = Path.GetExtension(file.FileName);
                             string newName = OwnorentHelper.RandomString(24)+fileExt;
-                            string path = Path.Combine(Server.MapPath("~/Content/Uploads/Requirements/"), newName);
+
+                            string targetPath = Server.MapPath("~/Content/Uploads/Requirements/");
+
+                            if (!System.IO.Directory.Exists(targetPath))
+                            {
+                                System.IO.Directory.CreateDirectory(targetPath);
+                            }
+
+                            string path = Path.Combine(targetPath, newName);
 
                             try
                             {
