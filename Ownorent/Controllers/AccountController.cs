@@ -181,7 +181,7 @@ namespace Ownorent.Controllers
                 return Content(e.Message);
             }
 
-            TempData["Message"] = "<strong>Account modified (Rejected - Resubmit Requirements) successful.</strong> " + user.Email + " has been notified.";
+            TempData["Message"] = "<strong>Account modification (Rejected - Resubmit Requirements) successful.</strong> " + user.Email + " has been notified.";
             return RedirectToAction("Accounts");
         }
 
@@ -440,6 +440,69 @@ namespace Ownorent.Controllers
                     ModelState.AddModelError("", "Invalid code.");
                     return View(model);
             }
+        }
+
+        [Authorize(Roles="Admin")]
+        public ActionResult AddAccount()
+        {
+            RegisterViewModel rvm = new RegisterViewModel();
+            rvm.Country = "Philippines";
+
+            if (TempData["Message"] != null)
+            {
+                ViewBag.Message = TempData["Message"];
+            }
+
+            return View(rvm);
+        }
+
+        [Authorize(Roles="Admin")]
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> AddAccount(RegisterViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = new ApplicationUser
+                {
+                    FirstName = model.FirstName,
+                    MiddleName = model.MiddleName,
+                    LastName = model.LastName,
+                    MobileNumber = model.MobileNumber,
+                    UserName = model.Email,
+                    Email = model.Email,
+                    EmailConfirmed = true,
+                    AccountType = model.AccountType,
+                    AccountStatus = AccountStatusConstant.APPROVED
+                };
+
+                var result = await UserManager.CreateAsync(user, model.Password);
+
+                if (result.Succeeded)
+                {
+                    db.Addresses.Add(new Address
+                    {
+                        Line1 = model.Line1,
+                        Line2 = model.Line2,
+                        Line3 = model.Line3,
+                        City = model.City,
+                        Zip = model.Zip,
+                        Country = model.Country,
+                        UserId = user.Id,
+                        IsDefault = true
+                    });
+
+                    await db.SaveChangesAsync();
+
+                    TempData["Message"] = "<strong>Account creation successful.</strong> Account has also been activated.";
+                    return RedirectToAction("Accounts", "Account");
+                }
+                AddErrors(result);
+            }
+
+            // If we got this far, something failed, redisplay form
+            return View(model);
         }
 
         //

@@ -1,0 +1,135 @@
+﻿@model Ownorent.Models.RegisterViewModel
+@using Ownorent.Models
+@{
+    ViewBag.Title = "Add Account";
+    ViewBag.bgColor = "#f8fafc";
+}
+
+@if (ViewBag.Message != null)
+{
+    <div class="row">
+        <div class="col-md-12">
+            <br />
+            <div class="ownorent-alert alert alert-success">
+                @Html.Raw(ViewBag.Message)
+            </div>
+        </div>
+    </div>
+}
+
+<div class="row">
+    <div class="col-md-offset-4 col-md-4">
+        <div class="account-card">
+            
+            <div class="account-header">
+                Ownorent Account Creation
+            </div>
+
+            <center>
+                <img src="~/Content/Images/logo.png" style="width:300px; transform:translate(0px)" />
+            </center>
+
+            @using (Html.BeginForm("AddAccount", "Account", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+            {
+                @Html.AntiForgeryToken()
+                @Html.ValidationSummary("", new { @class = "text-danger" })
+
+                <div class="form-group">
+                    <div class="col-md-12">
+                        @Html.LabelFor(m => m.AccountType, new { @class = "control-label" })
+                        @Html.DropDownListFor(
+                            m => m.AccountType,
+                            new List<SelectListItem>() {
+                                new SelectListItem { Text = "Admin", Value = AccountTypeConstant.ADMIN.ToString() },
+                                new SelectListItem { Text = "Customer", Value = AccountTypeConstant.CUSTOMER.ToString() },
+                                new SelectListItem { Text = "Seller", Value = AccountTypeConstant.SELLER.ToString() }
+                                
+                            },
+                            new { @class = "form-control" }
+                        )
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-12">
+                        @Html.LabelFor(m => m.FirstName, new { @class = "control-label" })
+                        @Html.TextBoxFor(m => m.FirstName, new { @class = "form-control" })
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-12">
+                        @Html.LabelFor(m => m.MiddleName, new { @class = "control-label" })
+                        @Html.TextBoxFor(m => m.MiddleName, new { @class = "form-control" })
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-12">
+                        @Html.LabelFor(m => m.LastName, new { @class = "control-label" })
+                        @Html.TextBoxFor(m => m.LastName, new { @class = "form-control" })
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-6">
+                        @Html.LabelFor(m => m.Line1, new { @class = "control-label" })
+                        @Html.TextBoxFor(m => m.Line1, new { @class = "form-control" })
+                    </div>
+                    <div class="col-md-6">
+                        @Html.LabelFor(m => m.Line2, new { @class = "control-label" })
+                        @Html.TextBoxFor(m => m.Line2, new { @class = "form-control" })
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-6">
+                        @Html.LabelFor(m => m.Line3, new { @class = "control-label" })
+                        @Html.TextBoxFor(m => m.Line3, new { @class = "form-control" })
+                    </div>
+                    <div class="col-md-6">
+                        @Html.LabelFor(m => m.City, new { @class = "control-label" })
+                        @Html.TextBoxFor(m => m.City, new { @class = "form-control" })
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-6">
+                        @Html.LabelFor(m => m.Zip, new { @class = "control-label" })
+                        @Html.TextBoxFor(m => m.Zip, new { @class = "form-control", @type="number", @step="1" })
+                    </div>
+                    <div class="col-md-6">
+                        @Html.LabelFor(m => m.Country, new { @class = "control-label" })
+                        @Html.TextBoxFor(m => m.Country, new { @class = "form-control", @readonly="true" })
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-12">
+                        @Html.LabelFor(m => m.Email, new { @class = "control-label", @type="email" })
+                        @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-12">
+                        @Html.LabelFor(m => m.Password, new { @class = "control-label" })
+                        @Html.PasswordFor(m => m.Password, new { @class = "form-control" })
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-12">
+                        @Html.LabelFor(m => m.ConfirmPassword, new { @class = "control-label" })
+                        @Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control" })
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <br />
+                        <input type="submit" class="btn btn-info btn-block" value="Add Account" />
+                        <br />
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

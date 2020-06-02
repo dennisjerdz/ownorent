@@ -41,7 +41,11 @@ else if (ViewBag.Message != null)
             <div class="ownorent-panel-body ownorent-panel-tools">
                 <div class="row">
                     <div class="col-md-4">
-                        <p>ACCOUNTS</p>
+                        <p>
+                            ACCOUNTS
+
+                            @Html.ActionLink("Add Account","AddAccount","Account",new { },new { @class="btn btn-xs btn-info" })
+                        </p>
                     </div>
                     <div class="col-md-3 col-md-offset-5">
                         <input class="form-control all-search width100" placeholder="Search ..."/>
