@@ -198,8 +198,13 @@
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
+    <Compile Include="Controllers\ProductsController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202006051023525_Product template labels.cs" />
+    <Compile Include="Migrations\202006051023525_Product template labels.Designer.cs">
+      <DependentUpon>202006051023525_Product template labels.cs</DependentUpon>
     </Compile>
     <Compile Include="OwnorentHelper.cs" />
     <Compile Include="Migrations\202005290332179_initial.cs" />
@@ -308,6 +313,11 @@
     <Content Include="Views\Account\Accounts.cshtml" />
     <Content Include="Views\Account\ViewRequirements.cshtml" />
     <Content Include="Views\Account\AddAccount.cshtml" />
+    <Content Include="Views\Products\Create.cshtml" />
+    <Content Include="Views\Products\Delete.cshtml" />
+    <Content Include="Views\Products\Details.cshtml" />
+    <Content Include="Views\Products\Edit.cshtml" />
+    <Content Include="Views\Products\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -327,6 +337,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202005312230501_Add Email Confirmation code to User.resx">
       <DependentUpon>202005312230501_Add Email Confirmation code to User.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202006051023525_Product template labels.resx">
+      <DependentUpon>202006051023525_Product template labels.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

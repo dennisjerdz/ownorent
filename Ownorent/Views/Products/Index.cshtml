@@ -1,0 +1,169 @@
+﻿@model IEnumerable<Ownorent.Models.ProductTemplate>
+@using Ownorent.Models
+@{
+    ViewBag.Title = "Products";
+    ViewBag.bgColor = "#f8fafc";
+}
+
+@if (ViewBag.Error != null)
+{
+    if (ViewBag.Error == "1")
+    {
+        <div class="row">
+            <div class="col-md-12">
+                <br />
+                <div class="ownorent-alert alert alert-danger">
+                    @Html.Raw(ViewBag.Message)
+                </div>
+            </div>
+        </div>
+    }
+}
+else if (ViewBag.Message != null)
+{
+    <div class="row">
+        <div class="col-md-12">
+            <br />
+            <div class="ownorent-alert alert alert-success">
+                @Html.Raw(ViewBag.Message)
+            </div>
+        </div>
+    </div>
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="ownorent-panel ownorent-panel-white marginTop15">
+            <div class="ownorent-panel-header" style="background-color:#71cd14; color:white;">
+
+            </div>
+
+            <div class="ownorent-panel-body ownorent-panel-tools">
+                <div class="row">
+                    <div class="col-md-4">
+                        <p>
+                            PRODUCTS
+
+                            @Html.ActionLink("Add Product", "Create", "Products", new { }, new { @class = "btn btn-xs btn-info" })
+                        </p>
+                    </div>
+                    <div class="col-md-3 col-md-offset-5">
+                        <input class="form-control all-search width100" placeholder="Search ..." />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="ownorent-panel ownorent-panel-white marginTop10">
+            <div class="ownorent-panel-header" style="background-color:#71cd14; color:white;">
+
+            </div>
+
+            <div class="ownorent-panel-body ownorent-panel-table">
+                <table class="table table-condensed table-hover">
+                    <thead>
+                        <tr>
+                            <th>
+                                CATEGORY
+                            </th>
+                            <th>
+                                NAME
+                            </th>
+                            <th>
+                                STATUS
+                            </th>
+                            <th>
+                                STOCK
+                            </th>
+                            <th>
+                                PRICE
+                            </th>
+                            <th>
+                                RENT - PRICE
+                            </th>
+                            <th>
+                                DATE CREATED
+                            </th>
+                            <th></th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    @item.Category.CategoryName
+                                </td>
+                                <td>
+                                    @item.ProductName
+                                </td>
+                                <td>
+                                    @switch (item.ProductTemplateStatus)
+                                    {
+                                        case ProductTemplateStatusConstant.APPROVED:
+                                            <span>Approved</span>
+                                            break;
+                                        case ProductTemplateStatusConstant.PENDING_REVIEW:
+                                            <span>Pending Review</span>
+                                            break;
+                                        case ProductTemplateStatusConstant.PENDING_WAREHOUSE_ARRIVAL:
+                                            <span>Pending Warehouse Arrival</span>
+                                            break;
+                                        case ProductTemplateStatusConstant.REJECTED_REVISE:
+                                            <span>Rejected - Revise</span>
+                                            break;
+                                        case ProductTemplateStatusConstant.REJECTED_NOT_ALLOWED:
+                                            <span>Rejected - Not Allowed</span>
+                                            break;
+                                        case ProductTemplateStatusConstant.REQUESTED_REMOVAL:
+                                            <span>User Requested Removal</span>
+                                            break;
+                                        case ProductTemplateStatusConstant.REMOVED:
+                                            <span>Removed</span>
+                                            break;
+                                    }
+                                </td>
+                                <td>
+                                    @item.Quantity (0 available)
+                                </td>
+                                <td>
+                                    @item.Price
+                                </td>
+                                <td>
+                                    @item.DailyRentPrice
+                                </td>
+                                <td>
+                                    @item.DateCreated.ToString("MM-dd-yyyy")
+                                </td>
+                                <td style="text-align:right;">
+                                    
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script>
+        $(document).ready(function () {
+            var datatable = $("table").DataTable({
+                paging: true,
+                "pageLength": 10,
+                "dom": "<'table-window'<'table-responsive'rt>><'window-footer'<'col-md-6'i><'col-md-6'p>>",
+                "columnDefs": [
+                    { "orderable": false, "targets": 6 }
+                ]
+            });
+
+            $(".all-search").keyup(function () {
+                datatable.search($(this).val()).draw();
+            })
+        });
+    </script>
+}

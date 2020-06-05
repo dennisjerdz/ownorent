@@ -88,24 +88,24 @@ namespace Ownorent.Migrations
                 });
             }
 
-            if (!context.Settings.Any(c => c.Code == "COMPUTE_MAXIMUM_DEPRECIATION_PRICE_PERCENTAGE"))
+            if (!context.Settings.Any(c => c.Code == "COMPUTE_SALVAGE_VALUE_PERCENTAGE"))
             {
                 context.Settings.Add(new Setting()
                 {
-                    Code = "COMPUTE_MAXIMUM_DEPRECIATION_PRICE_PERCENTAGE",
-                    Value = "9",
-                    Description = "Used in computation, if a product is over its lifespan, then Computed Price = PRICE * COMPUTE_MAXIMUM_DEPRECIATION_PRICE_PERCENTAGE",
+                    Code = "COMPUTE_SALVAGE_VALUE_PERCENTAGE",
+                    Value = "30",
+                    Description = "Used in computation, if a product is over its lifespan, then Computed Price = PRICE * COMPUTE_SALVAGE_VALUE_PERCENTAGE",
                     IsActive = true
                 });
             }
 
-            if (!context.Settings.Any(c => c.Code == "COMPUTE_MAXIMUM_DEPRECIATION_RENT_PRICE_PERCENTAGE"))
+            if (!context.Settings.Any(c => c.Code == "COMPUTE_SALVAGE_RENT_VALUE_PERCENTAGE"))
             {
                 context.Settings.Add(new Setting()
                 {
-                    Code = "COMPUTE_MAXIMUM_DEPRECIATION_RENT_PRICE_PERCENTAGE",
+                    Code = "COMPUTE_SALVAGE_RENT_VALUE_PERCENTAGE",
                     Value = "0.09",
-                    Description = "Used in computation, if a product is over its lifespan, then Computed Daily Rent Price = PRICE * COMPUTE_MAXIMUM_DEPRECIATION_RENT_PRICE_PERCENTAGE.",
+                    Description = "Used in computation, if a product is over its lifespan, then Computed Daily Rent Price = PRICE * COMPUTE_SALVAGE_RENT_VALUE_PERCENTAGE.",
                     IsActive = true
                 });
             }

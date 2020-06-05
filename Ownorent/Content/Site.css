@@ -3,8 +3,24 @@
     Yellow Green #71cd14
     Green #38c172
     Gray #f8fafc
-
+    Dark Gray #1b222c
 */
+
+.ownorent-bg-ygreen {
+    background-color:#71cd14;
+}
+
+.ownorent-text-ygreen {
+    color:#71cd14;
+}
+
+.ownorent-bg-gray{
+    background-color:#f8fafc;
+}
+
+.ownorent-text-gray{
+    color:#1b222c;
+}
 
 body {
     padding-bottom: 20px;
@@ -206,6 +222,15 @@ footer .right {
     margin-bottom:20px;
     text-align:center;
     color:white;
+}
+
+.ownorent-header-internal {
+    background-color:#38c172;
+    line-height:36px;
+    margin-bottom:20px;
+    text-align:left;
+    color:white;
+    padding-left:20px;
 }
 
 .account-card .form-horizontal{

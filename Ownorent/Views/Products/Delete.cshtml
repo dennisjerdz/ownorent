@@ -1,0 +1,184 @@
+﻿@model Ownorent.Models.ProductTemplate
+
+@{
+    ViewBag.Title = "Delete";
+}
+
+<h2>Delete</h2>
+
+<h3>Are you sure you want to delete this?</h3>
+<div>
+    <h4>ProductTemplate</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Category.CategoryName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Category.CategoryName)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.User.FirstName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.User.FirstName)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Warehouse.WarehouseName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Warehouse.WarehouseName)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.ProductName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ProductName)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.ProductDescription)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ProductDescription)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.ProductTemplateStatus)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ProductTemplateStatus)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.ProductPriceToUse)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ProductPriceToUse)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Quantity)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Quantity)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Price)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Price)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.DailyRentPrice)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.DailyRentPrice)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.ComputedPrice)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ComputedPrice)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.ComputedDailyRentPrice)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ComputedDailyRentPrice)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.AdminDefinedPrice)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.AdminDefinedPrice)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.AdminDefinedDailyRentPrice)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.AdminDefinedDailyRentPrice)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.ShippingFee)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ShippingFee)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.ShippingFeeProvincial)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ShippingFeeProvincial)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.DatePurchased)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.DatePurchased)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.LastModifiedBy)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.LastModifiedBy)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.DateCreated)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.DateCreated)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.DateLastModified)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.DateLastModified)
+        </dd>
+
+    </dl>
+
+    @using (Html.BeginForm()) {
+        @Html.AntiForgeryToken()
+
+        <div class="form-actions no-color">
+            <input type="submit" value="Delete" class="btn btn-default" /> |
+            @Html.ActionLink("Back to List", "Index")
+        </div>
+    }
+</div>

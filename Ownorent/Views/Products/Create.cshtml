@@ -1,0 +1,248 @@
+﻿@model Ownorent.Models.ProductTemplate
+@using Ownorent.Models
+@{
+    ViewBag.Title = "Add Product";
+    ViewBag.bgColor = "#f8fafc";
+}
+
+@if (ViewBag.Message != null)
+{
+    <div class="row">
+        <div class="col-md-12">
+            <br />
+            <div class="ownorent-alert alert alert-success">
+                @Html.Raw(ViewBag.Message)
+            </div>
+        </div>
+    </div>
+}
+
+<div class="row">
+    <div class="col-md-offset-3 col-md-6">
+        <div class="account-card">
+            
+            <div class="ownorent-header-internal">
+                Add Product
+            </div>
+
+            <!--<center>
+                <img src="~/Content/Images/logo.png" style="width:300px; transform:translate(0px)" />
+            </center>-->
+
+            @using (Html.BeginForm("Create", "Products", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+            {
+                @Html.AntiForgeryToken()
+                @Html.ValidationSummary("", new { @class = "text-danger" })
+
+                <div class="form-group">
+                    <div class="col-md-12">
+                        @Html.LabelFor(m => m.Category, new { @class = "control-label" })
+                        <select class="form-control category" name="CategoryId" >
+                            @if (ViewBag.CategoriesList != null)
+                            {
+                                foreach (Category c in (List<Category>)ViewBag.CategoriesList)
+                                {
+                                    <option value="@c.CategoryId" data-usefulLife="@c.UsefulLifeSpan">@c.CategoryName</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-12">
+                        @Html.LabelFor(m => m.ProductName, new { @class = "control-label" })
+                        @Html.TextBoxFor(m => m.ProductName, new { @class = "form-control" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-12">
+                        @Html.LabelFor(m => m.ProductDescription, new { @class = "control-label" })
+                        @Html.TextAreaFor(m=>m.ProductDescription, new { @class="form-control" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-6">
+                        @Html.LabelFor(m => m.Quantity, new { @class = "control-label" })
+                        @Html.TextBoxFor(m => m.Quantity, new { @class = "form-control", @type="number", @step="1" })
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="control-label">Date Purchased (mm/dd/yyyy)</label>
+                        @Html.TextBoxFor(m => m.DatePurchased, new { @class = "form-control", @type = "date", @max = DateTime.UtcNow.AddHours(8).ToString("yyyy-MM-dd") })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-6">
+                        @Html.LabelFor(m => m.Price, new { @class = "control-label" })
+                        @Html.TextBoxFor(m => m.Price, new { @class = "form-control", @type="number", @step=".01" })
+                    </div>
+
+                    <div class="col-md-6">
+                        @Html.LabelFor(m => m.DailyRentPrice, new { @class = "control-label" })
+                        @Html.TextBoxFor(m => m.DailyRentPrice, new { @class = "form-control", @type = "number", @step = ".01" })
+                    </div>
+                </div>
+
+                <hr />
+
+                <div class="form-group">
+                    <div class="col-md-6">
+                        <label>Depreciated Price <br />(based on Shelf life)</label>
+                        @Html.TextBoxFor(m => m.ComputedPrice, new { @class = "form-control", @type = "number", @step = ".01", @readonly = "true" })
+                    </div>
+
+                    <div class="col-md-6">
+                        <label>Depreciated Rent Price <br />(based on Shelf life)</label>
+                        @Html.TextBoxFor(m => m.ComputedDailyRentPrice, new { @class = "form-control", @type = "number", @step = ".01", @readonly = "true" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <label class="control-label">Warehouse</label>
+                        @Html.DropDownList("WarehouseId", null, htmlAttributes: new { @class = "form-control", @readonly="true" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <br />
+                        <input type="submit" class="btn btn-info btn-block" value="Add Product" />
+                        <br />
+                        <center>
+                            <p class="ownorent-text-gray">
+                                All new products are subject for approval.
+                            </p>
+                        </center>
+                        <br />
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script>
+        function dateDiff(dt1, dt2) {
+            /*
+             * setup 'empty' return object
+             */
+            var ret = { days: 0, months: 0, years: 0 };
+
+            /*
+             * If the dates are equal, return the 'empty' object
+             */
+            if (dt1 == dt2) return ret;
+
+            /*
+             * ensure dt2 > dt1
+             */
+            if (dt1 > dt2) {
+                var dtmp = dt2;
+                dt2 = dt1;
+                dt1 = dtmp;
+            }
+
+            /*
+             * First get the number of full years
+             */
+
+            var year1 = dt1.getFullYear();
+            var year2 = dt2.getFullYear();
+
+            var month1 = dt1.getMonth();
+            var month2 = dt2.getMonth();
+
+            var day1 = dt1.getDate();
+            var day2 = dt2.getDate();
+
+            /*
+             * Set initial values bearing in mind the months or days may be negative
+             */
+
+            ret['years'] = year2 - year1;
+            ret['months'] = month2 - month1;
+            ret['days'] = day2 - day1;
+
+            /*
+             * Now we deal with the negatives
+             */
+
+            /*
+             * First if the day difference is negative
+             * eg dt2 = 13 oct, dt1 = 25 sept
+             */
+            if (ret['days'] < 0) {
+                /*
+                 * Use temporary dates to get the number of days remaining in the month
+                 */
+                var dtmp1 = new Date(dt1.getFullYear(), dt1.getMonth() + 1, 1, 0, 0, -1);
+
+                var numDays = dtmp1.getDate();
+
+                ret['months'] -= 1;
+                ret['days'] += numDays;
+
+            }
+
+            /*
+             * Now if the month difference is negative
+             */
+            if (ret['months'] < 0) {
+                ret['months'] += 12;
+                ret['years'] -= 1;
+            }
+
+            return ret;
+        }
+
+        $(document).ready(function () {
+            var salvageValuePercent = @ViewBag.salvageValue;
+            var salvageRentValuePercent = @ViewBag.salvageRentValue;
+
+            $(".category").change(function () {
+                compute();
+            });
+
+            $("#Price").keyup(function() {
+                compute();
+            });
+
+            $("#DatePurchased").change(function() {
+                compute();
+            });
+
+            function compute(){
+                var price = $("#Price").val();
+                var dailyrentprice = $("#DailyRentPrice").val();
+                var datePurchasedText = $("#DatePurchased").val();
+                var usefulLife = $(".category").find("option:selected").data("usefullife");
+
+                if(price != null && usefulLife != null && datePurchasedText != null){
+                    var datePurchased = new Date(datePurchasedText);
+                    var dateNow = new Date();
+
+                    var difference = dateDiff(datePurchased, dateNow);
+
+                    var differenceInYears = (difference.years + (difference.months/12) + ((difference.days/30)/10));
+
+                    var salvageValue = (price*(salvageRentValuePercent/100));
+
+                    var annualDepreciation = (price - salvageValue) / usefulLife;
+                    var computedPrice = price-(annualDepreciation*differenceInYears);
+                    
+                    if(computedPrice < salvageValue){
+                        $("#ComputedPrice").val(salvageValue);
+                    }else{
+                        $("#ComputedPrice").val(computedPrice);
+                    }
+                }
+            }
+        });
+    </script>    
+}

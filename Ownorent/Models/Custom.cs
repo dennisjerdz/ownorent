@@ -7,6 +7,9 @@ using System.Web;
 
 namespace Ownorent.Models
 {
+    // Straight Line Depreciation
+    // https://bench.co/blog/accounting/straight-line-depreciation/
+
     public class Warehouse {
         public Warehouse() {
             DateCreated = DateTime.UtcNow.AddHours(8);
@@ -83,9 +86,14 @@ namespace Ownorent.Models
         }
 
         public int ProductTemplateId { get; set; }
+        [Required]
+        [Display(Name = "Name")]
         public string ProductName { get; set; }
+        [Required]
+        [Display(Name = "Description")]
         public string ProductDescription { get; set; }
 
+        [Display(Name = "Status")]
         public byte ProductTemplateStatus { get; set; }
         public byte ProductPriceToUse { get; set; }
 
@@ -101,10 +109,14 @@ namespace Ownorent.Models
         public float ShippingFeeProvincial { get; set; }
 
         [Required]
+        [Display(Name = "Date Purchased")]
         public DateTime DatePurchased { get; set; }
 
+        [Display(Name = "Last Modified By")]
         public string LastModifiedBy { get; set; }
+        [Display(Name = "Date Created")]
         public DateTime DateCreated { get; set; }
+        [Display(Name = "Last Modified Date")]
         public DateTime DateLastModified { get; set; }
 
         public int CategoryId { get; set; }
@@ -168,17 +180,26 @@ namespace Ownorent.Models
         }
 
         public int ProductId { get; set; }
+        [Required]
+        [Display(Name ="Name")]
         public string ProductName { get; set; }
+        [Required]
+        [Display(Name = "Description")]
         public string ProductDescription { get; set; }
+        [Display(Name = "Serial Number")]
         public string ProductSerialNumber { get; set; }
 
+        [Display(Name = "Status")]
         public byte ProductStatus { get; set; }
 
         public float? CustomPrice { get; set; }
         public float? CustomDailyRentPrice { get; set; }
 
+        [Display(Name = "Last Modified By")]
         public string LastModifiedBy { get; set; }
+        [Display(Name = "Date Created")]
         public DateTime DateCreated { get; set; }
+        [Display(Name = "Last Modified Date")]
         public DateTime DateLastModified { get; set; }
 
         public int ProductTemplateId { get; set; }
