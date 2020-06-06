@@ -206,6 +206,10 @@
     <Compile Include="Migrations\202006051023525_Product template labels.Designer.cs">
       <DependentUpon>202006051023525_Product template labels.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202006061838240_Tracking number.cs" />
+    <Compile Include="Migrations\202006061838240_Tracking number.Designer.cs">
+      <DependentUpon>202006061838240_Tracking number.cs</DependentUpon>
+    </Compile>
     <Compile Include="OwnorentHelper.cs" />
     <Compile Include="Migrations\202005290332179_initial.cs" />
     <Compile Include="Migrations\202005290332179_initial.Designer.cs">
@@ -318,6 +322,7 @@
     <Content Include="Views\Products\Details.cshtml" />
     <Content Include="Views\Products\Edit.cshtml" />
     <Content Include="Views\Products\Index.cshtml" />
+    <Content Include="Views\Products\Images.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -340,6 +345,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202006051023525_Product template labels.resx">
       <DependentUpon>202006051023525_Product template labels.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202006061838240_Tracking number.resx">
+      <DependentUpon>202006061838240_Tracking number.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

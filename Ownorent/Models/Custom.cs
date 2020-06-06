@@ -80,6 +80,16 @@ namespace Ownorent.Models
     }
 
     public class ProductTemplate {
+
+        /* Product Approval Process:
+         *  User Creates a product
+         *  Product upon creation will be "Pending Warehouse Arrival"
+         *  User ships product to the warehouse and fill out Tracking Number
+         *  Once product arrives at warehouse, Admin will change status to Pending Review and an Email will be sent to the user
+         *  Once the product has been reviewed and approved
+         *  Product will now be listed
+        */
+
         public ProductTemplate() {
             DateCreated = DateTime.UtcNow.AddHours(8);
             DateLastModified = DateTime.UtcNow.AddHours(8);
@@ -97,10 +107,13 @@ namespace Ownorent.Models
         public byte ProductTemplateStatus { get; set; }
         public byte ProductPriceToUse { get; set; }
 
+        [Display(Name = "Tracking Number")]
+        public string TrackingNumber { get; set; }
+
         public int Quantity { get; set; }
         public float Price { get; set; }
         public float? DailyRentPrice { get; set; }
-        public float? ComputedPrice { get; set; } // use setting percentage, based on category
+        public float? ComputedPrice { get; set; } // use setting percentage, based on category, straight line depreciation
         public float? ComputedDailyRentPrice { get; set; } // use setting percentage, 0.2% daily. Sample: 20k*0.2%=40php, 40*30days=1200, 20k/12months=1666.67
         public float? AdminDefinedPrice { get; set; }
         public float? AdminDefinedDailyRentPrice { get; set; }

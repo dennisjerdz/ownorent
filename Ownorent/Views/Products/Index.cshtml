@@ -1,5 +1,6 @@
 ﻿@model IEnumerable<Ownorent.Models.ProductTemplate>
 @using Ownorent.Models
+@using System.Globalization
 @{
     ViewBag.Title = "Products";
     ViewBag.bgColor = "#f8fafc";
@@ -60,7 +61,7 @@ else if (ViewBag.Message != null)
             </div>
 
             <div class="ownorent-panel-body ownorent-panel-table">
-                <table class="table table-condensed table-hover">
+                <table class="table table-condensed table-hover ownorent-compact-table">
                     <thead>
                         <tr>
                             <th>
@@ -102,25 +103,25 @@ else if (ViewBag.Message != null)
                                     @switch (item.ProductTemplateStatus)
                                     {
                                         case ProductTemplateStatusConstant.APPROVED:
-                                            <span>Approved</span>
+                                            <span class="ownorent-text-ygreen">Approved</span>
                                             break;
                                         case ProductTemplateStatusConstant.PENDING_REVIEW:
-                                            <span>Pending Review</span>
+                                            <span class="ownorent-text-orange">Pending Review</span>
                                             break;
                                         case ProductTemplateStatusConstant.PENDING_WAREHOUSE_ARRIVAL:
-                                            <span>Pending Warehouse Arrival</span>
+                                            <span class="ownorent-text-orange">Pending Warehouse Arrival</span>
                                             break;
                                         case ProductTemplateStatusConstant.REJECTED_REVISE:
-                                            <span>Rejected - Revise</span>
+                                            <span class="ownorent-text-red">Rejected - Revise</span>
                                             break;
                                         case ProductTemplateStatusConstant.REJECTED_NOT_ALLOWED:
-                                            <span>Rejected - Not Allowed</span>
+                                            <span class="ownorent-text-red">Rejected - Not Allowed</span>
                                             break;
                                         case ProductTemplateStatusConstant.REQUESTED_REMOVAL:
-                                            <span>User Requested Removal</span>
+                                            <span class="ownorent-text-gray">User Requested Removal</span>
                                             break;
                                         case ProductTemplateStatusConstant.REMOVED:
-                                            <span>Removed</span>
+                                            <span class="ownorent-text-silver">Removed</span>
                                             break;
                                     }
                                 </td>
@@ -128,16 +129,29 @@ else if (ViewBag.Message != null)
                                     @item.Quantity (0 available)
                                 </td>
                                 <td>
-                                    @item.Price
+                                    @item.Price.ToString("C2", CultureInfo.GetCultureInfo("fil-PH"))
                                 </td>
                                 <td>
-                                    @item.DailyRentPrice
+                                    @if (item.DailyRentPrice != null)
+                                    {
+                                        <text>@item.DailyRentPrice.Value.ToString("C2", CultureInfo.GetCultureInfo("fil-PH"))</text>
+                                    }
                                 </td>
                                 <td>
                                     @item.DateCreated.ToString("MM-dd-yyyy")
                                 </td>
                                 <td style="text-align:right;">
-                                    
+                                    @if (item.ProductTemplateStatus != ProductTemplateStatusConstant.REMOVED && item.ProductTemplateStatus != ProductTemplateStatusConstant.PENDING_REVIEW)
+                                    {
+                                        @Html.ActionLink("Edit", "Edit", new { id = item.ProductTemplateId }, new { @class = "btn btn-xs btn-warning" })
+                                    }
+
+                                    @Html.ActionLink("Images", "Images", new { id = item.ProductTemplateId }, new { @class="btn btn-xs btn-primary" })
+
+                                    @if (item.ProductTemplateStatus == ProductTemplateStatusConstant.PENDING_REVIEW || item.ProductTemplateStatus == ProductTemplateStatusConstant.PENDING_WAREHOUSE_ARRIVAL)
+                                    {
+                                        @Html.ActionLink("Cancel", "Cancel", new { id = item.ProductTemplateId }, new { @class = "btn btn-xs btn-danger" })
+                                    }
                                 </td>
                             </tr>
                         }

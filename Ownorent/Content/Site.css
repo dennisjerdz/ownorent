@@ -6,6 +6,36 @@
     Dark Gray #1b222c
 */
 
+.ownorent-toggle{
+    color:#348dcf;
+    text-decoration:none;
+    border-bottom:1px solid #c6d4de;
+    margin-bottom:15px;
+    display:inline-block;
+    padding:0px 10px 0px 0px;
+}
+
+.ownorent-toggle:hover{
+    text-decoration:none;
+    cursor:pointer;
+}
+
+.ownorent-bg-red {
+    background-color:#e02b2b;
+}
+
+.ownorent-text-red {
+    color:#e02b2b;
+}
+
+.ownorent-bg-orange {
+    background-color:#ea8e0e;
+}
+
+.ownorent-text-orange {
+    color:#ea8e0e;
+}
+
 .ownorent-bg-ygreen {
     background-color:#71cd14;
 }
@@ -15,11 +45,23 @@
 }
 
 .ownorent-bg-gray{
-    background-color:#f8fafc;
+    background-color:#1b222c;
 }
 
 .ownorent-text-gray{
     color:#1b222c;
+}
+
+.ownorent-bg-silver{
+    background-color:#838b9b;
+}
+
+.ownorent-text-silver{
+    color:#838b9b;
+}
+
+.parameters,.formula, .note{
+    font-size:0.8em;
 }
 
 body {
@@ -316,6 +358,10 @@ footer .right {
 
 .ownorent-panel .ownorent-panel-table{
     padding:10px 0px !important;
+}
+
+table.dataTable.ownorent-compact-table tbody td{
+    font-size:0.9em !important;
 }
 
 .table-responsive{
