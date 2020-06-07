@@ -20,6 +20,9 @@ namespace Ownorent.Controllers
         // GET: Products
         public ActionResult Index()
         {
+            ViewBag.Error = TempData["Error"];
+            ViewBag.Message = TempData["Message"];
+
             string userId = User.Identity.GetUserId();
             var productTemplates = db.ProductTemplates
                 .Include(p => p.Category)

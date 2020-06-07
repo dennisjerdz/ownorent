@@ -20,6 +20,9 @@ namespace Ownorent.Controllers
 
         public ActionResult Products()
         {
+            ViewBag.Error = TempData["Error"];
+            ViewBag.Message = TempData["Message"];
+
             var productTemplates = db.ProductTemplates
                 .Include(p => p.Category);
 

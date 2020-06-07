@@ -10,6 +10,10 @@
     display:inline-block;
 }
 
+.ownorent-dropdown-menu{
+    text-align:center;
+}
+
 .ownorent-toggle{
     color:#348dcf;
     text-decoration:none;
