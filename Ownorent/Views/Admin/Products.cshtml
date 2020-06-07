@@ -164,6 +164,11 @@ else if (ViewBag.Message != null)
                                         @Html.ActionLink("Approve", "Approve", new { id = item.ProductTemplateId }, new { @class = "btn btn-xs btn-success" })
                                     }
 
+                                    @if (item.ProductTemplateStatus == ProductTemplateStatusConstant.APPROVED)
+                                    {
+                                        @Html.ActionLink("Revert to Review", "RevertToReview", new { id = item.ProductTemplateId }, new { @class = "btn btn-xs btn-success" })
+                                    }
+
                                     @if (item.ProductTemplateStatus == ProductTemplateStatusConstant.PENDING_REVIEW)
                                     {
                                         @Html.ActionLink("Approve", "Approve", new { id = item.ProductTemplateId }, new { @class = "btn btn-xs btn-success" })

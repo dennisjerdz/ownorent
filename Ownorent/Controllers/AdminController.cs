@@ -269,6 +269,57 @@ namespace Ownorent.Controllers
             return RedirectToAction("Products");
         }
 
+        public ActionResult RevertToReview(int id)
+        {
+            var productTemplate = db.ProductTemplates.Include(p => p.Attachment).FirstOrDefault(p => p.ProductTemplateId == id);
+
+            if (productTemplate == null)
+            {
+                return HttpNotFound();
+            }
+
+            #region Email
+            string body = "Your product, " + productTemplate.ProductName + " has been reverted back to Pending Review. An Admin will contact you shall there be any clarifications. Another email will be sent once an Admin has finished reviewing your product.";
+
+            MailAddress fromAddress = new MailAddress("ownorent@gmail.com", "Ownorent Registration Service");
+            MailAddress toAddress = new MailAddress(productTemplate.User.Email, productTemplate.User.FirstName);
+            string fromPassword = "ownorent$123456";
+            string subject = "Ownorent Product Application - " + DateTime.UtcNow.AddHours(8).ToString("MM-dd-yy");
+
+            SmtpClient smtp = new SmtpClient()
+            {
+                Host = "smtp.gmail.com",
+                Port = 587,
+                EnableSsl = true,
+                DeliveryMethod = SmtpDeliveryMethod.Network,
+                UseDefaultCredentials = false,
+                Credentials = new System.Net.NetworkCredential(fromAddress.Address, fromPassword)
+            };
+
+            MailMessage message = new MailMessage(fromAddress, toAddress)
+            {
+                Subject = subject,
+                Body = body
+            };
+            message.CC.Add(new MailAddress(productTemplate.User.Email));
+            #endregion
+
+            try
+            {
+                smtp.Send(message);
+            }
+            catch (Exception e)
+            {
+                return Content(e.Message);
+            }
+
+            productTemplate.ProductTemplateStatus = ProductTemplateStatusConstant.PENDING_REVIEW;
+            db.SaveChanges();
+
+            TempData["Message"] = "<strong>Product status updated successfully.</strong> User has been notified.";
+            return RedirectToAction("Products");
+        }
+
         public ActionResult ConfirmArrival(int id)
         {
             var productTemplate = db.ProductTemplates.Include(p => p.Attachment).FirstOrDefault(p => p.ProductTemplateId == id);
