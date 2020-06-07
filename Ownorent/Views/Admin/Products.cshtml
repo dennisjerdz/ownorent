@@ -143,9 +143,16 @@ else if (ViewBag.Message != null)
                                     @item.DateCreated.ToString("MM-dd-yyyy")
                                 </td>
                                 <td style="text-align:right;">
-                                    @Html.ActionLink("Edit", "EditProduct", new { id = item.ProductTemplateId }, new { @class = "btn btn-xs btn-warning" })
-
-                                    @Html.ActionLink("Images", "Images", new { id = item.ProductTemplateId }, new { @class = "btn btn-xs btn-primary" })
+                                    <div class="dropdown ownorent-dropdown-button">
+                                        <button class="btn btn-xs btn-default ownorent-dropdown-button dropdown-toggle" type="button" data-toggle="dropdown">
+                                            Options
+                                            <span class="caret"></span>
+                                        </button>
+                                        <ul class="dropdown-menu ownorent-dropdown-menu">
+                                            <li>@Html.ActionLink("Edit", "EditProduct", new { id = item.ProductTemplateId })</li>
+                                            <li>@Html.ActionLink("Images", "Images", new { id = item.ProductTemplateId })</li>
+                                        </ul>
+                                    </div>
 
                                     @if (item.ProductTemplateStatus == ProductTemplateStatusConstant.PENDING_WAREHOUSE_ARRIVAL)
                                     {
@@ -154,6 +161,8 @@ else if (ViewBag.Message != null)
 
                                     @if (item.ProductTemplateStatus == ProductTemplateStatusConstant.PENDING_REVIEW)
                                     {
+                                        @Html.ActionLink("Approve", "Approve", new { id = item.ProductTemplateId }, new { @class = "btn btn-xs btn-success" })
+
                                         <div class="dropdown ownorent-dropdown-button">
                                             <button class="btn btn-xs btn-danger ownorent-dropdown-button dropdown-toggle" type="button" data-toggle="dropdown">
                                                 Reject

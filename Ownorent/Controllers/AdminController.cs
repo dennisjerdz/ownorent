@@ -215,6 +215,57 @@ namespace Ownorent.Controllers
             return RedirectToAction("Images", new { id = productId });
         }
 
+        public ActionResult Approve(int id)
+        {
+            var productTemplate = db.ProductTemplates.Include(p => p.Attachment).FirstOrDefault(p => p.ProductTemplateId == id);
+
+            if (productTemplate == null)
+            {
+                return HttpNotFound();
+            }
+
+            #region Email
+            string body = "Congratulations! Your product, " + productTemplate.ProductName + " , has been approved and will now be publicly listed. An email will be sent whenever a customer orders for your product.";
+
+            MailAddress fromAddress = new MailAddress("ownorent@gmail.com", "Ownorent Registration Service");
+            MailAddress toAddress = new MailAddress(productTemplate.User.Email, productTemplate.User.FirstName);
+            string fromPassword = "ownorent$123456";
+            string subject = "Ownorent Product Application - " + DateTime.UtcNow.AddHours(8).ToString("MM-dd-yy");
+
+            SmtpClient smtp = new SmtpClient()
+            {
+                Host = "smtp.gmail.com",
+                Port = 587,
+                EnableSsl = true,
+                DeliveryMethod = SmtpDeliveryMethod.Network,
+                UseDefaultCredentials = false,
+                Credentials = new System.Net.NetworkCredential(fromAddress.Address, fromPassword)
+            };
+
+            MailMessage message = new MailMessage(fromAddress, toAddress)
+            {
+                Subject = subject,
+                Body = body
+            };
+            message.CC.Add(new MailAddress(productTemplate.User.Email));
+            #endregion
+
+            try
+            {
+                smtp.Send(message);
+            }
+            catch (Exception e)
+            {
+                return Content(e.Message);
+            }
+
+            productTemplate.ProductTemplateStatus = ProductTemplateStatusConstant.APPROVED;
+            db.SaveChanges();
+
+            TempData["Message"] = "<strong>Product status updated successfully.</strong> User has been notified.";
+            return RedirectToAction("Products");
+        }
+
         public ActionResult ConfirmArrival(int id)
         {
             var productTemplate = db.ProductTemplates.Include(p => p.Attachment).FirstOrDefault(p => p.ProductTemplateId == id);
@@ -310,7 +361,7 @@ namespace Ownorent.Controllers
                 return Content(e.Message);
             }
 
-            productTemplate.ProductTemplateStatus = ProductTemplateStatusConstant.PENDING_REVIEW;
+            productTemplate.ProductTemplateStatus = ProductTemplateStatusConstant.REJECTED_REVISE;
             db.SaveChanges();
 
             TempData["Message"] = "<strong>Product status updated successfully.</strong> User has been notified.";
