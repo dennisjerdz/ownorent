@@ -17,7 +17,37 @@ namespace Ownorent.Controllers
     {
         private ApplicationDbContext db = new ApplicationDbContext();
 
-        // GET: Products
+        public ActionResult p(string search, int? page, int? category)
+        {
+            IQueryable<ProductTemplate> products;
+                        
+            if(search != null)
+            {
+                products = db.ProductTemplates
+                .Include(p => p.Category).Include(p=>p.Attachment)
+                .Where(p => p.ProductTemplateStatus == ProductTemplateStatusConstant.APPROVED
+                    && (p.ProductName.Contains(search) || p.ProductDescription.Contains(search)))
+                .OrderByDescending(p => p.Quantity);
+            }
+            else
+            {
+                products = db.ProductTemplates
+                .Include(p => p.Category).Include(p => p.Attachment)
+                .Where(p => p.ProductTemplateStatus == ProductTemplateStatusConstant.APPROVED)
+                .OrderByDescending(p => p.Quantity);
+            }
+
+            ViewBag.CategoriesList = db.Categories.ToList();
+
+            if (category != null)
+            {
+                return View(products.Where(p => p.CategoryId == category).ToList());
+            }else
+            {
+                return View(products.ToList());
+            }
+        }
+
         public ActionResult Index()
         {
             ViewBag.Error = TempData["Error"];
@@ -43,7 +73,6 @@ namespace Ownorent.Controllers
             return View(productTemplates);
         }
 
-        // GET: Products/Details/5
         public ActionResult Details(int? id)
         {
             if (id == null)

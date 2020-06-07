@@ -92,4 +92,6 @@ namespace Ownorent.Models
         public const int PROVINCIAL = 1;
         public const int NONE_ALREADY_DELIVERED = 2; // if payment isn't initial
     }
+
+    public class CartTypeConstant : TransactionTypeConstant { }
 }

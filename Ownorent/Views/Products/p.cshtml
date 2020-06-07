@@ -1,0 +1,358 @@
+﻿@model IEnumerable<Ownorent.Models.ProductTemplate>
+@using Ownorent.Models
+@using System.Globalization
+@{
+    ViewBag.Title = "Products";
+    ViewBag.bgColor = "#f8fafc";
+    ViewBag.Cart = "1";
+}
+
+@if (ViewBag.Error != null)
+{
+    if (ViewBag.Error == "1")
+    {
+        <div class="row">
+            <div class="col-md-12">
+                <br />
+                <div class="ownorent-alert alert alert-danger">
+                    @Html.Raw(ViewBag.Message)
+                </div>
+            </div>
+        </div>
+    }
+}
+else if (ViewBag.Message != null)
+{
+    <div class="row">
+        <div class="col-md-12">
+            <br />
+            <div class="ownorent-alert alert alert-success">
+                @Html.Raw(ViewBag.Message)
+            </div>
+        </div>
+    </div>
+}
+
+<div class="row">
+    <div class="col-md-3">
+        <div class="ownorent-panel ownorent-panel-white marginTop15">
+            <div class="ownorent-panel-header" style="background-color:#71cd14; color:white;">
+
+            </div>
+
+            <div class="ownorent-panel-body ownorent-panel-tools">
+                @using (Html.BeginForm("p", "Products", FormMethod.Get, new { @class = "form-horizontal", role = "form" }))
+                {
+                    <div class="form-group">
+                        <div class="col-md-12">
+                            <label class="control-label">Category</label>
+                            <select class="form-control category" name="category">
+                                @if (ViewBag.CategoriesList != null)
+                                {
+                                    <option value="">All</option>
+                                    foreach (Category c in (List<Category>)ViewBag.CategoriesList)
+                                    {
+                                        if (Request.Params["category"] == c.CategoryId.ToString())
+                                        {
+                                            <option value="@c.CategoryId" selected>@c.CategoryName</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@c.CategoryId">@c.CategoryName</option>
+                                        }
+                                    }
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-12">
+                            <label class="control-label">Keywords</label>
+                            <input class="form-control" name="search" value="@Request.Params["search"]"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-12">
+                            <input type="submit" class="btn btn-info btn-block" value="Search" />
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-9">
+        <div class="row">
+            @foreach (var item in Model)
+            {
+                <div class="col-md-3 col-xs-6">
+                    <div class="ownorent-product-card marginTop15">
+                        <div class="ownorent-product-card-header">
+
+                        </div>
+
+                        @if (item.Attachment.FirstOrDefault() != null)
+                        {
+                            <div class="ownorent-product-card-bg-container">
+                                <div class="ownorent-product-card-bg" style="background:url('@Url.Content("~/Content/Uploads/Images/"+item.Attachment.FirstOrDefault().Location)')"></div>
+                                <div class="ownorent-product-card-img" style="background:url('@Url.Content("~/Content/Uploads/Images/"+item.Attachment.FirstOrDefault().Location)')"></div>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="ownorent-product-card-bg-container">
+                                <div class="ownorent-product-card-img-no-pic ownorent-bg-silver" style="background:url('https://cdn0.iconfinder.com/data/icons/gray-business-toolbar/512/product-3-512.png')"></div>
+                            </div>
+                        }
+
+                        <div class="ownorent-product-card-info">
+                            <p class="name">@item.ProductName</p>
+                            <p class="price">
+                                <span class="info">Price:</span>
+                                @if (item.ProductPriceToUse == ProductPriceToUseConstant.SELLER_DEFINED_PRICE)
+                                {
+                                    <text>@item.Price.ToString("C2", CultureInfo.GetCultureInfo("fil-PH"))</text>
+                                }
+                                else
+                                {
+                                    if (item.ComputedPrice != null)
+                                    {
+                                        <text>@item.ComputedPrice.Value.ToString("C2", CultureInfo.GetCultureInfo("fil-PH"))</text>
+                                    }
+                                    else
+                                    {
+                                        <text>@item.Price.ToString("C2", CultureInfo.GetCultureInfo("fil-PH"))</text>
+                                    }
+                                }
+                            </p>
+                            <p class="price-rent">
+                                <span class="info">Daily Rent:</span>
+                                @if (item.ProductPriceToUse == ProductPriceToUseConstant.SELLER_DEFINED_PRICE)
+                                {
+                                    if (item.DailyRentPrice != null)
+                                    {
+                                        <text>@item.DailyRentPrice.Value.ToString("C2", CultureInfo.GetCultureInfo("fil-PH"))</text>
+                                    }
+                                    else
+                                    {
+                                        <text>No Rent Price Defined</text>
+                                    }
+                                }
+                                else
+                                {
+                                    if (item.ComputedDailyRentPrice != null)
+                                    {
+                                        <text>@item.ComputedDailyRentPrice.Value.ToString("C2", CultureInfo.GetCultureInfo("fil-PH"))</text>
+                                    }
+                                    else
+                                    {
+                                        if (item.DailyRentPrice != null)
+                                        {
+                                            <text>@item.DailyRentPrice.Value.ToString("C2", CultureInfo.GetCultureInfo("fil-PH"))</text>
+                                        }
+                                        else
+                                        {
+                                            <text>No Rent Price Defined</text>
+                                        }
+                                    }
+                                }
+                            </p>
+                            <div class="dropdown">
+                                <button class="btn btn-sm btn-default btn-block ownorent-dropdown-button dropdown-toggle" type="button" data-toggle="dropdown">
+                                    Add to Cart
+                                    <span class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu ownorent-dropdown-menu ownorent-dropdown-menu-right">
+                                    <li>@Html.ActionLink("Buy", "AddToCart", new { id = item.ProductTemplateId, type = CartTypeConstant.BUY })</li>
+                                    <li>@Html.ActionLink("Rent", "AddToCart", new { id = item.ProductTemplateId, type = CartTypeConstant.RENT })</li>
+                                    <li>@Html.ActionLink("Rent to Own", "AddToCart", new { id = item.ProductTemplateId, type = CartTypeConstant.RENT_TO_OWN })</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="col-md-12">
+            <div class="ownorent-panel ownorent-panel-white marginTop15">
+                <div class="ownorent-panel-header" style="background-color:#71cd14; color:white;">
+
+                </div>
+
+                <div class="ownorent-panel-body ownorent-panel-tools">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <p>
+                                PRODUCTS
+
+                                @*
+                                @Html.ActionLink("Add Product", "Create", "Products", new { }, new { @class = "btn btn-xs btn-info" })
+                                *@
+                            </p>
+                        </div>
+                        <div class="col-md-3 col-md-offset-5">
+                            <input class="form-control all-search width100" placeholder="Search ..." />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ownorent-panel ownorent-panel-white marginTop10">
+                <div class="ownorent-panel-header" style="background-color:#71cd14; color:white;">
+
+                </div>
+
+                <div class="ownorent-panel-body ownorent-panel-table">
+                    <table class="table table-condensed table-hover ownorent-compact-table">
+                        <thead>
+                            <tr>
+                                <th>
+                                    CATEGORY
+                                </th>
+                                <th>
+                                    NAME
+                                </th>
+                                <th>
+                                    STATUS
+                                </th>
+                                <th>
+                                    QTY
+                                </th>
+                                <th>
+                                    PRICE
+                                </th>
+                                <th>
+                                    DAILY RENT
+                                </th>
+                                <th>
+                                    CREATED
+                                </th>
+                                <th></th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        @item.Category.CategoryName
+                                    </td>
+                                    <td>
+                                        @item.ProductName
+                                    </td>
+                                    <td>
+                                        @switch (item.ProductTemplateStatus)
+                                        {
+                                            case ProductTemplateStatusConstant.APPROVED:
+                                                <span class="ownorent-text-ygreen">Approved</span>
+                                                break;
+                                            case ProductTemplateStatusConstant.PENDING_REVIEW:
+                                                <span class="ownorent-text-orange">Pending Review</span>
+                                                break;
+                                            case ProductTemplateStatusConstant.PENDING_WAREHOUSE_ARRIVAL:
+                                                <span class="ownorent-text-orange">Pending Warehouse Arrival</span>
+                                                break;
+                                            case ProductTemplateStatusConstant.REJECTED_REVISE:
+                                                <span class="ownorent-text-red">Rejected - Revise</span>
+                                                break;
+                                            case ProductTemplateStatusConstant.REJECTED_NOT_ALLOWED:
+                                                <span class="ownorent-text-red">Rejected - Not Allowed</span>
+                                                break;
+                                            case ProductTemplateStatusConstant.REQUESTED_REMOVAL:
+                                                <span class="ownorent-text-gray">User Requested Removal</span>
+                                                break;
+                                            case ProductTemplateStatusConstant.REMOVED:
+                                                <span class="ownorent-text-silver">Removed</span>
+                                                break;
+                                        }
+                                    </td>
+                                    <td>
+                                        @item.Quantity
+                                    </td>
+                                    <td>
+                                        @item.Price.ToString("C2", CultureInfo.GetCultureInfo("fil-PH"))
+                                    </td>
+                                    <td>
+                                        @if (item.DailyRentPrice != null)
+                                        {
+                                            <text>@item.DailyRentPrice.Value.ToString("C2", CultureInfo.GetCultureInfo("fil-PH"))</text>
+                                        }
+                                    </td>
+                                    <td>
+                                        @item.DateCreated.ToString("MM-dd-yyyy")
+                                    </td>
+                                    <td style="text-align:right;">
+                                        <div class="dropdown ownorent-dropdown-button">
+                                            <button class="btn btn-xs btn-default ownorent-dropdown-button dropdown-toggle" type="button" data-toggle="dropdown">
+                                                Options
+                                                <span class="caret"></span>
+                                            </button>
+                                            <ul class="dropdown-menu ownorent-dropdown-menu ownorent-dropdown-menu-right">
+                                                <li>@Html.ActionLink("Edit", "EditProduct", new { id = item.ProductTemplateId })</li>
+                                                <li>@Html.ActionLink("Images", "Images", new { id = item.ProductTemplateId })</li>
+                                            </ul>
+                                        </div>
+
+                                        @if (item.ProductTemplateStatus == ProductTemplateStatusConstant.PENDING_WAREHOUSE_ARRIVAL)
+                                        {
+                                            @Html.ActionLink("Confirm Arrival", "ConfirmArrival", new { id = item.ProductTemplateId }, new { @class = "btn btn-xs btn-info" })
+                                        }
+
+                                        @if (item.ProductTemplateStatus == ProductTemplateStatusConstant.REJECTED_REVISE)
+                                        {
+                                            @Html.ActionLink("Approve", "Approve", new { id = item.ProductTemplateId }, new { @class = "btn btn-xs btn-success" })
+                                        }
+
+                                        @if (item.ProductTemplateStatus == ProductTemplateStatusConstant.APPROVED)
+                                        {
+                                            @Html.ActionLink("Revert to Review", "RevertToReview", new { id = item.ProductTemplateId }, new { @class = "btn btn-xs btn-warning" })
+                                        }
+
+                                        @if (item.ProductTemplateStatus == ProductTemplateStatusConstant.PENDING_REVIEW)
+                                        {
+                                            @Html.ActionLink("Approve", "Approve", new { id = item.ProductTemplateId }, new { @class = "btn btn-xs btn-success" })
+
+                                            <div class="dropdown ownorent-dropdown-button">
+                                                <button class="btn btn-xs btn-danger ownorent-dropdown-button dropdown-toggle" type="button" data-toggle="dropdown">
+                                                    Reject
+                                                    <span class="caret"></span>
+                                                </button>
+                                                <ul class="dropdown-menu ownorent-dropdown-menu ownorent-dropdown-menu-right">
+                                                    <li>@Html.ActionLink("Reject - Revise", "RejectRevise", new { id = item.ProductTemplateId })</li>
+                                                    <li>@Html.ActionLink("Reject - Not Allowed", "RejectNotAllowed", new { id = item.ProductTemplateId })</li>
+                                                </ul>
+                                            </div>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+@section scripts{
+    <script>
+        $(document).ready(function () {
+            var datatable = $("table").DataTable({
+                paging: true,
+                "pageLength": 10,
+                "dom": "<'table-window'<'table-responsive'rt>><'window-footer'<'col-md-6'i><'col-md-6'p>>",
+                "columnDefs": [
+                    { "orderable": false, "targets": 7 }
+                ]
+            });
+
+            $(".all-search").keyup(function () {
+                datatable.search($(this).val()).draw();
+            })
+        });
+    </script>
+}

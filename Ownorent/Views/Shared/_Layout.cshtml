@@ -17,6 +17,10 @@
         string bgColor = ViewBag.bgColor ?? "white";
     }
     <body style="background-color:@bgColor;">
+        @if (ViewBag.Cart != null)
+        {
+            <a class="floating-cart" href="@Url.Action("Cart","Products")"><i class="icon flaticon-package"></i><span>6</span></a>
+        }
         <div class="navbar navbar-default">
             <div class="navbar-overhead">
                 <div class="container">
@@ -41,7 +45,7 @@
                         <li>@Html.ActionLink("HOME", "Index", "Home")</li>
                         @if (!User.Identity.IsAuthenticated)
                         {
-                            <li>@Html.ActionLink("PRODUCTS", "Index", "Home")</li>
+                            <li>@Html.ActionLink("PRODUCTS", "p", "Products")</li>
                             <li>@Html.ActionLink("CONTACT", "Contact", "Home")</li>
                         }
                         @if (User.IsInRole("Admin"))

@@ -185,6 +185,21 @@ namespace Ownorent.Models
         public ProductTemplate ProductTemplate { get; set; }
     }
 
+    public class Cart
+    {
+        public int CartId { get; set; }
+
+        public int ProductTemplateId { get; set; }
+        public virtual ProductTemplate Product { get; set; }
+
+        public string UserId { get; set; }
+        public ApplicationUser User { get; set; }
+
+        public int Quantity { get; set; }
+        public byte CartType { get; set; }
+        public DateTime DateCreated { get; set; }
+    }
+
     public class Product {
         public Product()
         {
