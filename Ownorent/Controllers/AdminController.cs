@@ -266,6 +266,108 @@ namespace Ownorent.Controllers
             return RedirectToAction("Products");
         }
 
+        public ActionResult RejectRevise(int id)
+        {
+            var productTemplate = db.ProductTemplates.Include(p => p.Attachment).FirstOrDefault(p => p.ProductTemplateId == id);
+
+            if (productTemplate == null)
+            {
+                return HttpNotFound();
+            }
+
+            #region Email
+            string body = "Your product, " + productTemplate.ProductName + ", needs updating. Please provide more information/pictures for your product";
+
+            MailAddress fromAddress = new MailAddress("ownorent@gmail.com", "Ownorent Registration Service");
+            MailAddress toAddress = new MailAddress(productTemplate.User.Email, productTemplate.User.FirstName);
+            string fromPassword = "ownorent$123456";
+            string subject = "Ownorent Product Application - " + DateTime.UtcNow.AddHours(8).ToString("MM-dd-yy");
+
+            SmtpClient smtp = new SmtpClient()
+            {
+                Host = "smtp.gmail.com",
+                Port = 587,
+                EnableSsl = true,
+                DeliveryMethod = SmtpDeliveryMethod.Network,
+                UseDefaultCredentials = false,
+                Credentials = new System.Net.NetworkCredential(fromAddress.Address, fromPassword)
+            };
+
+            MailMessage message = new MailMessage(fromAddress, toAddress)
+            {
+                Subject = subject,
+                Body = body
+            };
+            message.CC.Add(new MailAddress(productTemplate.User.Email));
+            #endregion
+
+            try
+            {
+                smtp.Send(message);
+            }
+            catch (Exception e)
+            {
+                return Content(e.Message);
+            }
+
+            productTemplate.ProductTemplateStatus = ProductTemplateStatusConstant.PENDING_REVIEW;
+            db.SaveChanges();
+
+            TempData["Message"] = "<strong>Product status updated successfully.</strong> User has been notified.";
+            return RedirectToAction("Products");
+        }
+
+        public ActionResult RejectNotAllowed(int id)
+        {
+            var productTemplate = db.ProductTemplates.Include(p => p.Attachment).FirstOrDefault(p => p.ProductTemplateId == id);
+
+            if (productTemplate == null)
+            {
+                return HttpNotFound();
+            }
+
+            #region Email
+            string body = "Your product, " + productTemplate.ProductName + " , has been rejected. Please visit this <a href='#'>page</a> for the list of prohibited items. Please contact us to arrange shipping out of the warehouse.";
+
+            MailAddress fromAddress = new MailAddress("ownorent@gmail.com", "Ownorent Registration Service");
+            MailAddress toAddress = new MailAddress(productTemplate.User.Email, productTemplate.User.FirstName);
+            string fromPassword = "ownorent$123456";
+            string subject = "Ownorent Product Application - " + DateTime.UtcNow.AddHours(8).ToString("MM-dd-yy");
+
+            SmtpClient smtp = new SmtpClient()
+            {
+                Host = "smtp.gmail.com",
+                Port = 587,
+                EnableSsl = true,
+                DeliveryMethod = SmtpDeliveryMethod.Network,
+                UseDefaultCredentials = false,
+                Credentials = new System.Net.NetworkCredential(fromAddress.Address, fromPassword)
+            };
+
+            MailMessage message = new MailMessage(fromAddress, toAddress)
+            {
+                Subject = subject,
+                Body = body
+            };
+            message.CC.Add(new MailAddress(productTemplate.User.Email));
+            #endregion
+
+            try
+            {
+                smtp.Send(message);
+            }
+            catch (Exception e)
+            {
+                return Content(e.Message);
+            }
+
+            productTemplate.ProductTemplateStatus = ProductTemplateStatusConstant.REJECTED_NOT_ALLOWED;
+            db.SaveChanges();
+
+            TempData["Message"] = "<strong>Product status updated successfully.</strong> User has been notified.";
+            return RedirectToAction("Products");
+        }
+
         public ActionResult Details(int? id)
         {
             if (id == null)

@@ -47,6 +47,7 @@
                         @if (User.IsInRole("Admin"))
                         {
                             <li>@Html.ActionLink("ACCOUNTS", "Accounts", "Account")</li>
+                            <li>@Html.ActionLink("PRODUCTS", "Products", "Admin")</li>
                         }
                         @if (User.IsInRole("Seller"))
                         {

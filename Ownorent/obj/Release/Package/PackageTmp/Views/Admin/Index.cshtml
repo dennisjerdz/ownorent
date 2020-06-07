@@ -1,0 +1,153 @@
+﻿@model IEnumerable<Ownorent.Models.ProductTemplate>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.Category.CategoryName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.User.FirstName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Warehouse.WarehouseName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.ProductName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.ProductDescription)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.ProductTemplateStatus)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.ProductPriceToUse)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.TrackingNumber)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Quantity)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Price)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.DailyRentPrice)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.ComputedPrice)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.ComputedDailyRentPrice)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.AdminDefinedPrice)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.AdminDefinedDailyRentPrice)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.ShippingFee)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.ShippingFeeProvincial)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.DatePurchased)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.LastModifiedBy)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.DateCreated)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.DateLastModified)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.Category.CategoryName)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.User.FirstName)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Warehouse.WarehouseName)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.ProductName)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.ProductDescription)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.ProductTemplateStatus)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.ProductPriceToUse)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.TrackingNumber)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Quantity)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Price)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.DailyRentPrice)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.ComputedPrice)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.ComputedDailyRentPrice)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.AdminDefinedPrice)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.AdminDefinedDailyRentPrice)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.ShippingFee)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.ShippingFeeProvincial)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.DatePurchased)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.LastModifiedBy)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.DateCreated)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.DateLastModified)
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id=item.ProductTemplateId }) |
+            @Html.ActionLink("Details", "Details", new { id=item.ProductTemplateId }) |
+            @Html.ActionLink("Delete", "Delete", new { id=item.ProductTemplateId })
+        </td>
+    </tr>
+}
+
+</table>

@@ -45,9 +45,7 @@ else if (ViewBag.Message != null)
                         <p>
                             PRODUCTS
 
-                            @*
-                                @Html.ActionLink("Add Product", "Create", "Products", new { }, new { @class = "btn btn-xs btn-info" })
-                            *@
+                            @Html.ActionLink("Add Product", "Create", "Products", new { }, new { @class = "btn btn-xs btn-info" })
                         </p>
                     </div>
                     <div class="col-md-3 col-md-offset-5">
@@ -159,7 +157,7 @@ else if (ViewBag.Message != null)
                                                 Reject
                                                 <span class="caret"></span>
                                             </button>
-                                            <ul class="dropdown-menu ownorent-dropdown-menu">
+                                            <ul class="dropdown-menu">
                                                 <li>@Html.ActionLink("Reject - Revise", "RejectRevise", new { id = item.ProductTemplateId })</li>
                                                 <li>@Html.ActionLink("Reject - Not Allowed", "RejectNotAllowed", new { id = item.ProductTemplateId })</li>
                                             </ul>
