@@ -166,7 +166,7 @@ else if (ViewBag.Message != null)
 
                                     @if (item.ProductTemplateStatus == ProductTemplateStatusConstant.APPROVED)
                                     {
-                                        @Html.ActionLink("Revert to Review", "RevertToReview", new { id = item.ProductTemplateId }, new { @class = "btn btn-xs btn-success" })
+                                        @Html.ActionLink("Revert to Review", "RevertToReview", new { id = item.ProductTemplateId }, new { @class = "btn btn-xs btn-warning" })
                                     }
 
                                     @if (item.ProductTemplateStatus == ProductTemplateStatusConstant.PENDING_REVIEW)

@@ -148,7 +148,7 @@ else if (ViewBag.Message != null)
                                             Options
                                             <span class="caret"></span>
                                         </button>
-                                        <ul class="dropdown-menu ownorent-dropdown-menu">
+                                        <ul class="dropdown-menu ownorent-dropdown-menu ownorent-dropdown-menu-right">
                                             <li>@Html.ActionLink("Edit", "EditProduct", new { id = item.ProductTemplateId })</li>
                                             <li>@Html.ActionLink("Images", "Images", new { id = item.ProductTemplateId })</li>
                                         </ul>
@@ -157,6 +157,16 @@ else if (ViewBag.Message != null)
                                     @if (item.ProductTemplateStatus == ProductTemplateStatusConstant.PENDING_WAREHOUSE_ARRIVAL)
                                     {
                                         @Html.ActionLink("Confirm Arrival", "ConfirmArrival", new { id = item.ProductTemplateId }, new { @class = "btn btn-xs btn-info" })
+                                    }
+
+                                    @if (item.ProductTemplateStatus == ProductTemplateStatusConstant.REJECTED_REVISE)
+                                    {
+                                        @Html.ActionLink("Approve", "Approve", new { id = item.ProductTemplateId }, new { @class = "btn btn-xs btn-success" })
+                                    }
+
+                                    @if (item.ProductTemplateStatus == ProductTemplateStatusConstant.APPROVED)
+                                    {
+                                        @Html.ActionLink("Revert to Review", "RevertToReview", new { id = item.ProductTemplateId }, new { @class = "btn btn-xs btn-success" })
                                     }
 
                                     @if (item.ProductTemplateStatus == ProductTemplateStatusConstant.PENDING_REVIEW)
@@ -168,7 +178,7 @@ else if (ViewBag.Message != null)
                                                 Reject
                                                 <span class="caret"></span>
                                             </button>
-                                            <ul class="dropdown-menu ownorent-dropdown-menu">
+                                            <ul class="dropdown-menu ownorent-dropdown-menu ownorent-dropdown-menu-right">
                                                 <li>@Html.ActionLink("Reject - Revise", "RejectRevise", new { id = item.ProductTemplateId })</li>
                                                 <li>@Html.ActionLink("Reject - Not Allowed", "RejectNotAllowed", new { id = item.ProductTemplateId })</li>
                                             </ul>
