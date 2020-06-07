@@ -74,16 +74,16 @@ else if (ViewBag.Message != null)
                                 STATUS
                             </th>
                             <th>
-                                QTY
+                                STOCK
                             </th>
                             <th>
                                 PRICE
                             </th>
                             <th>
-                                DAILY RENT
+                                RENT - PRICE
                             </th>
                             <th>
-                                CREATED
+                                DATE CREATED
                             </th>
                             <th></th>
                         </tr>
@@ -126,7 +126,7 @@ else if (ViewBag.Message != null)
                                     }
                                 </td>
                                 <td>
-                                    @item.Quantity
+                                    @item.Quantity (0 available)
                                 </td>
                                 <td>
                                     @item.Price.ToString("C2", CultureInfo.GetCultureInfo("fil-PH"))

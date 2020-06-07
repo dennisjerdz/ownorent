@@ -141,16 +141,27 @@ else if (ViewBag.Message != null)
                                     @item.DateCreated.ToString("MM-dd-yyyy")
                                 </td>
                                 <td style="text-align:right;">
-                                    @if (item.ProductTemplateStatus != ProductTemplateStatusConstant.REMOVED && item.ProductTemplateStatus != ProductTemplateStatusConstant.PENDING_REVIEW)
+                                    @Html.ActionLink("Edit", "EditProduct", new { id = item.ProductTemplateId }, new { @class = "btn btn-xs btn-warning" })
+
+                                    @Html.ActionLink("Images", "Images", new { id = item.ProductTemplateId }, new { @class = "btn btn-xs btn-primary" })
+
+                                    @if (item.ProductTemplateStatus == ProductTemplateStatusConstant.PENDING_WAREHOUSE_ARRIVAL)
                                     {
-                                        @Html.ActionLink("Edit", "Edit", new { id = item.ProductTemplateId }, new { @class = "btn btn-xs btn-warning" })
+                                        @Html.ActionLink("Confirm Arrival", "ConfirmArrival", new { id = item.ProductTemplateId }, new { @class = "btn btn-xs btn-info" })
                                     }
 
-                                    @Html.ActionLink("Images", "Images", new { id = item.ProductTemplateId }, new { @class="btn btn-xs btn-primary" })
-
-                                    @if (item.ProductTemplateStatus == ProductTemplateStatusConstant.PENDING_REVIEW || item.ProductTemplateStatus == ProductTemplateStatusConstant.PENDING_WAREHOUSE_ARRIVAL)
+                                    @if (item.ProductTemplateStatus == ProductTemplateStatusConstant.PENDING_REVIEW)
                                     {
-                                        @Html.ActionLink("Cancel", "Cancel", new { id = item.ProductTemplateId }, new { @class = "btn btn-xs btn-danger" })
+                                        <div class="dropdown ownorent-dropdown-button">
+                                            <button class="btn btn-xs btn-danger ownorent-dropdown-button dropdown-toggle" type="button" data-toggle="dropdown">
+                                                Reject
+                                                <span class="caret"></span>
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                <li>@Html.ActionLink("Reject - Revise", "RejectRevise", new { id = item.ProductTemplateId })</li>
+                                                <li>@Html.ActionLink("Reject - Not Allowed", "RejectNotAllowed", new { id = item.ProductTemplateId })</li>
+                                            </ul>
+                                        </div>
                                     }
                                 </td>
                             </tr>
@@ -171,7 +182,7 @@ else if (ViewBag.Message != null)
                 "pageLength": 10,
                 "dom": "<'table-window'<'table-responsive'rt>><'window-footer'<'col-md-6'i><'col-md-6'p>>",
                 "columnDefs": [
-                    { "orderable": false, "targets": 6 }
+                    { "orderable": false, "targets": 7 }
                 ]
             });
 

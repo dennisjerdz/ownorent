@@ -8,40 +8,25 @@ using System.Web;
 using System.Web.Mvc;
 using Ownorent.Models;
 using Microsoft.AspNet.Identity;
-using System.Threading.Tasks;
 using System.IO;
+using System.Net.Mail;
 
 namespace Ownorent.Controllers
 {
-    public class ProductsController : Controller
+    [Authorize(Roles="Admin")]
+    public class AdminController : Controller
     {
         private ApplicationDbContext db = new ApplicationDbContext();
 
-        // GET: Products
-        public ActionResult Index()
+        public ActionResult Products()
         {
-            string userId = User.Identity.GetUserId();
             var productTemplates = db.ProductTemplates
-                .Include(p => p.Category)
-                .Where(p => p.UserId == userId);
-                // .GroupBy(p=>p.Category.CategoryName);
+                .Include(p => p.Category);
 
             return View(productTemplates.ToList());
         }
 
-        public async Task<ActionResult> Index2()
-        {
-            string userId = User.Identity.GetUserId();
-            var productTemplates = await db.ProductTemplates
-                .Include(p => p.Category)
-                .Where(p => p.UserId == userId).ToListAsync();
-                //.GroupBy(p => p.Category.CategoryName).ToListAsync();
-
-            return View(productTemplates);
-        }
-
-        // GET: Products/Details/5
-        public ActionResult Details(int? id)
+        public ActionResult EditProduct(int? id)
         {
             if (id == null)
             {
@@ -52,11 +37,7 @@ namespace Ownorent.Controllers
             {
                 return HttpNotFound();
             }
-            return View(productTemplate);
-        }
 
-        public ActionResult Create()
-        {
             List<string> salvageProperties = new List<string>() { "COMPUTE_SALVAGE_VALUE_PERCENTAGE", "COMPUTE_SALVAGE_RENT_VALUE_PERCENTAGE", "COMPUTE_DAILY_RENT_PERCENTAGE" };
             var salvageSettings = db.Settings.Where(s => salvageProperties.Contains(s.Code)).ToList();
             var salvageValueSetting = salvageSettings.FirstOrDefault(s => s.Code == "COMPUTE_SALVAGE_VALUE_PERCENTAGE");
@@ -68,57 +49,54 @@ namespace Ownorent.Controllers
 
             ViewBag.WarehouseId = new SelectList(db.Warehouses, "WarehouseId", "WarehouseName");
             ViewBag.CategoriesList = db.Categories.ToList();
-            return View();
+
+            return View(productTemplate);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "ProductTemplateId,ProductName,TrackingNumber,ProductDescription,ProductTemplateStatus,Quantity,Price,DailyRentPrice,ComputedPrice,ComputedDailyRentPrice,DatePurchased,CategoryId,WarehouseId")] ProductTemplate productTemplate)
+        public ActionResult EditProduct([Bind(Include = "ProductTemplateId,UserId,DateCreated,ProductTemplateStatus,TrackingNumber,ProductName,ProductDescription,ProductPriceToUse,Quantity,Price,DailyRentPrice,ComputedPrice,ComputedDailyRentPrice,AdminDefinedPrice,AdminDefinedDailyRentPrice,ShippingFee,ShippingFeeProvincial,DatePurchased,CategoryId,WarehouseId")] ProductTemplate productTemplate)
         {
-            productTemplate.UserId = User.Identity.GetUserId();
-            productTemplate.DateCreated = DateTime.UtcNow.AddHours(8);
-            productTemplate.DateLastModified = DateTime.UtcNow.AddHours(8);
-            productTemplate.ProductTemplateStatus = ProductTemplateStatusConstant.PENDING_WAREHOUSE_ARRIVAL;
+            var actualTemplate = db.ProductTemplates.FirstOrDefault(p => p.ProductTemplateId == productTemplate.ProductTemplateId);
+
+            actualTemplate.ProductName = productTemplate.ProductName;
+            actualTemplate.ProductDescription = productTemplate.ProductDescription;
+            actualTemplate.Price = productTemplate.Price;
+            actualTemplate.DailyRentPrice = productTemplate.DailyRentPrice;
+            actualTemplate.ComputedPrice = productTemplate.ComputedPrice;
+            actualTemplate.ComputedDailyRentPrice = productTemplate.ComputedDailyRentPrice;
+            actualTemplate.CategoryId = productTemplate.CategoryId;
+            actualTemplate.TrackingNumber = productTemplate.TrackingNumber;
+            actualTemplate.WarehouseId = productTemplate.WarehouseId;
+            actualTemplate.Quantity = productTemplate.Quantity;
+            actualTemplate.DatePurchased = productTemplate.DatePurchased;
+            actualTemplate.LastModifiedBy = User.Identity.Name;
+            actualTemplate.DateLastModified = DateTime.UtcNow.AddHours(8);
+
+            actualTemplate.ShippingFee = productTemplate.ShippingFee;
+            actualTemplate.ShippingFeeProvincial = productTemplate.ShippingFeeProvincial;
+            actualTemplate.ProductPriceToUse = productTemplate.ProductPriceToUse;
 
             if (ModelState.IsValid)
             {
-                db.ProductTemplates.Add(productTemplate);
+                db.Entry(actualTemplate).State = EntityState.Modified;
                 db.SaveChanges();
-                TempData["Message"] = "<strong>Product added successfully.</strong> To expedite the approval process, upload images of the receipt/proof of purchase and the actual product.";
-                return RedirectToAction("Images", new { id = productTemplate.ProductTemplateId });
+                return RedirectToAction("Products");
             }
+
+            List<string> salvageProperties = new List<string>() { "COMPUTE_SALVAGE_VALUE_PERCENTAGE", "COMPUTE_SALVAGE_RENT_VALUE_PERCENTAGE", "COMPUTE_DAILY_RENT_PERCENTAGE" };
+            var salvageSettings = db.Settings.Where(s => salvageProperties.Contains(s.Code)).ToList();
+            var salvageValueSetting = salvageSettings.FirstOrDefault(s => s.Code == "COMPUTE_SALVAGE_VALUE_PERCENTAGE");
+            var salvageRentValueSetting = salvageSettings.FirstOrDefault(s => s.Code == "COMPUTE_SALVAGE_RENT_VALUE_PERCENTAGE");
+            var dailyRentPercentageSetting = salvageSettings.FirstOrDefault(s => s.Code == "COMPUTE_DAILY_RENT_PERCENTAGE");
+            ViewBag.salvageValue = (salvageValueSetting != null) ? salvageValueSetting.Value : "30";
+            ViewBag.salvageRentValue = (salvageRentValueSetting != null) ? salvageRentValueSetting.Value : "0.09";
+            ViewBag.dailyRentPercentage = (dailyRentPercentageSetting != null) ? dailyRentPercentageSetting.Value : "0.2";
 
             ViewBag.WarehouseId = new SelectList(db.Warehouses, "WarehouseId", "WarehouseName");
             ViewBag.CategoriesList = db.Categories.ToList();
+
             return View(productTemplate);
-        }
-
-        public ActionResult Cancel(int id)
-        {
-            var productTemplate = db.ProductTemplates.Include(p => p.Attachment).FirstOrDefault(p => p.ProductTemplateId == id);
-
-            if (productTemplate == null)
-            {
-                return HttpNotFound();
-            }
-
-            if (productTemplate.ProductTemplateStatus == ProductTemplateStatusConstant.PENDING_WAREHOUSE_ARRIVAL)
-            {
-                productTemplate.ProductTemplateStatus = ProductTemplateStatusConstant.REMOVED;
-                TempData["Message"] = "<strong>Product Application cancelled successfully.</strong> If your product is in-freight during cancellation, please contact us.";
-            }
-            else if(productTemplate.ProductTemplateStatus == ProductTemplateStatusConstant.PENDING_REVIEW)
-            {
-                productTemplate.ProductTemplateStatus = ProductTemplateStatusConstant.REMOVED;
-                TempData["Message"] = "<strong>Product Application cancelled successfully.</strong> Please contact us to arrange shipping out of the warehouse.";
-            }
-            else
-            {
-
-            }
-
-            db.SaveChanges();
-            return RedirectToAction("Index");
         }
 
         public ActionResult Images(int id)
@@ -132,7 +110,7 @@ namespace Ownorent.Controllers
                 ViewBag.Message = TempData["Message"];
             }
 
-            var productTemplate = db.ProductTemplates.Include(p=>p.Attachment).FirstOrDefault(p => p.ProductTemplateId == id);
+            var productTemplate = db.ProductTemplates.Include(p => p.Attachment).FirstOrDefault(p => p.ProductTemplateId == id);
 
             if (productTemplate == null)
             {
@@ -217,9 +195,9 @@ namespace Ownorent.Controllers
         {
             var image = db.ProductTemplateAttachments.FirstOrDefault(p => p.ProductTemplateAttachmentId == id);
 
-            if (image !=null)
+            if (image != null)
             {
-                var toDelete = Server.MapPath("~/Content/Uploads/Images/"+image.Location);
+                var toDelete = Server.MapPath("~/Content/Uploads/Images/" + image.Location);
 
                 if (System.IO.File.Exists(toDelete))
                 {
@@ -237,7 +215,58 @@ namespace Ownorent.Controllers
             return RedirectToAction("Images", new { id = productId });
         }
 
-        public ActionResult Edit(int? id)
+        public ActionResult ConfirmArrival(int id)
+        {
+            var productTemplate = db.ProductTemplates.Include(p => p.Attachment).FirstOrDefault(p => p.ProductTemplateId == id);
+
+            if (productTemplate == null)
+            {
+                return HttpNotFound();
+            }
+
+            #region Email
+            string body = "We have confirmed the arrival of your product, "+productTemplate.ProductName+" , in our "+productTemplate.Warehouse.WarehouseName+" Warehouse. Another email will be sent once an Admin has finished reviewing your product.";
+
+            MailAddress fromAddress = new MailAddress("ownorent@gmail.com", "Ownorent Registration Service");
+            MailAddress toAddress = new MailAddress(productTemplate.User.Email, productTemplate.User.FirstName);
+            string fromPassword = "ownorent$123456";
+            string subject = "Ownorent Product Application - " + DateTime.UtcNow.AddHours(8).ToString("MM-dd-yy");
+
+            SmtpClient smtp = new SmtpClient()
+            {
+                Host = "smtp.gmail.com",
+                Port = 587,
+                EnableSsl = true,
+                DeliveryMethod = SmtpDeliveryMethod.Network,
+                UseDefaultCredentials = false,
+                Credentials = new System.Net.NetworkCredential(fromAddress.Address, fromPassword)
+            };
+
+            MailMessage message = new MailMessage(fromAddress, toAddress)
+            {
+                Subject = subject,
+                Body = body
+            };
+            message.CC.Add(new MailAddress(productTemplate.User.Email));
+            #endregion
+
+            try
+            {
+                smtp.Send(message);
+            }
+            catch (Exception e)
+            {
+                return Content(e.Message);
+            }
+
+            productTemplate.ProductTemplateStatus = ProductTemplateStatusConstant.PENDING_REVIEW;
+            db.SaveChanges();
+
+            TempData["Message"] = "<strong>Product status updated successfully.</strong> User has been notified.";
+            return RedirectToAction("Products");
+        }
+
+        public ActionResult Details(int? id)
         {
             if (id == null)
             {
@@ -248,65 +277,10 @@ namespace Ownorent.Controllers
             {
                 return HttpNotFound();
             }
-
-            List<string> salvageProperties = new List<string>() { "COMPUTE_SALVAGE_VALUE_PERCENTAGE", "COMPUTE_SALVAGE_RENT_VALUE_PERCENTAGE", "COMPUTE_DAILY_RENT_PERCENTAGE" };
-            var salvageSettings = db.Settings.Where(s => salvageProperties.Contains(s.Code)).ToList();
-            var salvageValueSetting = salvageSettings.FirstOrDefault(s => s.Code == "COMPUTE_SALVAGE_VALUE_PERCENTAGE");
-            var salvageRentValueSetting = salvageSettings.FirstOrDefault(s => s.Code == "COMPUTE_SALVAGE_RENT_VALUE_PERCENTAGE");
-            var dailyRentPercentageSetting = salvageSettings.FirstOrDefault(s => s.Code == "COMPUTE_DAILY_RENT_PERCENTAGE");
-            ViewBag.salvageValue = (salvageValueSetting != null) ? salvageValueSetting.Value : "30";
-            ViewBag.salvageRentValue = (salvageRentValueSetting != null) ? salvageRentValueSetting.Value : "0.09";
-            ViewBag.dailyRentPercentage = (dailyRentPercentageSetting != null) ? dailyRentPercentageSetting.Value : "0.2";
-
-            ViewBag.WarehouseId = new SelectList(db.Warehouses, "WarehouseId", "WarehouseName");
-            ViewBag.CategoriesList = db.Categories.ToList();
-
             return View(productTemplate);
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "ProductTemplateId,UserId,DateCreated,ProductTemplateStatus,TrackingNumber,ProductName,ProductDescription,ProductPriceToUse,Quantity,Price,DailyRentPrice,ComputedPrice,ComputedDailyRentPrice,AdminDefinedPrice,AdminDefinedDailyRentPrice,ShippingFee,ShippingFeeProvincial,DatePurchased,CategoryId,WarehouseId")] ProductTemplate productTemplate)
-        {
-            var actualTemplate = db.ProductTemplates.FirstOrDefault(p => p.ProductTemplateId == productTemplate.ProductTemplateId);
-
-            actualTemplate.ProductName = productTemplate.ProductName;
-            actualTemplate.ProductDescription = productTemplate.ProductDescription;
-            actualTemplate.Price = productTemplate.Price;
-            actualTemplate.DailyRentPrice = productTemplate.DailyRentPrice;
-            actualTemplate.ComputedPrice = productTemplate.ComputedPrice;
-            actualTemplate.ComputedDailyRentPrice = productTemplate.ComputedDailyRentPrice;
-            actualTemplate.CategoryId = productTemplate.CategoryId;
-            actualTemplate.TrackingNumber = productTemplate.TrackingNumber;
-            actualTemplate.WarehouseId = productTemplate.WarehouseId;
-            actualTemplate.Quantity = productTemplate.Quantity;
-            actualTemplate.DatePurchased = productTemplate.DatePurchased;
-            actualTemplate.LastModifiedBy = User.Identity.Name;
-            actualTemplate.DateLastModified = DateTime.UtcNow.AddHours(8);
-
-            if (ModelState.IsValid)
-            {
-                db.Entry(actualTemplate).State = EntityState.Modified;
-                db.SaveChanges();
-                return RedirectToAction("Index");
-            }
-
-            List<string> salvageProperties = new List<string>() { "COMPUTE_SALVAGE_VALUE_PERCENTAGE", "COMPUTE_SALVAGE_RENT_VALUE_PERCENTAGE", "COMPUTE_DAILY_RENT_PERCENTAGE" };
-            var salvageSettings = db.Settings.Where(s => salvageProperties.Contains(s.Code)).ToList();
-            var salvageValueSetting = salvageSettings.FirstOrDefault(s => s.Code == "COMPUTE_SALVAGE_VALUE_PERCENTAGE");
-            var salvageRentValueSetting = salvageSettings.FirstOrDefault(s => s.Code == "COMPUTE_SALVAGE_RENT_VALUE_PERCENTAGE");
-            var dailyRentPercentageSetting = salvageSettings.FirstOrDefault(s => s.Code == "COMPUTE_DAILY_RENT_PERCENTAGE");
-            ViewBag.salvageValue = (salvageValueSetting != null) ? salvageValueSetting.Value : "30";
-            ViewBag.salvageRentValue = (salvageRentValueSetting != null) ? salvageRentValueSetting.Value : "0.09";
-            ViewBag.dailyRentPercentage = (dailyRentPercentageSetting != null) ? dailyRentPercentageSetting.Value : "0.2";
-
-            ViewBag.WarehouseId = new SelectList(db.Warehouses, "WarehouseId", "WarehouseName");
-            ViewBag.CategoriesList = db.Categories.ToList();
-
-            return View(productTemplate);
-        }
-
-        // GET: Products/Delete/5
+        // GET: Admin/Delete/5
         public ActionResult Delete(int? id)
         {
             if (id == null)
@@ -321,7 +295,7 @@ namespace Ownorent.Controllers
             return View(productTemplate);
         }
 
-        // POST: Products/Delete/5
+        // POST: Admin/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)
