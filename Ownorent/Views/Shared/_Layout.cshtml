@@ -19,7 +19,7 @@
     <body style="background-color:@bgColor;">
         @if (ViewBag.Cart != null)
         {
-            <a class="floating-cart" href="@Url.Action("Cart","Products")"><i class="icon flaticon-package"></i><span>6</span></a>
+            <a class="floating-cart" href="@Url.Action("Cart","Products")"><i class="icon flaticon-package"></i><span>@ViewBag.Cart</span></a>
         }
         <div class="navbar navbar-default">
             <div class="navbar-overhead">

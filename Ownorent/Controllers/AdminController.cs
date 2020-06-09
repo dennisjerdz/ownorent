@@ -10,6 +10,7 @@ using Ownorent.Models;
 using Microsoft.AspNet.Identity;
 using System.IO;
 using System.Net.Mail;
+using System.Threading.Tasks;
 
 namespace Ownorent.Controllers
 {
@@ -220,53 +221,75 @@ namespace Ownorent.Controllers
 
         public ActionResult Approve(int id)
         {
-            var productTemplate = db.ProductTemplates.Include(p => p.Attachment).FirstOrDefault(p => p.ProductTemplateId == id);
+            var productTemplate = db.ProductTemplates.Include(p => p.Attachment).Include(p=>p.Products).FirstOrDefault(p => p.ProductTemplateId == id);
 
             if (productTemplate == null)
             {
                 return HttpNotFound();
             }
 
-            #region Email
-            string body = "Congratulations! Your product, " + productTemplate.ProductName + " , has been approved and will now be publicly listed. An email will be sent whenever a customer orders for your product.";
-
-            MailAddress fromAddress = new MailAddress("ownorent@gmail.com", "Ownorent Registration Service");
-            MailAddress toAddress = new MailAddress(productTemplate.User.Email, productTemplate.User.FirstName);
-            string fromPassword = "ownorent$123456";
-            string subject = "Ownorent Product Application - " + DateTime.UtcNow.AddHours(8).ToString("MM-dd-yy");
-
-            SmtpClient smtp = new SmtpClient()
-            {
-                Host = "smtp.gmail.com",
-                Port = 587,
-                EnableSsl = true,
-                DeliveryMethod = SmtpDeliveryMethod.Network,
-                UseDefaultCredentials = false,
-                Credentials = new System.Net.NetworkCredential(fromAddress.Address, fromPassword)
-            };
-
-            MailMessage message = new MailMessage(fromAddress, toAddress)
-            {
-                Subject = subject,
-                Body = body
-            };
-            message.CC.Add(new MailAddress(productTemplate.User.Email));
-            #endregion
-
-            try
-            {
-                smtp.Send(message);
-            }
-            catch (Exception e)
-            {
-                return Content(e.Message);
-            }
+            // send email job
+            SendApproveEmailJob(productTemplate.ProductName, productTemplate.User.Email, productTemplate.User.FirstName);
 
             productTemplate.ProductTemplateStatus = ProductTemplateStatusConstant.APPROVED;
+
+            if (productTemplate.Quantity > 0)
+            {
+                if (productTemplate.Products.Count > 0)
+                {
+                    // this product has been approved before
+                }
+                else
+                {
+                    for (int count = 0; count < productTemplate.Quantity; count++)
+                    {
+                        db.Products.Add(new Product
+                        {
+                            ProductName = productTemplate.ProductName,
+                            ProductDescription = productTemplate.ProductDescription,
+                            ProductStatus = ProductStatusConstant.AVAILABLE,
+                            ProductTemplateId = productTemplate.ProductTemplateId
+                        });
+                    }
+                }
+            }
+
             db.SaveChanges();
 
             TempData["Message"] = "<strong>Product status updated successfully.</strong> User has been notified.";
             return RedirectToAction("Products");
+        }
+
+        public void SendApproveEmailJob(string productName, string email, string firstName)
+        {
+            Task.Run(() =>
+            {
+                string body = "Congratulations! Your product, " + productName + " , has been approved and will now be publicly listed. An email will be sent whenever a customer orders for your product.";
+
+                MailAddress fromAddress = new MailAddress("ownorent@gmail.com", "Ownorent Registration Service");
+                MailAddress toAddress = new MailAddress(email, firstName);
+                string fromPassword = "ownorent$123456";
+                string subject = "Ownorent Product Application - " + DateTime.UtcNow.AddHours(8).ToString("MM-dd-yy");
+
+                SmtpClient smtp = new SmtpClient()
+                {
+                    Host = "smtp.gmail.com",
+                    Port = 587,
+                    EnableSsl = true,
+                    DeliveryMethod = SmtpDeliveryMethod.Network,
+                    UseDefaultCredentials = false,
+                    Credentials = new System.Net.NetworkCredential(fromAddress.Address, fromPassword)
+                };
+
+                MailMessage message = new MailMessage(fromAddress, toAddress)
+                {
+                    Subject = subject,
+                    Body = body
+                };
+                message.CC.Add(new MailAddress(email));
+
+                smtp.Send(message);
+            });
         }
 
         public ActionResult RevertToReview(int id)

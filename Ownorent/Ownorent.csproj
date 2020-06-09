@@ -211,6 +211,14 @@
     <Compile Include="Migrations\202006061838240_Tracking number.Designer.cs">
       <DependentUpon>202006061838240_Tracking number.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202006091318136_byte or sbyte fixes.cs" />
+    <Compile Include="Migrations\202006091318136_byte or sbyte fixes.Designer.cs">
+      <DependentUpon>202006091318136_byte or sbyte fixes.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202006092030548_cart update to handle rent and rent to own.cs" />
+    <Compile Include="Migrations\202006092030548_cart update to handle rent and rent to own.Designer.cs">
+      <DependentUpon>202006092030548_cart update to handle rent and rent to own.cs</DependentUpon>
+    </Compile>
     <Compile Include="OwnorentHelper.cs" />
     <Compile Include="Migrations\202005290332179_initial.cs" />
     <Compile Include="Migrations\202005290332179_initial.Designer.cs">
@@ -330,6 +338,7 @@
     <Content Include="Views\Admin\Products.cshtml" />
     <Content Include="Views\Admin\Images.cshtml" />
     <Content Include="Views\Products\p.cshtml" />
+    <Content Include="Views\Products\Cart.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -355,6 +364,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202006061838240_Tracking number.resx">
       <DependentUpon>202006061838240_Tracking number.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202006091318136_byte or sbyte fixes.resx">
+      <DependentUpon>202006091318136_byte or sbyte fixes.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202006092030548_cart update to handle rent and rent to own.resx">
+      <DependentUpon>202006092030548_cart update to handle rent and rent to own.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

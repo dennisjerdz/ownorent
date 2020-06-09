@@ -187,16 +187,31 @@ namespace Ownorent.Models
 
     public class Cart
     {
+        public Cart()
+        {
+            DateCreated = DateTime.UtcNow.AddHours(8);
+        }
+
         public int CartId { get; set; }
 
         public int ProductTemplateId { get; set; }
-        public virtual ProductTemplate Product { get; set; }
+        [ForeignKey("ProductTemplateId")]
+        public ProductTemplate Product { get; set; }
 
         public string UserId { get; set; }
+        [ForeignKey("UserId")]
         public ApplicationUser User { get; set; }
 
         public int Quantity { get; set; }
         public byte CartType { get; set; }
+
+        public DateTime? RentDateStart { get; set; }
+        public DateTime? RentDateEnd { get; set; }
+
+        public int? RentToOwnPaymentTermId { get; set; }
+        [ForeignKey("RentToOwnPaymentTermId")]
+        public RentToOwnPaymentTerm PaymentTerm { get; set; }
+
         public DateTime DateCreated { get; set; }
     }
 
@@ -209,7 +224,7 @@ namespace Ownorent.Models
 
         public int ProductId { get; set; }
         [Required]
-        [Display(Name ="Name")]
+        [Display(Name = "Name")]
         public string ProductName { get; set; }
         [Required]
         [Display(Name = "Description")]
@@ -254,7 +269,7 @@ namespace Ownorent.Models
         [ForeignKey("ProductId")]
         public Product Product { get; set; }
     }
-    
+
     public class ProductNote
     {
         public ProductNote()
@@ -373,7 +388,41 @@ namespace Ownorent.Models
         public string Value { get; set; }
         public string Description { get; set; }
         public bool IsActive { get; set; }
-        
+
         public DateTime DateCreated { get; set; }
+    }
+
+    /*View Models*/
+
+    public class CartValidateModel{
+        public int ProductTemplateId { get; set; }
+        public string ProductName { get; set; }
+        public int QuantityNeeded { get; set; }
+
+        private int _QuantityAvailable;
+
+        public int QuantityAvailable {
+            get
+            {
+                return this._QuantityAvailable;
+            }
+            set
+            {
+                this._QuantityAvailable = value;
+                if (this.QuantityNeeded > this._QuantityAvailable)
+                {
+                    this.Error = true;
+                    this.Message = 
+                        "Your total requested quantity for "+this.ProductName+" is "+ this.QuantityNeeded+" but the quantity available is "+ this._QuantityAvailable + ".";
+                }
+                else
+                {
+                    this.Error = false;
+                    this.Message = "";
+                }
+            }
+        }
+        public bool Error { get; set; }
+        public string Message { get; set; }
     }
 }

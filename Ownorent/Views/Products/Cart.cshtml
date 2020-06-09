@@ -1,0 +1,395 @@
+﻿@model IEnumerable<Ownorent.Models.Cart>
+@using Ownorent.Models
+@using System.Globalization
+@{
+    ViewBag.Title = "Cart";
+    ViewBag.bgColor = "#f8fafc";
+}
+
+@if (ViewBag.Error != null)
+{
+    if (ViewBag.Error == "1")
+    {
+        <div class="row">
+            <div class="col-md-12">
+                <br />
+                <div class="ownorent-alert alert alert-danger">
+                    @Html.Raw(ViewBag.Message)
+                </div>
+            </div>
+        </div>
+    }
+}
+else if (ViewBag.Message != null)
+{
+    <div class="row">
+        <div class="col-md-12">
+            <br />
+            <div class="ownorent-alert alert alert-success">
+                @Html.Raw(ViewBag.Message)
+            </div>
+        </div>
+    </div>
+}
+
+<div class="row">
+    <div class="col-md-9">
+        <div class="ownorent-panel ownorent-panel-white marginTop15">
+
+            @if (Model.Count() == 0)
+            {
+                <div class="ownorent-panel-body">
+                    <center>
+                        <br />
+                        <h4>There are no items in your cart.</h4>
+                        <h4>Check our items @Html.ActionLink("here","p").</h4>
+                        <br />
+                    </center>
+                </div>
+            }
+            else
+            {
+                using (Html.BeginForm("Cart", "Products", FormMethod.Post, new { @class = "", role = "form" }))
+                {
+                    if (Model.Any(c => c.CartType == CartTypeConstant.BUY))
+                    {
+                        <div class="ownorent-panel-body ownorent-panel-table">
+                            <table class="table table-buy table-condensed table-hover ownorent-compact-table">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            NAME
+                                        </th>
+                                        <th>
+                                            PRICE
+                                        </th>
+                                        <th>
+                                            QTY
+                                        </th>
+                                        <th>
+                                            SUBTOTAL
+                                        </th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    @foreach (var item in Model.Where(c => c.CartType == CartTypeConstant.BUY))
+                                    {
+                                        <tr>
+                                            <td>
+                                                @item.Product.ProductName
+                                            </td>
+                                            <td>
+                                                @if (item.Product.ProductPriceToUse == ProductPriceToUseConstant.SELLER_DEFINED_PRICE)
+                                                {
+                                                    <text>@item.Product.Price.ToString("C2", CultureInfo.GetCultureInfo("fil-PH"))</text>
+                                                }
+                                                else
+                                                {
+                                                    if (item.Product.ComputedPrice != null)
+                                                    {
+                                                        <text>@item.Product.ComputedPrice.Value.ToString("C2", CultureInfo.GetCultureInfo("fil-PH"))</text>
+                                                    }
+                                                    else
+                                                    {
+                                                        <text>@item.Product.Price.ToString("C2", CultureInfo.GetCultureInfo("fil-PH"))</text>
+                                                    }
+                                                }
+                                            </td>
+                                            <td>
+                                                @item.Quantity
+                                            </td>
+                                            <td>
+                                                @if (item.Product.ProductPriceToUse == ProductPriceToUseConstant.SELLER_DEFINED_PRICE)
+                                                {
+                                                    <text>
+                                                        @((item.Product.Price * item.Quantity).ToString("C2", CultureInfo.GetCultureInfo("fil-PH")))
+                                                    </text>
+                                                }
+                                                else
+                                                {
+                                                    if (item.Product.ComputedPrice != null)
+                                                    {
+                                                        <text>
+                                                            @((item.Product.ComputedPrice.Value * item.Quantity).ToString("C2", CultureInfo.GetCultureInfo("fil-PH")))
+                                                        </text>
+                                                    }
+                                                    else
+                                                    {
+                                                        <text>
+                                                            @((item.Product.Price * item.Quantity).ToString("C2", CultureInfo.GetCultureInfo("fil-PH")))
+                                                        </text>
+                                                    }
+                                                }
+                                            </td>
+                                            <td style="text-align:right;">
+                                                @Html.ActionLink("Remove", "RemoveFromCart", new { id = item.CartId }, new { @class = "btn btn-xs btn-danger" })
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+
+                        </div>
+                    }
+
+                    if (Model.Any(c => c.CartType == CartTypeConstant.RENT))
+                    {
+                        <div class="ownorent-panel-body ownorent-panel-table">
+                            <table class="table table-rent table-condensed table-hover ownorent-compact-table">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            NAME
+                                        </th>
+                                        <th>
+                                            PRICE
+                                        </th>
+                                        <th>
+                                            QTY
+                                        </th>
+                                        <th>
+                                            SUBTOTAL
+                                        </th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    @foreach (var item in Model.Where(c => c.CartType == CartTypeConstant.RENT))
+                                    {
+                                        <tr>
+                                            <td>
+                                                @item.Product.ProductName
+                                            </td>
+                                            <td>
+                                                @if (item.Product.ProductPriceToUse == ProductPriceToUseConstant.SELLER_DEFINED_PRICE)
+                                                {
+                                                    if (item.Product.DailyRentPrice != null)
+                                                    {
+                                                        <text>@item.Product.DailyRentPrice.Value.ToString("C2", CultureInfo.GetCultureInfo("fil-PH"))</text>
+                                                    }
+                                                    else
+                                                    {
+                                                        if (item.Product.ComputedDailyRentPrice != null)
+                                                        {
+                                                            <text>@item.Product.ComputedDailyRentPrice.Value.ToString("C2", CultureInfo.GetCultureInfo("fil-PH"))</text>
+                                                        }
+                                                        else
+                                                        {
+                                                            <text>@((0).ToString("C2", CultureInfo.GetCultureInfo("fil-PH")))</text>
+                                                        }
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    if (item.Product.ComputedDailyRentPrice != null)
+                                                    {
+                                                        <text>@item.Product.ComputedDailyRentPrice.Value.ToString("C2", CultureInfo.GetCultureInfo("fil-PH"))</text>
+                                                    }
+                                                    else
+                                                    {
+                                                        <text>@((0).ToString("C2", CultureInfo.GetCultureInfo("fil-PH")))</text>
+                                                    }
+                                                }
+                                            </td>
+                                            <td>
+                                                @item.Quantity
+                                            </td>
+                                            <td>
+                                                @if (item.Product.ProductPriceToUse == ProductPriceToUseConstant.SELLER_DEFINED_PRICE)
+                                                {
+                                                    if (item.Product.DailyRentPrice != null)
+                                                    {
+                                                        <text>@((item.Product.DailyRentPrice.Value * item.Quantity).ToString("C2", CultureInfo.GetCultureInfo("fil-PH")))</text>
+                                                    }
+                                                    else
+                                                    {
+                                                        if (item.Product.ComputedDailyRentPrice != null)
+                                                        {
+                                                            <text>@((item.Product.ComputedDailyRentPrice.Value * item.Quantity).ToString("C2", CultureInfo.GetCultureInfo("fil-PH")))</text>
+                                                        }
+                                                        else
+                                                        {
+                                                            <text>@((0).ToString("C2", CultureInfo.GetCultureInfo("fil-PH")))</text>
+                                                        }
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    if (item.Product.ComputedDailyRentPrice != null)
+                                                    {
+                                                        <text>@((item.Product.ComputedDailyRentPrice.Value * item.Quantity).ToString("C2", CultureInfo.GetCultureInfo("fil-PH")))</text>
+                                                    }
+                                                    else
+                                                    {
+                                                        <text>@((0).ToString("C2", CultureInfo.GetCultureInfo("fil-PH")))</text>
+                                                    }
+                                                }
+                                            </td>
+                                            <td style="text-align:right;">
+                                                @Html.ActionLink("Remove", "RemoveFromCart", new { id = item.CartId }, new { @class = "btn btn-xs btn-danger" })
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+
+                        </div>
+                    }
+
+                    if (Model.Any(c => c.CartType == CartTypeConstant.RENT_TO_OWN))
+                    {
+                        <div class="ownorent-panel-body ownorent-panel-table">
+                            <table class="table table-rent-to-own table-condensed table-hover ownorent-compact-table">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            NAME
+                                        </th>
+                                        <th>
+                                            PRICE
+                                        </th>
+                                        <th>
+                                            QTY
+                                        </th>
+                                        <th>
+                                            SUBTOTAL
+                                        </th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    @foreach (var item in Model.Where(c => c.CartType == CartTypeConstant.RENT_TO_OWN))
+                                    {
+                                        <tr>
+                                            <td>
+                                                @item.Product.ProductName
+                                            </td>
+                                            <td>
+                                                @if (item.Product.ProductPriceToUse == ProductPriceToUseConstant.SELLER_DEFINED_PRICE)
+                                                {
+                                                    if (item.Product.DailyRentPrice != null)
+                                                    {
+                                                        <text>@item.Product.DailyRentPrice.Value.ToString("C2", CultureInfo.GetCultureInfo("fil-PH"))</text>
+                                                    }
+                                                    else
+                                                    {
+                                                        if (item.Product.ComputedDailyRentPrice != null)
+                                                        {
+                                                            <text>@item.Product.ComputedDailyRentPrice.Value.ToString("C2", CultureInfo.GetCultureInfo("fil-PH"))</text>
+                                                        }
+                                                        else
+                                                        {
+                                                            <text>@((0).ToString("C2", CultureInfo.GetCultureInfo("fil-PH")))</text>
+                                                        }
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    if (item.Product.ComputedDailyRentPrice != null)
+                                                    {
+                                                        <text>@item.Product.ComputedDailyRentPrice.Value.ToString("C2", CultureInfo.GetCultureInfo("fil-PH"))</text>
+                                                    }
+                                                    else
+                                                    {
+                                                        <text>@((0).ToString("C2", CultureInfo.GetCultureInfo("fil-PH")))</text>
+                                                    }
+                                                }
+                                            </td>
+                                            <td>
+                                                @item.Quantity
+                                            </td>
+                                            <td>
+                                                @if (item.Product.ProductPriceToUse == ProductPriceToUseConstant.SELLER_DEFINED_PRICE)
+                                                {
+                                                    if (item.Product.DailyRentPrice != null)
+                                                    {
+                                                        <text>@((item.Product.DailyRentPrice.Value * item.Quantity).ToString("C2", CultureInfo.GetCultureInfo("fil-PH")))</text>
+                                                    }
+                                                    else
+                                                    {
+                                                        if (item.Product.ComputedDailyRentPrice != null)
+                                                        {
+                                                            <text>@((item.Product.ComputedDailyRentPrice.Value * item.Quantity).ToString("C2", CultureInfo.GetCultureInfo("fil-PH")))</text>
+                                                        }
+                                                        else
+                                                        {
+                                                            <text>@((0).ToString("C2", CultureInfo.GetCultureInfo("fil-PH")))</text>
+                                                        }
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    if (item.Product.ComputedDailyRentPrice != null)
+                                                    {
+                                                        <text>@((item.Product.ComputedDailyRentPrice.Value * item.Quantity).ToString("C2", CultureInfo.GetCultureInfo("fil-PH")))</text>
+                                                    }
+                                                    else
+                                                    {
+                                                        <text>@((0).ToString("C2", CultureInfo.GetCultureInfo("fil-PH")))</text>
+                                                    }
+                                                }
+                                            </td>
+                                            <td style="text-align:right;">
+                                                @Html.ActionLink("Remove", "RemoveFromCart", new { id = item.CartId }, new { @class = "btn btn-xs btn-danger" })
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+
+                        </div>
+                    }
+                }
+            }
+            
+            
+            @*
+            <div class="ownorent-panel-header" style="background-color:#71cd14; color:white;">
+                
+            </div>
+            *@
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="ownorent-panel ownorent-panel-white marginTop15">
+            <div class="ownorent-panel-header" style="background-color:#71cd14; color:white;">
+
+            </div>
+
+            <div class="ownorent-panel-body ownorent-panel-tools">
+                @Html.ActionLink("Update Cart", "p", new { }, new { @class = "update-cart btn btn-xs btn-info" })
+
+                <hr />
+                Total: Money
+
+                @Html.ActionLink("Checkout", "Checkout", new { }, new { @class = "btn btn-md btn-block btn-warning" })
+                @Html.ActionLink("< Continue Shopping", "p", new { }, new { @class = "btn btn-xs btn-block btn-default" })
+            </div>
+        </div>
+    </div>
+    
+</div>
+
+@section scripts{
+    <script>
+        $(document).ready(function () {
+            var datatable = $(".table-buy").DataTable({
+                paging: true,
+                "pageLength": 10,
+                "dom": "<'table-window'<'table-responsive'rt>><'window-footer'<'col-md-6'i><'col-md-6'p>>",
+                "columnDefs": [
+                    { "orderable": false, "targets": 4 }
+                ]
+            });
+
+            $(".all-search").keyup(function () {
+                datatable.search($(this).val()).draw();
+            })
+        });
+    </script>
+}

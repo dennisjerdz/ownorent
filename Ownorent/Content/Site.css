@@ -384,7 +384,10 @@ footer .right {
 }
 
 .ownorent-product-card-header{
-    height:15px;
+    line-height:24px;
+    font-size:0.9em;
+    font-style:italic;
+    padding-left:6px;
     border-top: 1px solid #71cd14;
 }
 

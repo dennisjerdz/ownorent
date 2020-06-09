@@ -309,6 +309,10 @@ footer .right {
     padding:0px 0px 0px 20px !important;
 }
 
+.ownorent-alert{
+    margin-bottom:5px;
+}
+
 .ownorent-alert.alert-success{
     border: none !important;
     background-color:#38c172;
@@ -371,6 +375,98 @@ footer .right {
 
 .ownorent-panel .ownorent-panel-table{
     padding:10px 0px !important;
+}
+
+.ownorent-product-card{
+    background-color:white;
+    border:1px solid rgba(0,0,0,0.1);
+    border-radius:3px;
+}
+
+.ownorent-product-card-header{
+    height:15px;
+    border-top: 1px solid #71cd14;
+}
+
+.ownorent-product-card:hover .ownorent-product-card-img{
+    background-size:cover !important;
+}
+
+.ownorent-product-card-bg-container{
+    overflow:hidden;
+    margin-bottom:8px;
+}
+
+.ownorent-product-card-bg-container div{
+    position:relative !important;
+    top:0;
+    left:0;
+    border-top:1px solid rgba(0,0,0,0.1);
+    border-bottom:1px solid rgba(0,0,0,0.1);
+}
+
+.ownorent-product-card-bg{
+    filter: blur(12px);
+    -webkit-filter: blur(12px);
+    background-size:contain !important;
+    background-position:center !important;
+    height:160px;
+}
+
+.ownorent-product-card-img-no-pic{
+    width:100%;
+    height:160px;
+    background-repeat:repeat !important;
+    background-size: 61px 61px !important;
+    z-index:99;
+    filter: blur(1px);
+    -webkit-filter: brightness(3);
+}
+
+.ownorent-product-card-img{
+    width:100%;
+    height:160px;
+    background-size:contain !important;
+    background-position:center !important;
+    background-repeat:no-repeat !important;
+    z-index:99;
+    margin-top:-160px;
+}
+
+.ownorent-product-card-info{
+    width:100%;
+    padding:5px 15px 10px;
+}
+
+.ownorent-product-card-info p{
+    margin-bottom:5px;
+}
+
+.ownorent-product-card-info .name{
+    font-family: 'Roboto', sans-serif !important;
+    font-weight:400;
+    font-size:0.95em;
+    margin-bottom:12px;
+}
+
+.ownorent-product-card-info p .info{
+    color:#b3b0b0;
+    font-size:0.9em !important;
+    float:left !important;
+}
+
+.ownorent-product-card-info .price{
+    font-size:0.9em;
+    color:#035526;
+    text-align:right;
+}
+
+.ownorent-product-card-info .price-rent{
+    font-size:0.9em;
+    color:#035526;
+    padding-bottom:8px;
+    border-bottom:1px solid rgba(150,150,150,0.1);
+    text-align:right;
 }
 
 table.dataTable.ownorent-compact-table tbody td{
@@ -437,7 +533,48 @@ table.dataTable thead .sorting_desc{
     background-position-y:-5px !important;
 }
 
+.floating-cart{
+    position:fixed;
+    z-index: 999999999999999999;
+    top:48px;
+    right:110px;
+    border-radius:100%;
+    background-color:white;
+    padding:6px 9px 6px 13px;
+    border:1px solid rgba(0,0,0,0.1);
+    text-align:center;
+}
+
+.floating-cart span{
+    font-size:0.9em;
+    background-color:red;
+    border-radius:100%;
+    padding:0px 6px;
+    color:white;
+    margin:0px;
+    margin-left:-3px;
+}
+
+.floating-cart [class^="flaticon-"]:before,.floating-cart [class*=" flaticon-"]:before,.floating-cart [class^="flaticon-"]:after,.floating-cart [class*=" flaticon-"]:after{
+    margin-left:0px;
+    margin-right:-10px !important;
+    font-size:2em;
+}
+
 @media(max-width:767px) {
+    .floating-cart{
+        bottom:40px;
+        right:20px;
+        padding:16px 18px 16px 23px;
+        top:unset!important;
+    }
+
+    .floating-cart [class^="flaticon-"]:before,.floating-cart [class*=" flaticon-"]:before,.floating-cart [class^="flaticon-"]:after,.floating-cart [class*=" flaticon-"]:after{
+        margin-left:0px;
+        margin-right:-10px !important;
+        font-size:2em;
+    }
+
     .navbar-overhead .overhead-content {
         display:none !important;
     }

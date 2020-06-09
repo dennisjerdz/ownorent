@@ -65,6 +65,7 @@ namespace Ownorent.Models
         public DbSet<RentToOwnPaymentTerm> RentToOwnPaymentTerms { get; set; }
         public DbSet<Setting> Settings { get; set; }
         public DbSet<Address> Addresses { get; set; }
+        public DbSet<Cart> Carts { get; set; }
 
         public static ApplicationDbContext Create()
         {

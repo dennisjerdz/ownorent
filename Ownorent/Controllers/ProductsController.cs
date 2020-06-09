@@ -10,6 +10,7 @@ using Ownorent.Models;
 using Microsoft.AspNet.Identity;
 using System.Threading.Tasks;
 using System.IO;
+using System.Web.Helpers;
 
 namespace Ownorent.Controllers
 {
@@ -17,35 +18,161 @@ namespace Ownorent.Controllers
     {
         private ApplicationDbContext db = new ApplicationDbContext();
 
-        public ActionResult p(string search, int? page, int? category)
+        public async Task<ActionResult> p(string search, int? page, int? category)
         {
             IQueryable<ProductTemplate> products;
                         
-            if(search != null)
-            {
+            if(search != null) {
                 products = db.ProductTemplates
-                .Include(p => p.Category).Include(p=>p.Attachment)
+                .Include(p => p.Category).Include(p => p.Attachment).Include(p=>p.Products)
                 .Where(p => p.ProductTemplateStatus == ProductTemplateStatusConstant.APPROVED
-                    && (p.ProductName.Contains(search) || p.ProductDescription.Contains(search)))
-                .OrderByDescending(p => p.Quantity);
+                    && (p.ProductName.Contains(search) || p.ProductDescription.Contains(search)));
+            } else {
+                products = db.ProductTemplates
+                .Include(p => p.Category).Include(p => p.Attachment).Include(p => p.Products)
+                .Where(p => p.ProductTemplateStatus == ProductTemplateStatusConstant.APPROVED);
+            }
+
+            string userId = User.Identity.GetUserId();
+            ViewBag.CategoriesList = await db.Categories.ToListAsync();
+            ViewBag.Cart = await db.Carts.CountAsync(c => c.UserId == userId);
+
+            if (category != null) {
+                return View(await products.Where(p => p.CategoryId == category).ToListAsync());
+            } else {
+                return View(await products.ToListAsync());
+            }
+        }
+
+        [HttpPost]
+        public ActionResult AddToCart(int id, byte type)
+        {
+            var product = db.ProductTemplates.FirstOrDefault(p => p.ProductTemplateId == id);
+
+            if (product != null) {
+
+                string userId = User.Identity.GetUserId();
+                var cartItemExist = db.Carts.FirstOrDefault(c=>c.ProductTemplateId == id && c.UserId == userId && c.CartType == type);
+
+                if (cartItemExist != null) {
+                    return Json(new { status = 0, message = "<strong>Failed to add Product.</strong> Product already exists in your cart." }, JsonRequestBehavior.AllowGet);
+                } else {
+
+                    switch (type)
+                    {
+                        case CartTypeConstant.BUY:
+                            db.Carts.Add(new Cart()
+                            {
+                                CartType = type,
+                                ProductTemplateId = id,
+                                UserId = userId,
+                                Quantity = 1
+                            });
+                            break;
+                        case CartTypeConstant.RENT:
+                            db.Carts.Add(new Cart()
+                            {
+                                CartType = type,
+                                ProductTemplateId = id,
+                                UserId = userId,
+                                Quantity = 1,
+                                RentDateStart = DateTime.UtcNow.AddDays(3),
+                                RentDateEnd = DateTime.UtcNow.AddDays(4)
+                            });
+                            break;
+                        case CartTypeConstant.RENT_TO_OWN:
+                            RentToOwnPaymentTerm defaultPaymentTerm = db.RentToOwnPaymentTerms.FirstOrDefault(r => r.Months == 3);
+                            if (defaultPaymentTerm == null)
+                            {
+                                return Json(new { status = 0, message = "<strong>Failed to add Product.</strong> Default rent to own payment term cannot be found." }, JsonRequestBehavior.AllowGet);
+                            }
+
+                            db.Carts.Add(new Cart()
+                            {
+                                CartType = type,
+                                ProductTemplateId = id,
+                                UserId = userId,
+                                Quantity = 1,
+                                RentToOwnPaymentTermId = defaultPaymentTerm.RentToOwnPaymentTermId
+                            });
+                            break;
+                    }
+                    
+                    try
+                    {
+                        db.SaveChanges();
+                        return Json(new { status = 1, message = "<strong>Success!</strong> Product has been added to cart." }, JsonRequestBehavior.AllowGet);
+                    }
+                    catch (Exception e)
+                    {
+                        return Json(new { status = 0, message = $"<strong>Failed to add Product.</strong> {e.Message}" }, JsonRequestBehavior.AllowGet);
+                    }
+                    
+                }
+
+            } else {
+                return Json(new { status = 0, message = "<strong>Failed to add Product.</strong> Product does not exist." }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        public async Task<ActionResult> Cart()
+        {
+            if (TempData["Error"] != null)
+            {
+                ViewBag.Error = TempData["Error"];
+            }
+            if (TempData["Message"] != null)
+            {
+                ViewBag.Message = TempData["Message"];
+            }
+
+            string userId = User.Identity.GetUserId();
+            var cartItems = await db.Carts.Include(c=>c.Product).Include(c=>c.PaymentTerm).Where(c => c.UserId == userId).ToListAsync();
+
+            List<CartValidateModel> cartValidateItems = new List<CartValidateModel>();
+
+            var grouped = cartItems.GroupBy(c => c.ProductTemplateId);
+            foreach(var item in grouped)
+            {
+                int available = db.Products.Count(p => p.ProductTemplateId == item.Key && p.ProductStatus == ProductStatusConstant.AVAILABLE);
+                var getName = item.FirstOrDefault();
+                string productName = "";
+
+                if (getName != null)
+                {
+                    productName = getName.Product.ProductName;
+                }
+
+                cartValidateItems.Add(new CartValidateModel
+                {
+                    ProductTemplateId = item.Key,
+                    ProductName = productName,
+                    QuantityNeeded = item.Sum(i => i.Quantity),
+                    QuantityAvailable = available
+                });
+            }
+
+            return View(cartItems);
+        }
+
+        public ActionResult RemoveFromCart(int id)
+        {
+            string userId = User.Identity.GetUserId();
+            var cartItem = db.Carts.FirstOrDefault(c => c.CartId == id && c.UserId == userId);
+
+            if (cartItem != null)
+            {
+                db.Carts.Remove(cartItem);
+                db.SaveChanges();
+                TempData["Message"] = "<strong>Product removed successfully.</strong>";
             }
             else
             {
-                products = db.ProductTemplates
-                .Include(p => p.Category).Include(p => p.Attachment)
-                .Where(p => p.ProductTemplateStatus == ProductTemplateStatusConstant.APPROVED)
-                .OrderByDescending(p => p.Quantity);
+                TempData["Error"] = "1";
+                TempData["Message"] = "<strong>Failed to remove product from cart.</strong> The Product requested to be removed does not exist in your cart.";
             }
 
-            ViewBag.CategoriesList = db.Categories.ToList();
-
-            if (category != null)
-            {
-                return View(products.Where(p => p.CategoryId == category).ToList());
-            }else
-            {
-                return View(products.ToList());
-            }
+            return RedirectToAction("Cart");
         }
 
         public ActionResult Index()
