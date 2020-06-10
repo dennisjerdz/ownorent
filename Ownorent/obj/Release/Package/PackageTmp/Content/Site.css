@@ -536,6 +536,10 @@ table.dataTable thead .sorting_desc{
     background-position-y:-5px !important;
 }
 
+.table.dataTable.no-border-top  thead th, table.dataTable.no-border-top  thead td{
+    border-top:none;
+}
+
 .floating-cart{
     position:fixed;
     z-index: 999999999999999999;
@@ -562,6 +566,17 @@ table.dataTable thead .sorting_desc{
     margin-left:0px;
     margin-right:-10px !important;
     font-size:2em;
+}
+
+.table-inline-input{
+    width:45px !important;
+    display:inline-block !important;
+    text-align:right;
+    padding:0px;
+    height:auto !important;
+    border-radius:0px;
+    border:none;
+    border-bottom:1px solid rgba(0,0,0,0.2);
 }
 
 @media(max-width:767px) {
