@@ -44,6 +44,7 @@ namespace Ownorent.Controllers
             }
         }
 
+        [Authorize]
         [HttpPost]
         public ActionResult AddToCart(int id, byte type)
         {
