@@ -85,7 +85,7 @@ else if (ViewBag.Message != null)
                                 DAILY RENT
                             </th>
                             <th>
-                                CREATED
+                                SELLER
                             </th>
                             <th></th>
                         </tr>
@@ -140,7 +140,7 @@ else if (ViewBag.Message != null)
                                     }
                                 </td>
                                 <td>
-                                    @item.DateCreated.ToString("MM-dd-yyyy")
+                                    @item.User.Email
                                 </td>
                                 <td style="text-align:right;">
                                     <div class="dropdown ownorent-dropdown-button">
