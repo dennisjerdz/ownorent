@@ -60,9 +60,9 @@
                         }
                         @if (User.IsInRole("Customer"))
                         {
-                            <li>@Html.ActionLink("PRODUCTS", "About", "Home")</li>
-                            <li>@Html.ActionLink("CONTACT", "Contact", "Home")</li>
+                            <li>@Html.ActionLink("PRODUCTS", "p", "Products")</li>
                             <li>@Html.ActionLink("CART", "Cart", "Products")</li>
+                            <li>@Html.ActionLink("CONTACT", "Contact", "Home")</li>
                         }
                     </ul>
 

@@ -36,6 +36,18 @@ namespace Ownorent.Controllers
             string userId = User.Identity.GetUserId();
             ViewBag.CategoriesList = await db.Categories.ToListAsync();
             ViewBag.Cart = await db.Carts.CountAsync(c => c.UserId == userId);
+            
+
+            var user = await db.Users.FirstOrDefaultAsync(u => u.Id == userId);
+
+            if (user != null)
+            {
+                ViewBag.UserStatus = user.AccountStatus;
+            }
+            else
+            {
+                ViewBag.UserStatus = -1;
+            }
 
             if (category != null) {
                 return View(await products.Where(p => p.CategoryId == category).ToListAsync());
@@ -227,6 +239,14 @@ namespace Ownorent.Controllers
 
         public ActionResult Create()
         {
+            string userId = User.Identity.GetUserId();
+            if (db.Users.FirstOrDefault(u=>u.Id == userId).AccountStatus != AccountStatusConstant.APPROVED)
+            {
+                TempData["Error"] = "1";
+                TempData["Message"] = "Your account is not authorized to add products yet. Please go through review process.";
+                return RedirectToAction("Requirements", "Account", new { });
+            }
+
             List<string> salvageProperties = new List<string>() { "COMPUTE_SALVAGE_VALUE_PERCENTAGE", "COMPUTE_SALVAGE_RENT_VALUE_PERCENTAGE", "COMPUTE_DAILY_RENT_PERCENTAGE" };
             var salvageSettings = db.Settings.Where(s => salvageProperties.Contains(s.Code)).ToList();
             var salvageValueSetting = salvageSettings.FirstOrDefault(s => s.Code == "COMPUTE_SALVAGE_VALUE_PERCENTAGE");

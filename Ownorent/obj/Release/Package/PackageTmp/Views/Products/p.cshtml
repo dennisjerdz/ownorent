@@ -180,17 +180,24 @@
 
                             @if (productAvailabilityCount > 0)
                             {
-                                <div class="dropdown">
-                                    <button class="btn btn-sm btn-default btn-block ownorent-dropdown-button dropdown-toggle" type="button" data-toggle="dropdown">
-                                        Add to Cart
-                                        <span class="caret"></span>
-                                    </button>
-                                    <ul class="dropdown-menu ownorent-dropdown-menu ownorent-dropdown-menu-right">
-                                        <li>@Html.ActionLink("Buy", "AddToCart", new { }, new { @class = "addToCart", data_id = item.ProductTemplateId, data_type = CartTypeConstant.BUY })</li>
-                                        <li>@Html.ActionLink("Rent", "AddToCart", new { }, new { @class = "addToCart", data_id = item.ProductTemplateId, data_type = CartTypeConstant.RENT })</li>
-                                        <li>@Html.ActionLink("Rent to Own", "AddToCart", new { }, new { @class = "addToCart", data_id = item.ProductTemplateId, data_type = CartTypeConstant.RENT_TO_OWN })</li>
-                                    </ul>
-                                </div>
+                                if (User.Identity.IsAuthenticated)
+                                {
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-default btn-block ownorent-dropdown-button dropdown-toggle" type="button" data-toggle="dropdown">
+                                            Add to Cart
+                                            <span class="caret"></span>
+                                        </button>
+                                        <ul class="dropdown-menu ownorent-dropdown-menu ownorent-dropdown-menu-right">
+                                            <li>@Html.ActionLink("Buy", "AddToCart", new { }, new { @class = "addToCart", data_id = item.ProductTemplateId, data_type = CartTypeConstant.BUY })</li>
+                                            <li>@Html.ActionLink("Rent", "AddToCart", new { }, new { @class = "addToCart", data_id = item.ProductTemplateId, data_type = CartTypeConstant.RENT })</li>
+                                            <li>@Html.ActionLink("Rent to Own", "AddToCart", new { }, new { @class = "addToCart", data_id = item.ProductTemplateId, data_type = CartTypeConstant.RENT_TO_OWN })</li>
+                                        </ul>
+                                    </div>
+                                }
+                                else
+                                {
+                                    @Html.ActionLink("Login to Add to Cart","Login","Account",new { }, new { @class="btn btn-sm btn-block btn-warning" })
+                                }
                             }
                             else
                             {
@@ -207,14 +214,6 @@
 @section scripts{
     <script>
         $(document).ready(function () {
-            var datatable = $("table").DataTable({
-                paging: true,
-                "pageLength": 10,
-                "dom": "<'table-window'<'table-responsive'rt>><'window-footer'<'col-md-6'i><'col-md-6'p>>",
-                "columnDefs": [
-                    { "orderable": false, "targets": 7 }
-                ]
-            });
 
             $(".all-search").keyup(function () {
                 datatable.search($(this).val()).draw();

@@ -51,17 +51,18 @@
                         @if (User.IsInRole("Admin"))
                         {
                             <li>@Html.ActionLink("ACCOUNTS", "Accounts", "Account")</li>
-                            <li>@Html.ActionLink("PRODUCTS", "Products", "Admin")</li>
+                            <li>@Html.ActionLink("MANAGE PRODUCTS", "Products", "Admin")</li>
                         }
                         @if (User.IsInRole("Seller"))
                         {
-                            <li>@Html.ActionLink("PRODUCTS", "Index", "Products")</li>
+                            <li>@Html.ActionLink("MANAGE PRODUCTS", "Index", "Products")</li>
                             <li>@Html.ActionLink("REQUIREMENTS", "Requirements", "Account")</li>
                         }
                         @if (User.IsInRole("Customer"))
                         {
                             <li>@Html.ActionLink("PRODUCTS", "About", "Home")</li>
                             <li>@Html.ActionLink("CONTACT", "Contact", "Home")</li>
+                            <li>@Html.ActionLink("CART", "Cart", "Products")</li>
                         }
                     </ul>
 
@@ -69,6 +70,24 @@
             </div>
         </div>
         <div class="container body-content">
+            @if (ViewBag.Error != null)
+            {
+                if (ViewBag.Error == "1")
+                {
+                    <div class="ownorent-alert alert alert-danger alert-dismissible marginTop10">
+                        <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                        @Html.Raw(ViewBag.Message)
+                    </div>
+                }
+            }
+            else if (ViewBag.Message != null)
+            {
+                <div class="ownorent-alert alert alert-success alert-dismissable marginTop10">
+                    <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                    @Html.Raw(ViewBag.Message)
+                </div>
+            }
+
             @RenderBody()
             <hr />
             <footer>

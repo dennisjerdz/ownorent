@@ -87,3 +87,4 @@ C:\Users\Jerdz\Documents\Visual Studio 2015\Projects\Ownorent\Ownorent\obj\Relea
 C:\Users\Jerdz\Documents\Visual Studio 2015\Projects\Ownorent\Ownorent\obj\Release\Ownorent.Migrations.Trackingnumber.resources
 C:\Users\Jerdz\Documents\Visual Studio 2015\Projects\Ownorent\Ownorent\obj\Release\Ownorent.Migrations.byteorsbytefixes.resources
 C:\Users\Jerdz\Documents\Visual Studio 2015\Projects\Ownorent\Ownorent\obj\Release\Ownorent.Migrations.cartupdatetohandlerentandrenttoown.resources
+C:\Users\Jerdz\Documents\Visual Studio 2015\Projects\Ownorent\Ownorent\obj\Release\Ownorent.Migrations.computenumberofdaysuponaddtocartrentandsavetodb.resources

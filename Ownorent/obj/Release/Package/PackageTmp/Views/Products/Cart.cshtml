@@ -4,29 +4,28 @@
 @{
     ViewBag.Title = "Cart";
     ViewBag.bgColor = "#f8fafc";
+    List<CartValidateModel> cartValidationItems = (List<CartValidateModel>)ViewBag.cartValidationItems;
+    List<RentToOwnPaymentTerm> rentToOwnPaymentTerms = (List<RentToOwnPaymentTerm>)ViewBag.rentToOwnPaymentTerms;
+
+    int cartIndex = 0;
+    float buyTotal = 0f;
+    float rentTotal = 0f;
+    float rentOwnTotal = 0f;
 }
 
-@if (ViewBag.Error != null)
-{
-    if (ViewBag.Error == "1")
-    {
-        <div class="row">
-            <div class="col-md-12">
-                <br />
-                <div class="ownorent-alert alert alert-danger">
-                    @Html.Raw(ViewBag.Message)
-                </div>
-            </div>
-        </div>
-    }
-}
-else if (ViewBag.Message != null)
+@if (cartValidationItems.Any(c => c.Error))
 {
     <div class="row">
         <div class="col-md-12">
             <br />
-            <div class="ownorent-alert alert alert-success">
-                @Html.Raw(ViewBag.Message)
+            <div class="ownorent-alert alert alert-danger">
+                Some items in your cart <strong>exceed the Available Quantity</strong>;
+                <ul>
+                    @foreach (var item in cartValidationItems.Where(c=>c.Error))
+                    {
+                        <li><strong>@item.ProductName</strong> - @item.Message</li>
+                    }
+                </ul>
             </div>
         </div>
     </div>
@@ -49,13 +48,8 @@ else if (ViewBag.Message != null)
             }
             else
             {
-                using (Html.BeginForm("Cart", "Products", FormMethod.Post, new { @class = "", role = "form" }))
+                using (Html.BeginForm("Cart", "Products", FormMethod.Post, new { @id="cart", @class = "", role = "form" }))
                 {
-                    int cartIndex = 0;
-                    float buyTotal = 0f;
-                    float rentTotal = 0f;
-                    float rentOwnTotal = 0f;
-
                     if (Model.Any(c => c.CartType == CartTypeConstant.BUY))
                     {
                         <div class="ownorent-panel-body ownorent-panel-table">
@@ -70,7 +64,7 @@ else if (ViewBag.Message != null)
                                         <th>
                                             NAME
                                         </th>
-                                        <th>
+                                        <th style="text-align:right;">
                                             PRICE
                                         </th>
                                         <th style="text-align:right;">
@@ -90,7 +84,7 @@ else if (ViewBag.Message != null)
                                             <td>
                                                 @item.Product.ProductName
                                             </td>
-                                            <td>
+                                            <td class="table-options-90">
                                                 @if (item.Product.ProductPriceToUse == ProductPriceToUseConstant.SELLER_DEFINED_PRICE)
                                                 {
                                                     <text>@item.Product.Price.ToString("C2", CultureInfo.GetCultureInfo("fil-PH"))</text>
@@ -107,11 +101,11 @@ else if (ViewBag.Message != null)
                                                     }
                                                 }
                                             </td>
-                                            <td style="text-align:right;">
-                                                <input name="Cart[@cartIndex].CartId" value="@item.CartId" type="hidden" />
-                                                <input name="Cart[@cartIndex].Quantity" value="@item.Quantity" class="form-control table-inline-input" type="number" step="1" />
+                                            <td class="table-options-70">
+                                                <input name="cartItems[@cartIndex].CartId" value="@item.CartId" type="hidden" />
+                                                <input name="cartItems[@cartIndex].Quantity" value="@item.Quantity" class="form-control table-inline-input" type="number" step="1" />
                                             </td>
-                                            <td style="text-align:right;">
+                                            <td class="table-options-90">
                                                 @if (item.Product.ProductPriceToUse == ProductPriceToUseConstant.SELLER_DEFINED_PRICE)
                                                 {
                                                     buyTotal += (item.Product.Price * item.Quantity);
@@ -140,7 +134,7 @@ else if (ViewBag.Message != null)
                                                     }
                                                 }
                                             </td>
-                                            <td style="text-align:right;">
+                                            <td class="table-options-70">
                                                 @Html.ActionLink("Remove", "RemoveFromCart", new { id = item.CartId }, new { @class = "btn btn-xs btn-danger" })
                                             </td>
                                         </tr>
@@ -169,13 +163,19 @@ else if (ViewBag.Message != null)
                             <table class="table no-border-top table-rent table-condensed table-hover ownorent-compact-table">
                                 <thead>
                                     <tr>
-                                        <th colspan="5">
+                                        <th colspan="7">
                                             ORDER TYPE: RENT
                                         </th>
                                     </tr>
                                     <tr>
                                         <th>
                                             NAME
+                                        </th>
+                                        <th>
+                                            START
+                                        </th>
+                                        <th>
+                                            END
                                         </th>
                                         <th>
                                             PRICE
@@ -196,6 +196,12 @@ else if (ViewBag.Message != null)
                                         <tr>
                                             <td>
                                                 @item.Product.ProductName
+                                            </td>
+                                            <td>
+                                                <input name="cartItems[@cartIndex].RentDateStart" data-value="@item.RentDateStart.Value.ToString("yyyy-MM-dd")" class="form-control table-inline-input-date" type="date"  min="@DateTime.UtcNow.AddHours(8).AddDays(2).ToString("yyyy-MM-dd")" />
+                                            </td>
+                                            <td>
+                                                <input name="cartItems[@cartIndex].RentDateEnd" data-value="@item.RentDateEnd.Value.ToString("yyyy-MM-dd")" class="form-control table-inline-input-date" type="date" min="@DateTime.UtcNow.AddHours(8).AddDays(2).ToString("yyyy-MM-dd")" />
                                             </td>
                                             <td>
                                                 @if (item.Product.ProductPriceToUse == ProductPriceToUseConstant.SELLER_DEFINED_PRICE)
@@ -228,30 +234,42 @@ else if (ViewBag.Message != null)
                                                     }
                                                 }
                                             </td>
-                                            <td style="text-align:right;">
-                                                <input name="Cart[@cartIndex].CartId" value="@item.CartId" type="hidden" />
-                                                <input name="Cart[@cartIndex].Quantity" value="@item.Quantity" class="form-control table-inline-input" type="number" step="1" />
+                                            <td class="table-options-70">
+                                                <input name="cartItems[@cartIndex].CartId" value="@item.CartId" type="hidden" />
+                                                <input name="cartItems[@cartIndex].Quantity" value="@item.Quantity" class="form-control table-inline-input" type="number" step="1" />
                                             </td>
-                                            <td style="text-align:right;">
+                                            <td class="table-options-90">
                                                 @if (item.Product.ProductPriceToUse == ProductPriceToUseConstant.SELLER_DEFINED_PRICE)
                                                 {
                                                     if (item.Product.DailyRentPrice != null)
                                                     {
-                                                        rentTotal += (item.Product.DailyRentPrice.Value * item.Quantity);
+                                                        rentTotal += (item.Product.DailyRentPrice.Value * item.Quantity * item.RentNumberOfDays.Value);
 
-                                                        <text>@((item.Product.DailyRentPrice.Value * item.Quantity).ToString("C2", CultureInfo.GetCultureInfo("fil-PH")))</text>
+                                                        @*
+                                                            <text>
+                                                                @((item.Product.DailyRentPrice.Value * item.Quantity).ToString("C2", CultureInfo.GetCultureInfo("fil-PH")))
+                                                            </text>
+                                                        *@
                                                     }
                                                     else
                                                     {
                                                         if (item.Product.ComputedDailyRentPrice != null)
                                                         {
-                                                            rentTotal += (item.Product.ComputedDailyRentPrice.Value * item.Quantity);
+                                                            rentTotal += (item.Product.ComputedDailyRentPrice.Value * item.Quantity * item.RentNumberOfDays.Value);
 
-                                                            <text>@((item.Product.ComputedDailyRentPrice.Value * item.Quantity).ToString("C2", CultureInfo.GetCultureInfo("fil-PH")))</text>
+                                                            @*
+                                                                <text>
+                                                                    @((item.Product.ComputedDailyRentPrice.Value * item.Quantity).ToString("C2", CultureInfo.GetCultureInfo("fil-PH")))
+                                                                </text>
+                                                            *@
                                                         }
                                                         else
                                                         {
-                                                            <text>@((0).ToString("C2", CultureInfo.GetCultureInfo("fil-PH")))</text>
+                                                            @*
+                                                                <text>
+                                                                    @((0).ToString("C2", CultureInfo.GetCultureInfo("fil-PH")))
+                                                                </text>
+                                                            *@
                                                         }
                                                     }
                                                 }
@@ -259,23 +277,130 @@ else if (ViewBag.Message != null)
                                                 {
                                                     if (item.Product.ComputedDailyRentPrice != null)
                                                     {
-                                                        <text>@((item.Product.ComputedDailyRentPrice.Value * item.Quantity).ToString("C2", CultureInfo.GetCultureInfo("fil-PH")))</text>
+                                                        rentTotal += (item.Product.ComputedDailyRentPrice.Value * item.Quantity * item.RentNumberOfDays.Value);
+
+                                                        @*
+                                                            <text>
+                                                                @((item.Product.ComputedDailyRentPrice.Value * item.Quantity).ToString("C2", CultureInfo.GetCultureInfo("fil-PH")))
+                                                            </text>
+                                                        *@
+                                                        
                                                     }
                                                     else
                                                     {
-                                                        <text>@((0).ToString("C2", CultureInfo.GetCultureInfo("fil-PH")))</text>
+                                                        @*
+                                                            <text>
+                                                                @((0).ToString("C2", CultureInfo.GetCultureInfo("fil-PH")))
+                                                            </text>
+                                                        *@
                                                     }
                                                 }
+
+                                                -
                                             </td>
-                                            <td style="text-align:right;">
+                                            <td class="table-options-70">
                                                 @Html.ActionLink("Remove", "RemoveFromCart", new { id = item.CartId }, new { @class = "btn btn-xs btn-danger" })
                                             </td>
                                         </tr>
+
+                                        if (item.RentNumberOfDays > 30)
+                                        {
+                                            int breakdown = 1;
+
+                                            for(int rentNumberOfDays = item.RentNumberOfDays.Value; rentNumberOfDays > 0; rentNumberOfDays -= 30)
+                                            {
+                                                <tr>
+                                                    <td class="ownorent-text-silver">@rentNumberOfDays day/s Rent</td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td class="ownorent-text-silver">Payment @breakdown</td>
+                                                    <td class="ownorent-text-silver" style="text-align:right;">
+                                                        @if (item.Product.ProductPriceToUse == ProductPriceToUseConstant.SELLER_DEFINED_PRICE)
+                                                        {
+                                                            if (item.Product.DailyRentPrice != null)
+                                                            {
+                                                                <text>@((item.Product.DailyRentPrice.Value * rentNumberOfDays * item.Quantity).ToString("C2", CultureInfo.GetCultureInfo("fil-PH")))</text>
+                                                            }
+                                                            else
+                                                            {
+                                                                if (item.Product.ComputedDailyRentPrice != null)
+                                                                {
+                                                                    <text>@((item.Product.ComputedDailyRentPrice.Value * rentNumberOfDays * item.Quantity).ToString("C2", CultureInfo.GetCultureInfo("fil-PH")))</text>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <text>@((0).ToString("C2", CultureInfo.GetCultureInfo("fil-PH")))</text>
+                                                                }
+                                                            }
+                                                        }
+                                                        else
+                                                        {
+                                                            if (item.Product.ComputedDailyRentPrice != null)
+                                                            {
+                                                                <text>@((item.Product.ComputedDailyRentPrice.Value * rentNumberOfDays * item.Quantity).ToString("C2", CultureInfo.GetCultureInfo("fil-PH")))</text>
+                                                            }
+                                                            else
+                                                            {
+                                                                <text>@((0).ToString("C2", CultureInfo.GetCultureInfo("fil-PH")))</text>
+                                                            }
+                                                        }
+                                                    </td>
+                                                    <td></td>
+                                                </tr>
+
+                                                breakdown++;
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <tr>
+                                                <td class="ownorent-text-silver">@item.RentNumberOfDays day/s Rent</td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td class="ownorent-text-silver">Payment 1</td>
+                                                <td class="ownorent-text-silver" style="text-align:right;">
+                                                    @if (item.Product.ProductPriceToUse == ProductPriceToUseConstant.SELLER_DEFINED_PRICE)
+                                                    {
+                                                        if (item.Product.DailyRentPrice != null)
+                                                        {
+                                                            <text>@((item.Product.DailyRentPrice.Value * item.RentNumberOfDays.Value * item.Quantity).ToString("C2", CultureInfo.GetCultureInfo("fil-PH")))</text>
+                                                        }
+                                                        else
+                                                        {
+                                                            if (item.Product.ComputedDailyRentPrice != null)
+                                                            {
+                                                                <text>@((item.Product.ComputedDailyRentPrice.Value * item.RentNumberOfDays.Value * item.Quantity).ToString("C2", CultureInfo.GetCultureInfo("fil-PH")))</text>
+                                                            }
+                                                            else
+                                                            {
+                                                                <text>@((0).ToString("C2", CultureInfo.GetCultureInfo("fil-PH")))</text>
+                                                            }
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        if (item.Product.ComputedDailyRentPrice != null)
+                                                        {
+                                                            <text>@((item.Product.ComputedDailyRentPrice.Value * item.RentNumberOfDays.Value * item.Quantity).ToString("C2", CultureInfo.GetCultureInfo("fil-PH")))</text>
+                                                        }
+                                                        else
+                                                        {
+                                                            <text>@((0).ToString("C2", CultureInfo.GetCultureInfo("fil-PH")))</text>
+                                                        }
+                                                    }
+                                                </td>
+                                                <td></td>
+                                            </tr>
+                                        }
 
                                         cartIndex++;
                                     }
 
                                     <tr>
+                                        <td></td>
+                                        <td></td>
                                         <td></td>
                                         <td></td>
                                         <td style="text-align:right;">
@@ -305,7 +430,10 @@ else if (ViewBag.Message != null)
                                         <th>
                                             NAME
                                         </th>
-                                        <th>
+                                        <th style="text-align:right;">
+                                            PAYMENT TERM
+                                        </th>
+                                        <th style="text-align:right;">
                                             PRICE
                                         </th>
                                         <th style="text-align:right;">
@@ -325,87 +453,116 @@ else if (ViewBag.Message != null)
                                             <td>
                                                 @item.Product.ProductName
                                             </td>
-                                            <td>
-                                                @if (item.Product.ProductPriceToUse == ProductPriceToUseConstant.SELLER_DEFINED_PRICE)
-                                                {
-                                                    if (item.Product.DailyRentPrice != null)
+                                            <td style="text-align:right;">
+                                                <select style="width:145px !important;" data-value="@item.RentToOwnPaymentTermId" name="cartItems[@cartIndex].RentToOwnPaymentTermId" class="form-control table-inline-input-date">
+                                                    @foreach (var rto in rentToOwnPaymentTerms)
                                                     {
-                                                        <text>@item.Product.DailyRentPrice.Value.ToString("C2", CultureInfo.GetCultureInfo("fil-PH"))</text>
-                                                    }
-                                                    else
-                                                    {
-                                                        if (item.Product.ComputedDailyRentPrice != null)
+                                                        if (item.RentToOwnPaymentTermId == rto.RentToOwnPaymentTermId)
                                                         {
-                                                            <text>@item.Product.ComputedDailyRentPrice.Value.ToString("C2", CultureInfo.GetCultureInfo("fil-PH"))</text>
+                                                            <option value="@rto.RentToOwnPaymentTermId">@rto.Months months - @rto.InterestRate.ToString("F2")%</option>
                                                         }
                                                         else
                                                         {
-                                                            <text>@((0).ToString("C2", CultureInfo.GetCultureInfo("fil-PH")))</text>
+                                                            <option value="@rto.RentToOwnPaymentTermId">@rto.Months months - @rto.InterestRate.ToString("F2")%</option>
                                                         }
                                                     }
-                                                }
-                                                else
-                                                {
-                                                    if (item.Product.ComputedDailyRentPrice != null)
-                                                    {
-                                                        <text>@item.Product.ComputedDailyRentPrice.Value.ToString("C2", CultureInfo.GetCultureInfo("fil-PH"))</text>
-                                                    }
-                                                    else
-                                                    {
-                                                        <text>@((0).ToString("C2", CultureInfo.GetCultureInfo("fil-PH")))</text>
-                                                    }
-                                                }
+                                                </select>
                                             </td>
-                                            <td style="text-align:right;">
-                                                <input name="Cart[@cartIndex].CartId" value="@item.CartId" type="hidden" />
-                                                <input name="Cart[@cartIndex].Quantity" value="@item.Quantity" class="form-control table-inline-input" type="number" step="1" />
-                                            </td>
-                                            <td style="text-align:right;">
+                                            <td class="table-options-90">
                                                 @if (item.Product.ProductPriceToUse == ProductPriceToUseConstant.SELLER_DEFINED_PRICE)
                                                 {
-                                                    if (item.Product.DailyRentPrice != null)
-                                                    {
-                                                        rentOwnTotal += (item.Product.DailyRentPrice.Value * item.Quantity);
-
-                                                        <text>@((item.Product.DailyRentPrice.Value * item.Quantity).ToString("C2", CultureInfo.GetCultureInfo("fil-PH")))</text>
-                                                    }
-                                                    else
-                                                    {
-                                                        if (item.Product.ComputedDailyRentPrice != null)
-                                                        {
-                                                            rentOwnTotal += (item.Product.ComputedDailyRentPrice.Value * item.Quantity);
-
-                                                            <text>@((item.Product.ComputedDailyRentPrice.Value * item.Quantity).ToString("C2", CultureInfo.GetCultureInfo("fil-PH")))</text>
-                                                        }
-                                                        else
-                                                        {
-                                                            <text>@((0).ToString("C2", CultureInfo.GetCultureInfo("fil-PH")))</text>
-                                                        }
-                                                    }
+                                                    <text>@item.Product.Price.ToString("C2", CultureInfo.GetCultureInfo("fil-PH"))</text>
                                                 }
                                                 else
                                                 {
-                                                    if (item.Product.ComputedDailyRentPrice != null)
+                                                    if (item.Product.ComputedPrice != null)
                                                     {
-                                                        rentOwnTotal += (item.Product.ComputedDailyRentPrice.Value * item.Quantity);
-
-                                                        <text>@((item.Product.ComputedDailyRentPrice.Value * item.Quantity).ToString("C2", CultureInfo.GetCultureInfo("fil-PH")))</text>
+                                                        <text>@item.Product.ComputedPrice.Value.ToString("C2", CultureInfo.GetCultureInfo("fil-PH"))</text>
                                                     }
                                                     else
                                                     {
-                                                        <text>@((0).ToString("C2", CultureInfo.GetCultureInfo("fil-PH")))</text>
+                                                        <text>@item.Product.Price.ToString("C2", CultureInfo.GetCultureInfo("fil-PH"))</text>
                                                     }
                                                 }
                                             </td>
-                                            <td style="text-align:right;">
+                                            <td class="table-options-70">
+                                                <input name="cartItems[@cartIndex].CartId" value="@item.CartId" type="hidden" />
+                                                <input name="cartItems[@cartIndex].Quantity" value="@item.Quantity" class="form-control table-inline-input" type="number" step="1" />
+                                            </td>
+                                            <td class="table-options-90">
+                                                @if (item.Product.ProductPriceToUse == ProductPriceToUseConstant.SELLER_DEFINED_PRICE)
+                                                {
+                                                    // rentOwnTotal += ((item.Product.Price + (item.Product.Price * (item.PaymentTerm.InterestRate / 100))) * item.Quantity);
+
+                                                    <text>
+                                                        @(((item.Product.Price + (item.Product.Price * (item.PaymentTerm.InterestRate / 100))) * item.Quantity).ToString("C2", CultureInfo.GetCultureInfo("fil-PH")))
+                                                    </text>
+                                                }
+                                                else
+                                                {
+                                                    if (item.Product.ComputedPrice != null)
+                                                    {
+                                                        // rentOwnTotal += ((item.Product.ComputedPrice.Value + (item.Product.ComputedPrice.Value * (item.PaymentTerm.InterestRate / 100))) * item.Quantity);
+
+                                                        <text>
+                                                            @(((item.Product.ComputedPrice.Value + (item.Product.ComputedPrice.Value * (item.PaymentTerm.InterestRate / 100))) * item.Quantity).ToString("C2", CultureInfo.GetCultureInfo("fil-PH")))
+                                                        </text>
+                                                    }
+                                                    else
+                                                    {
+                                                        // rentOwnTotal += ((item.Product.Price + (item.Product.Price * (item.PaymentTerm.InterestRate / 100))) * item.Quantity);
+
+                                                        <text>
+                                                            @(((item.Product.Price + (item.Product.Price * (item.PaymentTerm.InterestRate/100))) * item.Quantity).ToString("C2", CultureInfo.GetCultureInfo("fil-PH")))
+                                                        </text>
+                                                    }
+                                                }
+                                            </td>
+                                            <td class="table-options-70">
                                                 @Html.ActionLink("Remove", "RemoveFromCart", new { id = item.CartId }, new { @class = "btn btn-xs btn-danger" })
                                             </td>
                                         </tr>
+                                        <tr>
+                                            <td class="ownorent-text-silver">Required Initial Payment (Ammortization)</td>
+                                            <td></td>
+                                            <td></td>
+                                            <td class="ownorent-text-silver"></td>
+                                            <td class="ownorent-text-silver" style="text-align:right;">
+                                                @if (item.Product.ProductPriceToUse == ProductPriceToUseConstant.SELLER_DEFINED_PRICE)
+                                                {
+                                                    rentOwnTotal += (((item.Product.Price + (item.Product.Price * (item.PaymentTerm.InterestRate / 100))) / item.PaymentTerm.Months) * item.Quantity);
 
+                                                    <text>
+                                                        @((((item.Product.Price + (item.Product.Price * (item.PaymentTerm.InterestRate / 100))) / item.PaymentTerm.Months) * item.Quantity).ToString("C2", CultureInfo.GetCultureInfo("fil-PH")))
+                                                    </text>
+                                                }
+                                                else
+                                                {
+                                                    if (item.Product.ComputedPrice != null)
+                                                    {
+                                                        rentOwnTotal += (((item.Product.ComputedPrice.Value + (item.Product.ComputedPrice.Value * (item.PaymentTerm.InterestRate / 100))) / item.PaymentTerm.Months) * item.Quantity);
+
+                                                        <text>
+                                                            @((((item.Product.ComputedPrice.Value + (item.Product.ComputedPrice.Value * (item.PaymentTerm.InterestRate / 100))) / item.PaymentTerm.Months) * item.Quantity).ToString("C2", CultureInfo.GetCultureInfo("fil-PH")))
+                                                        </text>
+                                                    }
+                                                    else
+                                                    {
+                                                        rentOwnTotal += (((item.Product.Price + (item.Product.Price * (item.PaymentTerm.InterestRate / 100))) / item.PaymentTerm.Months) * item.Quantity);
+
+                                                        <text>
+                                                            @((((item.Product.Price + (item.Product.Price * (item.PaymentTerm.InterestRate / 100))) / item.PaymentTerm.Months) * item.Quantity).ToString("C2", CultureInfo.GetCultureInfo("fil-PH")))
+                                                        </text>
+                                                    }
+                                                }
+                                            </td>
+                                            <td></td>
+                                        </tr>
                                         cartIndex++;
                                     }
 
                                     <tr>
+                                        <td></td>
                                         <td></td>
                                         <td></td>
                                         <td style="text-align:right;">
@@ -442,10 +599,27 @@ else if (ViewBag.Message != null)
             <div class="ownorent-panel-body ownorent-panel-tools">
                 @Html.ActionLink("Update Cart", "p", new { }, new { @class = "update-cart btn btn-xs btn-info" })
 
-                <hr />
-                Total: Money
+                <hr style="margin-top:4px; margin-bottom:4px;"/>
+                
+                <p style="margin-bottom:10px; font-size:1em;">
+                    Total:
+                    <span class="ownorent-text-ygreen" style="float:right;">
+                        @((buyTotal + rentTotal + rentOwnTotal).ToString("C2", CultureInfo.GetCultureInfo("fil-PH")))
+                    </span>
+                </p>
 
-                @Html.ActionLink("Checkout", "Checkout", new { }, new { @class = "btn btn-md btn-block btn-warning" })
+                @if (cartValidationItems.Any(c => c.Error))
+                {
+                    <p class="ownorent-text-red" style="font-size:0.9em; margin-bottom:10px;">Please resolve issues<br /> prior to Checkout.</p>
+                    <img style="width:200px; margin-bottom:10px;" src="https://www.paypalobjects.com/digitalassets/c/website/marketing/apac/C2/logos-buttons/optimize/Full_Online_Tray_RGB.png" />
+                    @Html.ActionLink("Checkout", "Checkout", new { }, new { @class = "btn btn-md btn-block btn-warning", @disabled = "true" })
+                }
+                else
+                {
+                    <img style="width:100%; margin-bottom:10px;" src="https://www.paypalobjects.com/digitalassets/c/website/marketing/apac/C2/logos-buttons/optimize/Full_Online_Tray_RGB.png" />
+                    @Html.ActionLink("Checkout", "Checkout", new { }, new { @class = "btn btn-md btn-block btn-info ownorent-bg-paypal-blue", @style= "letter-spacing:0.9px; font-size:1.1em; font-style:italic; font-weight:600;" })
+                }
+
                 @Html.ActionLink("< Continue Shopping", "p", new { }, new { @class = "btn btn-xs btn-block btn-default" })
             </div>
         </div>
@@ -456,6 +630,15 @@ else if (ViewBag.Message != null)
 @section scripts{
     <script>
         $(document).ready(function () {
+            $(".table-inline-input-date").each(function () {
+                $(this).val($(this).data("value"));
+            })
+
+            $(".update-cart").click(function (e) {
+                e.preventDefault();
+                $("#cart").submit();
+            })
+
             var buy = $(".table-buy").DataTable({
                 paging: true,
                 "pageLength": 10,
