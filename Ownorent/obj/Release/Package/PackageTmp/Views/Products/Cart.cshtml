@@ -42,7 +42,7 @@ else if (ViewBag.Message != null)
                     <center>
                         <br />
                         <h4>There are no items in your cart.</h4>
-                        <h4>Check our items @Html.ActionLink("here", "p").</h4>
+                        <h4>Check our items @Html.ActionLink("here","p").</h4>
                         <br />
                     </center>
                 </div>
@@ -51,21 +51,11 @@ else if (ViewBag.Message != null)
             {
                 using (Html.BeginForm("Cart", "Products", FormMethod.Post, new { @class = "", role = "form" }))
                 {
-                    int cartIndex = 0;
-                    float buyTotal = 0f;
-                    float rentTotal = 0f;
-                    float rentOwnTotal = 0f;
-
                     if (Model.Any(c => c.CartType == CartTypeConstant.BUY))
                     {
                         <div class="ownorent-panel-body ownorent-panel-table">
-                            <table class="table table-buy no-border-top table-condensed table-hover ownorent-compact-table">
+                            <table class="table table-buy table-condensed table-hover ownorent-compact-table">
                                 <thead>
-                                    <tr>
-                                        <th colspan="5">
-                                            ORDER TYPE: BUY
-                                        </th>
-                                    </tr>
                                     <tr>
                                         <th>
                                             NAME
@@ -73,16 +63,16 @@ else if (ViewBag.Message != null)
                                         <th>
                                             PRICE
                                         </th>
-                                        <th style="text-align:right;">
+                                        <th>
                                             QTY
                                         </th>
-                                        <th style="text-align:right;">
+                                        <th>
                                             SUBTOTAL
                                         </th>
                                         <th></th>
                                     </tr>
                                 </thead>
-                                
+
                                 <tbody>
                                     @foreach (var item in Model.Where(c => c.CartType == CartTypeConstant.BUY))
                                     {
@@ -107,15 +97,12 @@ else if (ViewBag.Message != null)
                                                     }
                                                 }
                                             </td>
-                                            <td style="text-align:right;">
-                                                <input name="Cart[@cartIndex].CartId" value="@item.CartId" type="hidden" />
-                                                <input name="Cart[@cartIndex].Quantity" value="@item.Quantity" class="form-control table-inline-input" type="number" step="1" />
+                                            <td>
+                                                @item.Quantity
                                             </td>
-                                            <td style="text-align:right;">
+                                            <td>
                                                 @if (item.Product.ProductPriceToUse == ProductPriceToUseConstant.SELLER_DEFINED_PRICE)
                                                 {
-                                                    buyTotal += (item.Product.Price * item.Quantity);
-
                                                     <text>
                                                         @((item.Product.Price * item.Quantity).ToString("C2", CultureInfo.GetCultureInfo("fil-PH")))
                                                     </text>
@@ -124,16 +111,12 @@ else if (ViewBag.Message != null)
                                                 {
                                                     if (item.Product.ComputedPrice != null)
                                                     {
-                                                        buyTotal += (item.Product.ComputedPrice.Value * item.Quantity);
-
                                                         <text>
                                                             @((item.Product.ComputedPrice.Value * item.Quantity).ToString("C2", CultureInfo.GetCultureInfo("fil-PH")))
                                                         </text>
                                                     }
                                                     else
                                                     {
-                                                        buyTotal += (item.Product.Price * item.Quantity);
-
                                                         <text>
                                                             @((item.Product.Price * item.Quantity).ToString("C2", CultureInfo.GetCultureInfo("fil-PH")))
                                                         </text>
@@ -144,35 +127,18 @@ else if (ViewBag.Message != null)
                                                 @Html.ActionLink("Remove", "RemoveFromCart", new { id = item.CartId }, new { @class = "btn btn-xs btn-danger" })
                                             </td>
                                         </tr>
-
-                                        cartIndex++;
                                     }
-                                    <tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td style="text-align:right;">
-                                            Total:
-                                        </td>
-                                        <td style="text-align:right;">
-                                            @buyTotal.ToString("C2",CultureInfo.GetCultureInfo("fil-PH"))
-                                        </td>
-                                        <td></td>
-                                    </tr>
                                 </tbody>
                             </table>
+
                         </div>
                     }
 
                     if (Model.Any(c => c.CartType == CartTypeConstant.RENT))
                     {
                         <div class="ownorent-panel-body ownorent-panel-table">
-                            <table class="table no-border-top table-rent table-condensed table-hover ownorent-compact-table">
+                            <table class="table table-rent table-condensed table-hover ownorent-compact-table">
                                 <thead>
-                                    <tr>
-                                        <th colspan="5">
-                                            ORDER TYPE: RENT
-                                        </th>
-                                    </tr>
                                     <tr>
                                         <th>
                                             NAME
@@ -180,10 +146,10 @@ else if (ViewBag.Message != null)
                                         <th>
                                             PRICE
                                         </th>
-                                        <th style="text-align:right;">
+                                        <th>
                                             QTY
                                         </th>
-                                        <th style="text-align:right;">
+                                        <th>
                                             SUBTOTAL
                                         </th>
                                         <th></th>
@@ -228,25 +194,20 @@ else if (ViewBag.Message != null)
                                                     }
                                                 }
                                             </td>
-                                            <td style="text-align:right;">
-                                                <input name="Cart[@cartIndex].CartId" value="@item.CartId" type="hidden" />
-                                                <input name="Cart[@cartIndex].Quantity" value="@item.Quantity" class="form-control table-inline-input" type="number" step="1" />
+                                            <td>
+                                                @item.Quantity
                                             </td>
-                                            <td style="text-align:right;">
+                                            <td>
                                                 @if (item.Product.ProductPriceToUse == ProductPriceToUseConstant.SELLER_DEFINED_PRICE)
                                                 {
                                                     if (item.Product.DailyRentPrice != null)
                                                     {
-                                                        rentTotal += (item.Product.DailyRentPrice.Value * item.Quantity);
-
                                                         <text>@((item.Product.DailyRentPrice.Value * item.Quantity).ToString("C2", CultureInfo.GetCultureInfo("fil-PH")))</text>
                                                     }
                                                     else
                                                     {
                                                         if (item.Product.ComputedDailyRentPrice != null)
                                                         {
-                                                            rentTotal += (item.Product.ComputedDailyRentPrice.Value * item.Quantity);
-
                                                             <text>@((item.Product.ComputedDailyRentPrice.Value * item.Quantity).ToString("C2", CultureInfo.GetCultureInfo("fil-PH")))</text>
                                                         }
                                                         else
@@ -271,36 +232,18 @@ else if (ViewBag.Message != null)
                                                 @Html.ActionLink("Remove", "RemoveFromCart", new { id = item.CartId }, new { @class = "btn btn-xs btn-danger" })
                                             </td>
                                         </tr>
-
-                                        cartIndex++;
                                     }
-
-                                    <tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td style="text-align:right;">
-                                            Total:
-                                        </td>
-                                        <td style="text-align:right;">
-                                            @rentTotal.ToString("C2", CultureInfo.GetCultureInfo("fil-PH"))
-                                        </td>
-                                        <td></td>
-                                    </tr>
                                 </tbody>
                             </table>
+
                         </div>
                     }
 
                     if (Model.Any(c => c.CartType == CartTypeConstant.RENT_TO_OWN))
                     {
                         <div class="ownorent-panel-body ownorent-panel-table">
-                            <table class="table no-border-top table-rent-to-own table-condensed table-hover ownorent-compact-table">
+                            <table class="table table-rent-to-own table-condensed table-hover ownorent-compact-table">
                                 <thead>
-                                    <tr>
-                                        <th colspan="5">
-                                            ORDER TYPE: RENT-TO-OWN
-                                        </th>
-                                    </tr>
                                     <tr>
                                         <th>
                                             NAME
@@ -308,10 +251,10 @@ else if (ViewBag.Message != null)
                                         <th>
                                             PRICE
                                         </th>
-                                        <th style="text-align:right;">
+                                        <th>
                                             QTY
                                         </th>
-                                        <th style="text-align:right;">
+                                        <th>
                                             SUBTOTAL
                                         </th>
                                         <th></th>
@@ -356,25 +299,20 @@ else if (ViewBag.Message != null)
                                                     }
                                                 }
                                             </td>
-                                            <td style="text-align:right;">
-                                                <input name="Cart[@cartIndex].CartId" value="@item.CartId" type="hidden" />
-                                                <input name="Cart[@cartIndex].Quantity" value="@item.Quantity" class="form-control table-inline-input" type="number" step="1" />
+                                            <td>
+                                                @item.Quantity
                                             </td>
-                                            <td style="text-align:right;">
+                                            <td>
                                                 @if (item.Product.ProductPriceToUse == ProductPriceToUseConstant.SELLER_DEFINED_PRICE)
                                                 {
                                                     if (item.Product.DailyRentPrice != null)
                                                     {
-                                                        rentOwnTotal += (item.Product.DailyRentPrice.Value * item.Quantity);
-
                                                         <text>@((item.Product.DailyRentPrice.Value * item.Quantity).ToString("C2", CultureInfo.GetCultureInfo("fil-PH")))</text>
                                                     }
                                                     else
                                                     {
                                                         if (item.Product.ComputedDailyRentPrice != null)
                                                         {
-                                                            rentOwnTotal += (item.Product.ComputedDailyRentPrice.Value * item.Quantity);
-
                                                             <text>@((item.Product.ComputedDailyRentPrice.Value * item.Quantity).ToString("C2", CultureInfo.GetCultureInfo("fil-PH")))</text>
                                                         }
                                                         else
@@ -387,8 +325,6 @@ else if (ViewBag.Message != null)
                                                 {
                                                     if (item.Product.ComputedDailyRentPrice != null)
                                                     {
-                                                        rentOwnTotal += (item.Product.ComputedDailyRentPrice.Value * item.Quantity);
-
                                                         <text>@((item.Product.ComputedDailyRentPrice.Value * item.Quantity).ToString("C2", CultureInfo.GetCultureInfo("fil-PH")))</text>
                                                     }
                                                     else
@@ -401,21 +337,7 @@ else if (ViewBag.Message != null)
                                                 @Html.ActionLink("Remove", "RemoveFromCart", new { id = item.CartId }, new { @class = "btn btn-xs btn-danger" })
                                             </td>
                                         </tr>
-
-                                        cartIndex++;
                                     }
-
-                                    <tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td style="text-align:right;">
-                                            Total:
-                                        </td>
-                                        <td style="text-align:right;">
-                                            @rentOwnTotal.ToString("C2", CultureInfo.GetCultureInfo("fil-PH"))
-                                        </td>
-                                        <td></td>
-                                    </tr>
                                 </tbody>
                             </table>
 
@@ -423,12 +345,12 @@ else if (ViewBag.Message != null)
                     }
                 }
             }
-
-
+            
+            
             @*
-                <div class="ownorent-panel-header" style="background-color:#71cd14; color:white;">
-
-                </div>
+            <div class="ownorent-panel-header" style="background-color:#71cd14; color:white;">
+                
+            </div>
             *@
         </div>
     </div>
@@ -450,31 +372,19 @@ else if (ViewBag.Message != null)
             </div>
         </div>
     </div>
-
+    
 </div>
 
 @section scripts{
     <script>
         $(document).ready(function () {
-            var buy = $(".table-buy").DataTable({
+            var datatable = $(".table-buy").DataTable({
                 paging: true,
                 "pageLength": 10,
-                "dom": "<'table-window'<'table-responsive'rt>>",
-                "ordering": false
-            });
-
-            var rent = $(".table-rent").DataTable({
-                paging: true,
-                "pageLength": 10,
-                "dom": "<'table-window'<'table-responsive'rt>>",
-                "ordering": false
-            });
-
-            var rentToOwn = $(".table-rent-to-own").DataTable({
-                paging: true,
-                "pageLength": 10,
-                "dom": "<'table-window'<'table-responsive'rt>>",
-                "ordering": false
+                "dom": "<'table-window'<'table-responsive'rt>><'window-footer'<'col-md-6'i><'col-md-6'p>>",
+                "columnDefs": [
+                    { "orderable": false, "targets": 4 }
+                ]
             });
 
             $(".all-search").keyup(function () {

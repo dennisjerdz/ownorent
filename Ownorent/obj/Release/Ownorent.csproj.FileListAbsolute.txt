@@ -85,3 +85,5 @@ C:\Users\Jerdz\Documents\Visual Studio 2015\Projects\Ownorent\Ownorent\obj\Relea
 C:\Users\Jerdz\Documents\Visual Studio 2015\Projects\Ownorent\Ownorent\obj\Release\Ownorent.csprojResolveAssemblyReference.cache
 C:\Users\Jerdz\Documents\Visual Studio 2015\Projects\Ownorent\Ownorent\obj\Release\Ownorent.Migrations.Producttemplatelabels.resources
 C:\Users\Jerdz\Documents\Visual Studio 2015\Projects\Ownorent\Ownorent\obj\Release\Ownorent.Migrations.Trackingnumber.resources
+C:\Users\Jerdz\Documents\Visual Studio 2015\Projects\Ownorent\Ownorent\obj\Release\Ownorent.Migrations.byteorsbytefixes.resources
+C:\Users\Jerdz\Documents\Visual Studio 2015\Projects\Ownorent\Ownorent\obj\Release\Ownorent.Migrations.cartupdatetohandlerentandrenttoown.resources
