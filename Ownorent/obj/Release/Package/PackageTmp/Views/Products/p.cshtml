@@ -182,17 +182,24 @@
                             {
                                 if (User.Identity.IsAuthenticated)
                                 {
-                                    <div class="dropdown">
-                                        <button class="btn btn-sm btn-default btn-block ownorent-dropdown-button dropdown-toggle" type="button" data-toggle="dropdown">
-                                            Add to Cart
-                                            <span class="caret"></span>
-                                        </button>
-                                        <ul class="dropdown-menu ownorent-dropdown-menu ownorent-dropdown-menu-right">
-                                            <li>@Html.ActionLink("Buy", "AddToCart", new { }, new { @class = "addToCart", data_id = item.ProductTemplateId, data_type = CartTypeConstant.BUY })</li>
-                                            <li>@Html.ActionLink("Rent", "AddToCart", new { }, new { @class = "addToCart", data_id = item.ProductTemplateId, data_type = CartTypeConstant.RENT })</li>
-                                            <li>@Html.ActionLink("Rent to Own", "AddToCart", new { }, new { @class = "addToCart", data_id = item.ProductTemplateId, data_type = CartTypeConstant.RENT_TO_OWN })</li>
-                                        </ul>
-                                    </div>
+                                    if (ViewBag.UserStatus == AccountStatusConstant.APPROVED)
+                                    {
+                                        <div class="dropdown">
+                                            <button class="btn btn-sm btn-default btn-block ownorent-dropdown-button dropdown-toggle" type="button" data-toggle="dropdown">
+                                                Add to Cart
+                                                <span class="caret"></span>
+                                            </button>
+                                            <ul class="dropdown-menu ownorent-dropdown-menu ownorent-dropdown-menu-right">
+                                                <li>@Html.ActionLink("Buy", "AddToCart", new { }, new { @class = "addToCart", data_id = item.ProductTemplateId, data_type = CartTypeConstant.BUY })</li>
+                                                <li>@Html.ActionLink("Rent", "AddToCart", new { }, new { @class = "addToCart", data_id = item.ProductTemplateId, data_type = CartTypeConstant.RENT })</li>
+                                                <li>@Html.ActionLink("Rent to Own", "AddToCart", new { }, new { @class = "addToCart", data_id = item.ProductTemplateId, data_type = CartTypeConstant.RENT_TO_OWN })</li>
+                                            </ul>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <input type="button" disabled class="btn btn-sm btn-default btn-block btn-warning" value="Verify your Account first" />
+                                    }
                                 }
                                 else
                                 {

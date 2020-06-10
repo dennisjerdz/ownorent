@@ -10,7 +10,9 @@
     int cartIndex = 0;
     float buyTotal = 0f;
     float rentTotal = 0f;
+    float rentRequiredPayment = 0f;
     float rentOwnTotal = 0f;
+    float rentOwnRequiredPayment = 0f;
 }
 
 @if (cartValidationItems.Any(c => c.Error))
@@ -103,7 +105,7 @@
                                             </td>
                                             <td class="table-options-70">
                                                 <input name="cartItems[@cartIndex].CartId" value="@item.CartId" type="hidden" />
-                                                <input name="cartItems[@cartIndex].Quantity" value="@item.Quantity" class="form-control table-inline-input" type="number" step="1" />
+                                                <input name="cartItems[@cartIndex].Quantity" value="@item.Quantity" class="form-control table-inline-input" type="number" step="1" min="0" />
                                             </td>
                                             <td class="table-options-90">
                                                 @if (item.Product.ProductPriceToUse == ProductPriceToUseConstant.SELLER_DEFINED_PRICE)
@@ -236,7 +238,7 @@
                                             </td>
                                             <td class="table-options-70">
                                                 <input name="cartItems[@cartIndex].CartId" value="@item.CartId" type="hidden" />
-                                                <input name="cartItems[@cartIndex].Quantity" value="@item.Quantity" class="form-control table-inline-input" type="number" step="1" />
+                                                <input name="cartItems[@cartIndex].Quantity" value="@item.Quantity" class="form-control table-inline-input" type="number" step="1" min="0" />
                                             </td>
                                             <td class="table-options-90">
                                                 @if (item.Product.ProductPriceToUse == ProductPriceToUseConstant.SELLER_DEFINED_PRICE)
@@ -309,18 +311,32 @@
 
                                             for(int rentNumberOfDays = item.RentNumberOfDays.Value; rentNumberOfDays > 0; rentNumberOfDays -= 30)
                                             {
-                                                <tr>
-                                                    <td class="ownorent-text-silver">@rentNumberOfDays day/s Rent</td>
-                                                    <td></td>
-                                                    <td></td>
-                                                    <td></td>
-                                                    <td class="ownorent-text-silver">Payment @breakdown</td>
-                                                    <td class="ownorent-text-silver" style="text-align:right;">
-                                                        @if (item.Product.ProductPriceToUse == ProductPriceToUseConstant.SELLER_DEFINED_PRICE)
-                                                        {
-                                                            if (item.Product.DailyRentPrice != null)
+                                                if (rentNumberOfDays < 30)
+                                                {
+                                                    <tr>
+                                                        <td class="ownorent-text-silver">@rentNumberOfDays day/s Rent</td>
+                                                        <td></td>
+                                                        <td></td>
+                                                        <td></td>
+                                                        <td class="ownorent-text-silver">Payment @breakdown</td>
+                                                        <td class="ownorent-text-silver" style="text-align:right;">
+                                                            @if (item.Product.ProductPriceToUse == ProductPriceToUseConstant.SELLER_DEFINED_PRICE)
                                                             {
-                                                                <text>@((item.Product.DailyRentPrice.Value * rentNumberOfDays * item.Quantity).ToString("C2", CultureInfo.GetCultureInfo("fil-PH")))</text>
+                                                                if (item.Product.DailyRentPrice != null)
+                                                                {
+                                                                    <text>@((item.Product.DailyRentPrice.Value * rentNumberOfDays * item.Quantity).ToString("C2", CultureInfo.GetCultureInfo("fil-PH")))</text>
+                                                                }
+                                                                else
+                                                                {
+                                                                    if (item.Product.ComputedDailyRentPrice != null)
+                                                                    {
+                                                                        <text>@((item.Product.ComputedDailyRentPrice.Value * rentNumberOfDays * item.Quantity).ToString("C2", CultureInfo.GetCultureInfo("fil-PH")))</text>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <text>@((0).ToString("C2", CultureInfo.GetCultureInfo("fil-PH")))</text>
+                                                                    }
+                                                                }
                                                             }
                                                             else
                                                             {
@@ -333,22 +349,68 @@
                                                                     <text>@((0).ToString("C2", CultureInfo.GetCultureInfo("fil-PH")))</text>
                                                                 }
                                                             }
-                                                        }
-                                                        else
-                                                        {
-                                                            if (item.Product.ComputedDailyRentPrice != null)
+                                                        </td>
+                                                        <td></td>
+                                                    </tr>
+                                                }
+                                                else
+                                                {
+                                                    <tr>
+                                                        <td class="ownorent-text-silver">30 day/s Rent</td>
+                                                        <td></td>
+                                                        <td></td>
+                                                        <td></td>
+                                                        <td class="ownorent-text-silver">Payment @breakdown</td>
+                                                        <td class="ownorent-text-silver" style="text-align:right;">
+                                                            @if (item.Product.ProductPriceToUse == ProductPriceToUseConstant.SELLER_DEFINED_PRICE)
                                                             {
-                                                                <text>@((item.Product.ComputedDailyRentPrice.Value * rentNumberOfDays * item.Quantity).ToString("C2", CultureInfo.GetCultureInfo("fil-PH")))</text>
+                                                                if (item.Product.DailyRentPrice != null)
+                                                                {
+                                                                    if (breakdown == 1)
+                                                                    {
+                                                                        rentRequiredPayment += (item.Product.DailyRentPrice.Value * 30 * item.Quantity);
+                                                                    }
+                                                                    
+                                                                    <text>@((item.Product.DailyRentPrice.Value * 30 * item.Quantity).ToString("C2", CultureInfo.GetCultureInfo("fil-PH")))</text>
+                                                                }
+                                                                else
+                                                                {
+                                                                    if (item.Product.ComputedDailyRentPrice != null)
+                                                                    {
+                                                                        if (breakdown == 1)
+                                                                        {
+                                                                            rentRequiredPayment += (item.Product.ComputedDailyRentPrice.Value * 30 * item.Quantity);
+                                                                        }
+
+                                                                        <text>@((item.Product.ComputedDailyRentPrice.Value * 30 * item.Quantity).ToString("C2", CultureInfo.GetCultureInfo("fil-PH")))</text>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <text>@((0).ToString("C2", CultureInfo.GetCultureInfo("fil-PH")))</text>
+                                                                    }
+                                                                }
                                                             }
                                                             else
                                                             {
-                                                                <text>@((0).ToString("C2", CultureInfo.GetCultureInfo("fil-PH")))</text>
-                                                            }
-                                                        }
-                                                    </td>
-                                                    <td></td>
-                                                </tr>
+                                                                if (item.Product.ComputedDailyRentPrice != null)
+                                                                {
+                                                                    if (breakdown == 1)
+                                                                    {
+                                                                        rentRequiredPayment += (item.Product.ComputedDailyRentPrice.Value * 30 * item.Quantity);
+                                                                    }
 
+                                                                    <text>@((item.Product.ComputedDailyRentPrice.Value * 30 * item.Quantity).ToString("C2", CultureInfo.GetCultureInfo("fil-PH")))</text>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <text>@((0).ToString("C2", CultureInfo.GetCultureInfo("fil-PH")))</text>
+                                                                }
+                                                            }
+                                                        </td>
+                                                        <td></td>
+                                                    </tr>
+                                                }
+                                                
                                                 breakdown++;
                                             }
                                         }
@@ -365,12 +427,16 @@
                                                     {
                                                         if (item.Product.DailyRentPrice != null)
                                                         {
+                                                            rentRequiredPayment = (item.Product.DailyRentPrice.Value * item.RentNumberOfDays.Value * item.Quantity);
+
                                                             <text>@((item.Product.DailyRentPrice.Value * item.RentNumberOfDays.Value * item.Quantity).ToString("C2", CultureInfo.GetCultureInfo("fil-PH")))</text>
                                                         }
                                                         else
                                                         {
                                                             if (item.Product.ComputedDailyRentPrice != null)
                                                             {
+                                                                rentRequiredPayment = (item.Product.ComputedDailyRentPrice.Value * item.RentNumberOfDays.Value * item.Quantity);
+
                                                                 <text>@((item.Product.ComputedDailyRentPrice.Value * item.RentNumberOfDays.Value * item.Quantity).ToString("C2", CultureInfo.GetCultureInfo("fil-PH")))</text>
                                                             }
                                                             else
@@ -383,6 +449,8 @@
                                                     {
                                                         if (item.Product.ComputedDailyRentPrice != null)
                                                         {
+                                                            rentRequiredPayment = (item.Product.ComputedDailyRentPrice.Value * item.RentNumberOfDays.Value * item.Quantity);
+
                                                             <text>@((item.Product.ComputedDailyRentPrice.Value * item.RentNumberOfDays.Value * item.Quantity).ToString("C2", CultureInfo.GetCultureInfo("fil-PH")))</text>
                                                         }
                                                         else
@@ -408,6 +476,19 @@
                                         </td>
                                         <td style="text-align:right;">
                                             @rentTotal.ToString("C2", CultureInfo.GetCultureInfo("fil-PH"))
+                                        </td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td style="text-align:right;">
+                                            Required:
+                                        </td>
+                                        <td style="text-align:right;">
+                                            @rentRequiredPayment.ToString("C2", CultureInfo.GetCultureInfo("fil-PH"))
                                         </td>
                                         <td></td>
                                     </tr>
@@ -487,50 +568,58 @@
                                             </td>
                                             <td class="table-options-70">
                                                 <input name="cartItems[@cartIndex].CartId" value="@item.CartId" type="hidden" />
-                                                <input name="cartItems[@cartIndex].Quantity" value="@item.Quantity" class="form-control table-inline-input" type="number" step="1" />
+                                                <input name="cartItems[@cartIndex].Quantity" value="@item.Quantity" class="form-control table-inline-input" type="number" step="1" min="0" />
                                             </td>
                                             <td class="table-options-90">
                                                 @if (item.Product.ProductPriceToUse == ProductPriceToUseConstant.SELLER_DEFINED_PRICE)
                                                 {
-                                                    // rentOwnTotal += ((item.Product.Price + (item.Product.Price * (item.PaymentTerm.InterestRate / 100))) * item.Quantity);
+                                                    rentOwnTotal += ((item.Product.Price + (item.Product.Price * (item.PaymentTerm.InterestRate / 100))) * item.Quantity);
 
+                                                    /*
                                                     <text>
                                                         @(((item.Product.Price + (item.Product.Price * (item.PaymentTerm.InterestRate / 100))) * item.Quantity).ToString("C2", CultureInfo.GetCultureInfo("fil-PH")))
                                                     </text>
+                                                    */
                                                 }
                                                 else
                                                 {
                                                     if (item.Product.ComputedPrice != null)
                                                     {
-                                                        // rentOwnTotal += ((item.Product.ComputedPrice.Value + (item.Product.ComputedPrice.Value * (item.PaymentTerm.InterestRate / 100))) * item.Quantity);
+                                                        rentOwnTotal += ((item.Product.ComputedPrice.Value + (item.Product.ComputedPrice.Value * (item.PaymentTerm.InterestRate / 100))) * item.Quantity);
 
+                                                        /*
                                                         <text>
                                                             @(((item.Product.ComputedPrice.Value + (item.Product.ComputedPrice.Value * (item.PaymentTerm.InterestRate / 100))) * item.Quantity).ToString("C2", CultureInfo.GetCultureInfo("fil-PH")))
                                                         </text>
+                                                        */
                                                     }
                                                     else
                                                     {
-                                                        // rentOwnTotal += ((item.Product.Price + (item.Product.Price * (item.PaymentTerm.InterestRate / 100))) * item.Quantity);
+                                                        rentOwnTotal += ((item.Product.Price + (item.Product.Price * (item.PaymentTerm.InterestRate / 100))) * item.Quantity);
 
+                                                        /*
                                                         <text>
                                                             @(((item.Product.Price + (item.Product.Price * (item.PaymentTerm.InterestRate/100))) * item.Quantity).ToString("C2", CultureInfo.GetCultureInfo("fil-PH")))
                                                         </text>
+                                                        */
                                                     }
                                                 }
+
+                                                -
                                             </td>
                                             <td class="table-options-70">
                                                 @Html.ActionLink("Remove", "RemoveFromCart", new { id = item.CartId }, new { @class = "btn btn-xs btn-danger" })
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td class="ownorent-text-silver">Required Initial Payment (Ammortization)</td>
+                                            <td class="ownorent-text-silver">Ammortization</td>
                                             <td></td>
                                             <td></td>
                                             <td class="ownorent-text-silver"></td>
-                                            <td class="ownorent-text-silver" style="text-align:right;">
+                                            <td class="ownorent-text-silver table-options-90" style="text-align:right;">
                                                 @if (item.Product.ProductPriceToUse == ProductPriceToUseConstant.SELLER_DEFINED_PRICE)
                                                 {
-                                                    rentOwnTotal += (((item.Product.Price + (item.Product.Price * (item.PaymentTerm.InterestRate / 100))) / item.PaymentTerm.Months) * item.Quantity);
+                                                    rentOwnRequiredPayment += (((item.Product.Price + (item.Product.Price * (item.PaymentTerm.InterestRate / 100))) / item.PaymentTerm.Months) * item.Quantity);
 
                                                     <text>
                                                         @((((item.Product.Price + (item.Product.Price * (item.PaymentTerm.InterestRate / 100))) / item.PaymentTerm.Months) * item.Quantity).ToString("C2", CultureInfo.GetCultureInfo("fil-PH")))
@@ -540,7 +629,7 @@
                                                 {
                                                     if (item.Product.ComputedPrice != null)
                                                     {
-                                                        rentOwnTotal += (((item.Product.ComputedPrice.Value + (item.Product.ComputedPrice.Value * (item.PaymentTerm.InterestRate / 100))) / item.PaymentTerm.Months) * item.Quantity);
+                                                        rentOwnRequiredPayment += (((item.Product.ComputedPrice.Value + (item.Product.ComputedPrice.Value * (item.PaymentTerm.InterestRate / 100))) / item.PaymentTerm.Months) * item.Quantity);
 
                                                         <text>
                                                             @((((item.Product.ComputedPrice.Value + (item.Product.ComputedPrice.Value * (item.PaymentTerm.InterestRate / 100))) / item.PaymentTerm.Months) * item.Quantity).ToString("C2", CultureInfo.GetCultureInfo("fil-PH")))
@@ -548,13 +637,15 @@
                                                     }
                                                     else
                                                     {
-                                                        rentOwnTotal += (((item.Product.Price + (item.Product.Price * (item.PaymentTerm.InterestRate / 100))) / item.PaymentTerm.Months) * item.Quantity);
+                                                        rentOwnRequiredPayment += (((item.Product.Price + (item.Product.Price * (item.PaymentTerm.InterestRate / 100))) / item.PaymentTerm.Months) * item.Quantity);
 
                                                         <text>
                                                             @((((item.Product.Price + (item.Product.Price * (item.PaymentTerm.InterestRate / 100))) / item.PaymentTerm.Months) * item.Quantity).ToString("C2", CultureInfo.GetCultureInfo("fil-PH")))
                                                         </text>
                                                     }
                                                 }
+
+                                                x @item.PaymentTerm.Months
                                             </td>
                                             <td></td>
                                         </tr>
@@ -568,8 +659,20 @@
                                         <td style="text-align:right;">
                                             Total:
                                         </td>
-                                        <td style="text-align:right;">
+                                        <td class="table-options-90" style="text-align:right;">
                                             @rentOwnTotal.ToString("C2", CultureInfo.GetCultureInfo("fil-PH"))
+                                        </td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td style="text-align:right;">
+                                            Required:
+                                        </td>
+                                        <td class="table-options-90" style="text-align:right;">
+                                            @rentOwnRequiredPayment.ToString("C2", CultureInfo.GetCultureInfo("fil-PH"))
                                         </td>
                                         <td></td>
                                     </tr>
@@ -601,10 +704,17 @@
 
                 <hr style="margin-top:4px; margin-bottom:4px;"/>
                 
-                <p style="margin-bottom:10px; font-size:1em;">
+                <p style="margin-bottom:10px; font-size:0.7em;">
                     Total:
-                    <span class="ownorent-text-ygreen" style="float:right;">
+                    <span class="ownorent-text-silver" style="float:right;">
                         @((buyTotal + rentTotal + rentOwnTotal).ToString("C2", CultureInfo.GetCultureInfo("fil-PH")))
+                    </span>
+                </p>
+
+                <p style="margin-bottom:10px; font-size:0.9em;">
+                    Pay on Checkout:
+                    <span class="ownorent-text-ygreen" style="float:right;">
+                        @((buyTotal + rentRequiredPayment + rentOwnRequiredPayment).ToString("C2", CultureInfo.GetCultureInfo("fil-PH")))
                     </span>
                 </p>
 

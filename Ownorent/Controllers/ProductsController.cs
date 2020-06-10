@@ -175,6 +175,48 @@ namespace Ownorent.Controllers
         [HttpPost]
         public async Task<ActionResult> Cart(List<Cart> cartItems)
         {
+            if (cartItems == null)
+            {
+                return RedirectToAction("Cart");
+            }
+
+            string userId = User.Identity.GetUserId();
+
+            foreach (var item in cartItems)
+            {
+                var cartItem = db.Carts.Include(c => c.Product).Include(c => c.PaymentTerm).FirstOrDefault(c => c.CartId == item.CartId && c.UserId == userId);
+
+                if (cartItem != null)
+                {
+                    if (item.Quantity == 0)
+                    {
+                        db.Carts.Remove(cartItem);
+                    }
+                    else
+                    {
+                        cartItem.Quantity = item.Quantity;
+
+                        switch (cartItem.CartType)
+                        {
+                            case CartTypeConstant.BUY:
+                                break;
+                            case CartTypeConstant.RENT:
+                                cartItem.RentDateStart = item.RentDateStart;
+                                cartItem.RentDateEnd = item.RentDateEnd;
+                                cartItem.RentNumberOfDays = ((item.RentDateEnd - item.RentDateStart).Value.Days)+1;
+                                break;
+                            case CartTypeConstant.RENT_TO_OWN:
+                                cartItem.RentToOwnPaymentTermId = item.RentToOwnPaymentTermId;
+                                break;
+                        }
+                    }
+                }
+            }
+
+            await db.SaveChangesAsync();
+
+            TempData["Message"] = "<strong>Cart updated successfully.</strong> Please review changes.";
+
             return RedirectToAction("Cart");
         }
 
