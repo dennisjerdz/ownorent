@@ -219,6 +219,10 @@
     <Compile Include="Migrations\202006092030548_cart update to handle rent and rent to own.Designer.cs">
       <DependentUpon>202006092030548_cart update to handle rent and rent to own.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202006100528253_compute number of days upon add to cart rent and save to db.cs" />
+    <Compile Include="Migrations\202006100528253_compute number of days upon add to cart rent and save to db.Designer.cs">
+      <DependentUpon>202006100528253_compute number of days upon add to cart rent and save to db.cs</DependentUpon>
+    </Compile>
     <Compile Include="OwnorentHelper.cs" />
     <Compile Include="Migrations\202005290332179_initial.cs" />
     <Compile Include="Migrations\202005290332179_initial.Designer.cs">
@@ -370,6 +374,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202006092030548_cart update to handle rent and rent to own.resx">
       <DependentUpon>202006092030548_cart update to handle rent and rent to own.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202006100528253_compute number of days upon add to cart rent and save to db.resx">
+      <DependentUpon>202006100528253_compute number of days upon add to cart rent and save to db.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

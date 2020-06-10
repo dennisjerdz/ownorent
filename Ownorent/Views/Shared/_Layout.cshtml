@@ -70,6 +70,24 @@
             </div>
         </div>
         <div class="container body-content">
+            @if (ViewBag.Error != null)
+            {
+                if (ViewBag.Error == "1")
+                {
+                    <div class="ownorent-alert alert alert-danger alert-dismissible marginTop10">
+                        <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                        @Html.Raw(ViewBag.Message)
+                    </div>
+                }
+            }
+            else if (ViewBag.Message != null)
+            {
+                <div class="ownorent-alert alert alert-success alert-dismissable marginTop10">
+                    <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                    @Html.Raw(ViewBag.Message)
+                </div>
+            }
+
             @RenderBody()
             <hr />
             <footer>

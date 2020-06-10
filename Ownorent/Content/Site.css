@@ -33,6 +33,14 @@
     cursor:pointer;
 }
 
+.ownorent-bg-paypal-blue{
+    background-color:#0053ff;
+}
+
+.ownorent-text-paypal-blue{
+    color:#0053ff;
+}
+
 .ownorent-bg-red {
     background-color:#e02b2b;
 }
@@ -540,6 +548,21 @@ table.dataTable thead .sorting_desc{
     border-top:none;
 }
 
+.table-options-70{
+    width:70px !important;
+    text-align:right !important;
+}
+
+.table-options-90{
+    width:90px !important;
+    text-align:right !important;
+}
+
+.table-options-120{
+    width:120px !important;
+    text-align:right !important;
+}
+
 .floating-cart{
     position:fixed;
     z-index: 999999999999999999;
@@ -570,6 +593,17 @@ table.dataTable thead .sorting_desc{
 
 .table-inline-input{
     width:45px !important;
+    display:inline-block !important;
+    text-align:right;
+    padding:0px;
+    height:auto !important;
+    border-radius:0px;
+    border:none;
+    border-bottom:1px solid rgba(0,0,0,0.2);
+}
+
+.table-inline-input-date{
+    width:130px !important;
     display:inline-block !important;
     text-align:right;
     padding:0px;

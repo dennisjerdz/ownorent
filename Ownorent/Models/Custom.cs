@@ -207,6 +207,7 @@ namespace Ownorent.Models
 
         public DateTime? RentDateStart { get; set; }
         public DateTime? RentDateEnd { get; set; }
+        public int? RentNumberOfDays { get; set; }
 
         public int? RentToOwnPaymentTermId { get; set; }
         [ForeignKey("RentToOwnPaymentTermId")]

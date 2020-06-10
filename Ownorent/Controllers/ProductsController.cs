@@ -77,8 +77,9 @@ namespace Ownorent.Controllers
                                 ProductTemplateId = id,
                                 UserId = userId,
                                 Quantity = 1,
-                                RentDateStart = DateTime.UtcNow.AddDays(3),
-                                RentDateEnd = DateTime.UtcNow.AddDays(4)
+                                RentDateStart = DateTime.UtcNow.AddHours(8).AddDays(2),
+                                RentDateEnd = DateTime.UtcNow.AddHours(8).AddDays(2),
+                                RentNumberOfDays = 1
                             });
                             break;
                         case CartTypeConstant.RENT_TO_OWN:
@@ -153,7 +154,16 @@ namespace Ownorent.Controllers
                 });
             }
 
+            ViewBag.cartValidationItems = cartValidateItems;
+            ViewBag.rentToOwnPaymentTerms = db.RentToOwnPaymentTerms.ToList();
+
             return View(cartItems);
+        }
+
+        [HttpPost]
+        public async Task<ActionResult> Cart(List<Cart> cartItems)
+        {
+            return RedirectToAction("Cart");
         }
 
         public ActionResult RemoveFromCart(int id)
