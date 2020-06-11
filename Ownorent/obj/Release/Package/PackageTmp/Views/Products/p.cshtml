@@ -6,33 +6,7 @@
     ViewBag.bgColor = "#f8fafc";
 }
 
-<section id="messages">
-    @if (ViewBag.Error != null)
-    {
-        if (ViewBag.Error == "1")
-        {
-            <div class="row">
-                <div class="col-md-12">
-                    <br />
-                    <div class="ownorent-alert alert alert-danger">
-                        @Html.Raw(ViewBag.Message)
-                    </div>
-                </div>
-            </div>
-        }
-    }
-    else if (ViewBag.Message != null)
-    {
-        <div class="row">
-            <div class="col-md-12">
-                <br />
-                <div class="ownorent-alert alert alert-success">
-                    @Html.Raw(ViewBag.Message)
-                </div>
-            </div>
-        </div>
-    }
-</section>
+<section id="messages"></section>
 
 <div class="row">
     <div class="col-md-3">

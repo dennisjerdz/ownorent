@@ -240,6 +240,140 @@ namespace Ownorent.Controllers
             return RedirectToAction("Cart");
         }
 
+        public async Task<ActionResult> Checkout()
+        {
+            if (TempData["Error"] != null)
+            {
+                ViewBag.Error = TempData["Error"];
+            }
+            if (TempData["Message"] != null)
+            {
+                ViewBag.Message = TempData["Message"];
+            }
+
+            string userId = User.Identity.GetUserId();
+
+            if (userId == null)
+            {
+                TempData["Error"] = "1";
+                TempData["Message"] = "<strong>Checkout failed.</strong> Please login.";
+                return RedirectToAction("Cart");
+            }
+
+            var cartItems = await db.Carts.Include(c => c.Product).Include(c => c.PaymentTerm).Where(c => c.UserId == userId).ToListAsync();
+
+            #region validate cart items
+            if (cartItems.Count == 0)
+            {
+                TempData["Error"] = "1";
+                TempData["Message"] = "<strong>Checkout failed.</strong> No items in cart.";
+                return RedirectToAction("Cart");
+            }
+
+            List<CartValidateModel> cartValidateItems = new List<CartValidateModel>();
+
+            var grouped = cartItems.GroupBy(c => c.ProductTemplateId);
+            foreach (var item in grouped)
+            {
+                int available = db.Products.Count(p => p.ProductTemplateId == item.Key && p.ProductStatus == ProductStatusConstant.AVAILABLE);
+                var getName = item.FirstOrDefault();
+                string productName = "";
+
+                if (getName != null)
+                {
+                    productName = getName.Product.ProductName;
+                }
+
+                cartValidateItems.Add(new CartValidateModel
+                {
+                    ProductTemplateId = item.Key,
+                    ProductName = productName,
+                    QuantityNeeded = item.Sum(i => i.Quantity),
+                    QuantityAvailable = available
+                });
+            }
+
+            if (cartValidateItems.Any(c=>c.Error))
+            {
+                ViewBag.cartValidationItems = cartValidateItems;
+                ViewBag.rentToOwnPaymentTerms = db.RentToOwnPaymentTerms.ToList();
+                return View("Cart",cartItems);
+            }
+            #endregion
+
+            var user = await db.Users.FirstOrDefaultAsync(u => u.Id == userId);
+
+            #region validate user
+            if (user.Addresses.Count == 0)
+            {
+                TempData["Error"] = "1";
+                TempData["Message"] = "<strong>Checkout failed.</strong> No User address found.";
+                return RedirectToAction("Cart");
+            }
+            #endregion
+
+            TransactionGroup tg = new TransactionGroup() {
+                UserId = userId
+            };
+
+            db.TransactionGroups.Add(tg);
+
+            Address addressToUse = user.Addresses.FirstOrDefault(a => a.IsDefault);
+
+            foreach (var item in cartItems)
+            {
+                Product availableProduct = db.Products.FirstOrDefault(p => p.ProductTemplateId == item.ProductTemplateId
+                    && p.ProductStatus == ProductStatusConstant.AVAILABLE);
+
+                #region validate product availability
+                if (availableProduct == null)
+                {
+                    TempData["Error"] = "1";
+                    TempData["Message"] = "<strong>Checkout failed.</strong> No stock available for "+item.Product.ProductName+".";
+                    return RedirectToAction("Cart");
+                }
+                #endregion
+
+                Transaction transactionPerProduct = new Transaction() {
+                    TransactionGroupId = tg.TransactionGroupId,
+                    AddressId = addressToUse.AddressId,
+                    City = addressToUse.City,
+                    Country = addressToUse.Country,
+                    Line1 = addressToUse.Line1,
+                    Line2 = addressToUse.Line2,
+                    Line3 = addressToUse.Line3,
+                    Zip = addressToUse.Zip,
+                    ProductId = availableProduct.ProductId,
+                    TransactionStatus = TransactionStatusConstant.PENDING
+                };
+
+                #region determine price
+                if (item.Product.ProductPriceToUse == ProductPriceToUseConstant.SELLER_DEFINED_PRICE)
+                {
+                    transactionPerProduct.ProductPrice = item.Product.Price;
+                    transactionPerProduct.ProductDailyRentPrice = (item.Product.DailyRentPrice != null) ? item.Product.DailyRentPrice : item.Product.ComputedDailyRentPrice;
+
+                    if (item.Product.ComputedDailyRentPrice == null)
+                    {
+                        transactionPerProduct.ProductDailyRentPrice = 0;
+                    }
+                }
+                else
+                {
+                    transactionPerProduct.ProductPrice = (item.Product.ComputedPrice != null) ? item.Product.ComputedPrice.Value : item.Product.Price;
+                    transactionPerProduct.ProductDailyRentPrice = (item.Product.ComputedDailyRentPrice != null) ? item.Product.ComputedPrice.Value : item.Product.DailyRentPrice;
+
+                    if (item.Product.DailyRentPrice == null)
+                    {
+                        transactionPerProduct.ProductDailyRentPrice = 0;
+                    }
+                }
+                #endregion
+            }
+
+            return View("Cart", cartItems);
+        }
+
         public ActionResult Index()
         {
             ViewBag.Error = TempData["Error"];

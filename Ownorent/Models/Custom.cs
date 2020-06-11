@@ -288,6 +288,24 @@ namespace Ownorent.Models
         public Product Product { get; set; }
     }
 
+    public class TransactionGroup
+    {
+        public TransactionGroup()
+        {
+            DateCreated = DateTime.UtcNow.AddHours(8);
+        }
+
+        public int TransactionGroupId { get; set; }
+
+        public string UserId { get; set; }
+        [ForeignKey("UserId")]
+        public virtual ApplicationUser User { get; set; }
+        
+        public List<Transaction> Transactions { get; set; }
+
+        public DateTime DateCreated { get; set; }
+    }
+
     public class Transaction {
         public Transaction()
         {
@@ -324,17 +342,13 @@ namespace Ownorent.Models
         public float? ProductDailyRentPrice { get; set; }
         public float? RentToOwnInterestRate { get; set; }
 
-        public float PlatformTaxBuy { get; set; }
-        public float PlatformTaxDailyRent { get; set; }
-        public float PlatformTaxRentToOwn { get; set; }
-
         public int ProductId { get; set; }
         [ForeignKey("ProductId")]
         public virtual Product Product { get; set; }
-
-        public string UserId { get; set; }
-        [ForeignKey("UserId")]
-        public virtual ApplicationUser User { get; set; }
+        
+        public int TransactionGroupId { get; set; }
+        [ForeignKey("TransactionGroupId")]
+        public virtual TransactionGroup TransactionGroup { get; set; }
 
         public List<Payment> Payments { get; set; }
 
@@ -356,6 +370,10 @@ namespace Ownorent.Models
         public float ShippingFee { get; set; }
 
         public string PaypalTransactionId { get; set; }
+
+        public float? PlatformTaxBuy { get; set; }
+        public float? PlatformTaxDailyRent { get; set; }
+        public float? PlatformTaxRentToOwn { get; set; }
 
         public string LastModifiedBy { get; set; }
         public DateTime DateCreated { get; set; }

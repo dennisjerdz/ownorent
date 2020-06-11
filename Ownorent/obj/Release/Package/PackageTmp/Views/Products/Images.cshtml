@@ -5,32 +5,6 @@
     ViewBag.bgColor = "#f8fafc";
 }
 
-@if (ViewBag.Error != null)
-{
-    if (ViewBag.Error == "1")
-    {
-        <div class="row">
-            <div class="col-md-12">
-                <br />
-                <div class="ownorent-alert alert alert-danger">
-                    @Html.Raw(ViewBag.Message)
-                </div>
-            </div>
-        </div>
-    }
-}
-else if (ViewBag.Message != null)
-{
-    <div class="row">
-        <div class="col-md-12">
-            <br />
-            <div class="ownorent-alert alert alert-success">
-                @Html.Raw(ViewBag.Message)
-            </div>
-        </div>
-    </div>
-}
-
 <div class="row">
     <div class="col-md-4">
         <div class="ownorent-panel ownorent-panel-white marginTop15">

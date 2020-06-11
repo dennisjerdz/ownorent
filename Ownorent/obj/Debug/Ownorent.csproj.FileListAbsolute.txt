@@ -88,3 +88,5 @@ C:\Users\Jerdz\Documents\Visual Studio 2015\Projects\Ownorent\Ownorent\obj\Debug
 C:\Users\Jerdz\Documents\Visual Studio 2015\Projects\Ownorent\Ownorent\obj\Debug\Ownorent.Migrations.byteorsbytefixes.resources
 C:\Users\Jerdz\Documents\Visual Studio 2015\Projects\Ownorent\Ownorent\obj\Debug\Ownorent.Migrations.cartupdatetohandlerentandrenttoown.resources
 C:\Users\Jerdz\Documents\Visual Studio 2015\Projects\Ownorent\Ownorent\obj\Debug\Ownorent.Migrations.computenumberofdaysuponaddtocartrentandsavetodb.resources
+C:\Users\Jerdz\Documents\Visual Studio 2015\Projects\Ownorent\Ownorent\obj\Debug\Ownorent.Migrations.transactionandpaymentdbchanges.resources
+C:\Users\Jerdz\Documents\Visual Studio 2015\Projects\Ownorent\Ownorent\obj\Debug\Ownorent.Migrations.transactiongroups.resources
