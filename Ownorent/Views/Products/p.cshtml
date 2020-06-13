@@ -100,7 +100,12 @@
                         }
 
                         <div class="ownorent-product-card-info">
+                            <p class="name"></p>
                             <p class="name">@item.ProductName</p>
+                            <p class="price" style="color:#b5cdd9;">
+                                <span class="info">DOP:</span>
+                                @item.DatePurchased.ToString("MM-dd-yyyy")
+                            </p>
                             <p class="price">
                                 <span class="info">Price:</span>
                                 @if (item.ProductPriceToUse == ProductPriceToUseConstant.SELLER_DEFINED_PRICE)

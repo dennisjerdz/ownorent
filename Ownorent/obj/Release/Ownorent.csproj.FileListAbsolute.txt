@@ -94,3 +94,5 @@ C:\Users\Jerdz\Documents\Visual Studio 2015\Projects\Ownorent\Ownorent\obj\Relea
 C:\Users\Jerdz\Documents\Visual Studio 2015\Projects\Ownorent\Ownorent\obj\Release\Ownorent.Migrations.renameentity.resources
 C:\Users\Jerdz\Documents\Visual Studio 2015\Projects\Ownorent\Ownorent\obj\Release\Ownorent.Migrations.dbadjustmentsforpaypalagain.resources
 C:\Users\Jerdz\Documents\Visual Studio 2015\Projects\Ownorent\Ownorent\obj\Release\Ownorent.Migrations.invoicedescriptiononproducttemplate.resources
+C:\Users\Jerdz\Documents\Visual Studio 2015\Projects\Ownorent\Ownorent\obj\Release\Ownorent.Migrations.nullablerentpaymenttermid.resources
+C:\Users\Jerdz\Documents\Visual Studio 2015\Projects\Ownorent\Ownorent\obj\Release\Ownorent.Migrations.rentnumberofdays.resources
