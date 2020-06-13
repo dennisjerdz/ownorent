@@ -243,6 +243,10 @@
     <Compile Include="Migrations\202006130038372_db adjustments for paypal again.Designer.cs">
       <DependentUpon>202006130038372_db adjustments for paypal again.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202006130731038_invoice description on product template.cs" />
+    <Compile Include="Migrations\202006130731038_invoice description on product template.Designer.cs">
+      <DependentUpon>202006130731038_invoice description on product template.cs</DependentUpon>
+    </Compile>
     <Compile Include="OwnorentHelper.cs" />
     <Compile Include="Migrations\202005290332179_initial.cs" />
     <Compile Include="Migrations\202005290332179_initial.Designer.cs">
@@ -412,6 +416,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202006130038372_db adjustments for paypal again.resx">
       <DependentUpon>202006130038372_db adjustments for paypal again.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202006130731038_invoice description on product template.resx">
+      <DependentUpon>202006130731038_invoice description on product template.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
