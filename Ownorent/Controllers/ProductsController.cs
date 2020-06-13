@@ -527,7 +527,7 @@ namespace Ownorent.Controllers
                     name = item.Product.ProductName,
                     quantity = item.Quantity.ToString(),
                     sku = "OWNO00-"+item.Product.ProductTemplateId,
-                    description = item.Product.ProductDescription,
+                    description = item.Product.InvoiceDescription,
                     unit_amount = new PaypalCreateOrderModel.PaypalPurchaseUnitModel.PaypalUnitAmountModel { 
                         currency_code = "PHP",
                         value = paypalProductValue.ToString()
@@ -681,7 +681,7 @@ namespace Ownorent.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "ProductTemplateId,ProductName,TrackingNumber,ProductDescription,ProductTemplateStatus,Quantity,Price,DailyRentPrice,ComputedPrice,ComputedDailyRentPrice,DatePurchased,CategoryId,WarehouseId")] ProductTemplate productTemplate)
+        public ActionResult Create([Bind(Include = "InvoiceDescription,ProductTemplateId,ProductName,TrackingNumber,ProductDescription,ProductTemplateStatus,Quantity,Price,DailyRentPrice,ComputedPrice,ComputedDailyRentPrice,DatePurchased,CategoryId,WarehouseId")] ProductTemplate productTemplate)
         {
             productTemplate.UserId = User.Identity.GetUserId();
             productTemplate.DateCreated = DateTime.UtcNow.AddHours(8);
@@ -874,7 +874,7 @@ namespace Ownorent.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "ProductTemplateId,UserId,DateCreated,ProductTemplateStatus,TrackingNumber,ProductName,ProductDescription,ProductPriceToUse,Quantity,Price,DailyRentPrice,ComputedPrice,ComputedDailyRentPrice,AdminDefinedPrice,AdminDefinedDailyRentPrice,ShippingFee,ShippingFeeProvincial,DatePurchased,CategoryId,WarehouseId")] ProductTemplate productTemplate)
+        public ActionResult Edit([Bind(Include = "InvoiceDescription,ProductTemplateId,UserId,DateCreated,ProductTemplateStatus,TrackingNumber,ProductName,ProductDescription,ProductPriceToUse,Quantity,Price,DailyRentPrice,ComputedPrice,ComputedDailyRentPrice,AdminDefinedPrice,AdminDefinedDailyRentPrice,ShippingFee,ShippingFeeProvincial,DatePurchased,CategoryId,WarehouseId")] ProductTemplate productTemplate)
         {
             var actualTemplate = db.ProductTemplates.FirstOrDefault(p => p.ProductTemplateId == productTemplate.ProductTemplateId);
 
@@ -891,6 +891,7 @@ namespace Ownorent.Controllers
             actualTemplate.DatePurchased = productTemplate.DatePurchased;
             actualTemplate.LastModifiedBy = User.Identity.Name;
             actualTemplate.DateLastModified = DateTime.UtcNow.AddHours(8);
+            actualTemplate.InvoiceDescription = productTemplate.InvoiceDescription;
 
             if (ModelState.IsValid)
             {

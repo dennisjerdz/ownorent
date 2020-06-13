@@ -102,6 +102,8 @@ namespace Ownorent.Models
         [Required]
         [Display(Name = "Description")]
         public string ProductDescription { get; set; }
+        [Display(Name = "Invoice Description")]
+        public string InvoiceDescription { get; set; }
 
         [Display(Name = "Status")]
         public byte ProductTemplateStatus { get; set; }
