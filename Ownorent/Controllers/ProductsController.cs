@@ -550,12 +550,12 @@ namespace Ownorent.Controllers
             }
             #endregion
 
-            mainPurchaseUnit.amount.value = totalRequiredAmount.ToString();
-            mainPurchaseUnit.amount.breakdown.item_total.value = totalRequiredAmount.ToString();
-            tgPaymentAttempt.TotalAmount = totalRequiredAmount;
+            mainPurchaseUnit.amount.value = Math.Round(totalRequiredAmount,2).ToString();
+            mainPurchaseUnit.amount.breakdown.item_total.value = Math.Round(totalRequiredAmount, 2).ToString();
+            tgPaymentAttempt.TotalAmount = (float)Math.Round(totalRequiredAmount,2);
             tgPaymentAttempt.PlatformTaxOrder = platformTaxOrder;
-            tgPaymentAttempt.AmountForSystem = platformTaxOrder * totalRequiredAmount;
-            tgPaymentAttempt.AmountForSeller = totalRequiredAmount - (platformTaxOrder * totalRequiredAmount);
+            tgPaymentAttempt.AmountForSystem = platformTaxOrder * tgPaymentAttempt.TotalAmount;
+            tgPaymentAttempt.AmountForSeller = tgPaymentAttempt.TotalAmount - (platformTaxOrder * tgPaymentAttempt.TotalAmount);
 
             #region checkout http request
             PaypalCheckoutResultModel checkoutResult;
