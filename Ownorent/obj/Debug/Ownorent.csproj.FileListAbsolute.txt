@@ -77,7 +77,6 @@ C:\Users\Jerdz\Documents\Visual Studio 2015\Projects\Ownorent\Ownorent\bin\Micro
 C:\Users\Jerdz\Documents\Visual Studio 2015\Projects\Ownorent\Ownorent\bin\Microsoft.Owin.Security.Google.xml
 C:\Users\Jerdz\Documents\Visual Studio 2015\Projects\Ownorent\Ownorent\bin\Microsoft.Owin.Security.Twitter.xml
 C:\Users\Jerdz\Documents\Visual Studio 2015\Projects\Ownorent\Ownorent\bin\Microsoft.Owin.Security.MicrosoftAccount.xml
-C:\Users\Jerdz\Documents\Visual Studio 2015\Projects\Ownorent\Ownorent\obj\Debug\Ownorent.csprojResolveAssemblyReference.cache
 C:\Users\Jerdz\Documents\Visual Studio 2015\Projects\Ownorent\Ownorent\obj\Debug\Ownorent.Migrations.initial.resources
 C:\Users\Jerdz\Documents\Visual Studio 2015\Projects\Ownorent\Ownorent\obj\Debug\Ownorent.Migrations.AddEmailConfirmationcodetoUser.resources
 C:\Users\Jerdz\Documents\Visual Studio 2015\Projects\Ownorent\Ownorent\obj\Debug\Ownorent.Migrations.Producttemplatelabels.resources
@@ -90,7 +89,9 @@ C:\Users\Jerdz\Documents\Visual Studio 2015\Projects\Ownorent\Ownorent\obj\Debug
 C:\Users\Jerdz\Documents\Visual Studio 2015\Projects\Ownorent\Ownorent\obj\Debug\Ownorent.Migrations.dbadjustmentsforpaypal.resources
 C:\Users\Jerdz\Documents\Visual Studio 2015\Projects\Ownorent\Ownorent\obj\Debug\Ownorent.Migrations.renameentity.resources
 C:\Users\Jerdz\Documents\Visual Studio 2015\Projects\Ownorent\Ownorent\obj\Debug\Ownorent.Migrations.dbadjustmentsforpaypalagain.resources
+C:\Users\Jerdz\Documents\Visual Studio 2015\Projects\Ownorent\Ownorent\obj\Debug\Ownorent.Migrations.invoicedescriptiononproducttemplate.resources
 C:\Users\Jerdz\Documents\Visual Studio 2015\Projects\Ownorent\Ownorent\obj\Debug\Ownorent.csproj.GenerateResource.Cache
 C:\Users\Jerdz\Documents\Visual Studio 2015\Projects\Ownorent\Ownorent\obj\Debug\Ownorent.dll
 C:\Users\Jerdz\Documents\Visual Studio 2015\Projects\Ownorent\Ownorent\obj\Debug\Ownorent.pdb
-C:\Users\Jerdz\Documents\Visual Studio 2015\Projects\Ownorent\Ownorent\obj\Debug\Ownorent.Migrations.invoicedescriptiononproducttemplate.resources
+C:\Users\Jerdz\Documents\Visual Studio 2015\Projects\Ownorent\Ownorent\obj\Debug\Ownorent.Migrations.nullablerentpaymenttermid.resources
+C:\Users\Jerdz\Documents\Visual Studio 2015\Projects\Ownorent\Ownorent\obj\Debug\Ownorent.Migrations.rentnumberofdays.resources

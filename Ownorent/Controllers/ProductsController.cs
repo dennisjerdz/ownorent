@@ -335,10 +335,14 @@ namespace Ownorent.Controllers
             };
 
             db.TransactionGroups.Add(tg);
+            await db.SaveChangesAsync();
 
             TransactionGroupPaymentAttempt tgPaymentAttempt = new TransactionGroupPaymentAttempt() {
-                TransactionGroupId = tg.TransactionGroupId
+                TransactionGroupId = tg.TransactionGroupId,
+                Status = TransactionGroupPaymentStatusConstant.PENDING
             };
+            db.TransactionGroupPaymentAttempts.Add(tgPaymentAttempt);
+            await db.SaveChangesAsync();
 
             float totalRequiredAmount = 0f;
             float totalAmountForSystem = 0f;
@@ -415,9 +419,12 @@ namespace Ownorent.Controllers
                         Line3 = addressToUse.Line3,
                         Zip = addressToUse.Zip,
                         ProductId = availableProduct.ProductId,
+                        ProductPrice = price,
+                        ProductDailyRentPrice = dailyRentPrice,
                         TransactionStatus = TransactionStatusConstant.PENDING,
                     };
                     db.Transactions.Add(transactionPerProduct);
+                    await db.SaveChangesAsync();
 
                     switch (item.CartType)
                     {
@@ -432,7 +439,11 @@ namespace Ownorent.Controllers
                             totalRequiredAmount += price;
                             break;
                             case CartTypeConstant.RENT:
-                            #region rent
+                            transactionPerProduct.RentStartDate = item.RentDateStart;
+                            transactionPerProduct.RentEndDate = item.RentDateEnd;
+                            transactionPerProduct.RentNumberOfDays = item.RentNumberOfDays;
+
+                            #region create rent payments
                             if (item.RentNumberOfDays > 30)
                             {
                                 // if rent is more than 30 days, break down in monthly payments
@@ -484,6 +495,9 @@ namespace Ownorent.Controllers
                             #endregion
                             break;
                         case CartTypeConstant.RENT_TO_OWN:
+                            transactionPerProduct.RentToOwnPaymentTermId = item.RentToOwnPaymentTermId;
+                            transactionPerProduct.RentToOwnInterestRate = item.PaymentTerm.InterestRate;
+
                             float ammortization = (price + (price * (item.PaymentTerm.InterestRate/100))) / item.PaymentTerm.Months;
                             for (int paymentTermIndex = 0; paymentTermIndex < item.PaymentTerm.Months; paymentTermIndex++)
                             {
@@ -538,6 +552,10 @@ namespace Ownorent.Controllers
 
             mainPurchaseUnit.amount.value = totalRequiredAmount.ToString();
             mainPurchaseUnit.amount.breakdown.item_total.value = totalRequiredAmount.ToString();
+            tgPaymentAttempt.TotalAmount = totalRequiredAmount;
+            tgPaymentAttempt.PlatformTaxOrder = platformTaxOrder;
+            tgPaymentAttempt.AmountForSystem = platformTaxOrder * totalRequiredAmount;
+            tgPaymentAttempt.AmountForSeller = totalRequiredAmount - (platformTaxOrder * totalRequiredAmount);
 
             #region checkout http request
             PaypalCheckoutResultModel checkoutResult;
@@ -570,6 +588,7 @@ namespace Ownorent.Controllers
                 // assign Transaction ID/ Reference ID from paypal to DB
                 tgPaymentAttempt.Code = checkoutResult.id;
 
+
                 // we could clear the cart and change product availability here
                 // or just wait for checkout but another customer might purchase
 
@@ -599,6 +618,8 @@ namespace Ownorent.Controllers
                 
                 if (order != null)
                 {
+                    order.Status = TransactionGroupPaymentStatusConstant.SUCCESS;
+
                     // change product availability here
                     // remove products
 

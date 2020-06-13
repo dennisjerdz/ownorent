@@ -247,6 +247,14 @@
     <Compile Include="Migrations\202006130731038_invoice description on product template.Designer.cs">
       <DependentUpon>202006130731038_invoice description on product template.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202006130809279_nullable rent payment term id.cs" />
+    <Compile Include="Migrations\202006130809279_nullable rent payment term id.Designer.cs">
+      <DependentUpon>202006130809279_nullable rent payment term id.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202006130831470_rent number of days.cs" />
+    <Compile Include="Migrations\202006130831470_rent number of days.Designer.cs">
+      <DependentUpon>202006130831470_rent number of days.cs</DependentUpon>
+    </Compile>
     <Compile Include="OwnorentHelper.cs" />
     <Compile Include="Migrations\202005290332179_initial.cs" />
     <Compile Include="Migrations\202005290332179_initial.Designer.cs">
@@ -419,6 +427,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202006130731038_invoice description on product template.resx">
       <DependentUpon>202006130731038_invoice description on product template.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202006130809279_nullable rent payment term id.resx">
+      <DependentUpon>202006130809279_nullable rent payment term id.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202006130831470_rent number of days.resx">
+      <DependentUpon>202006130831470_rent number of days.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

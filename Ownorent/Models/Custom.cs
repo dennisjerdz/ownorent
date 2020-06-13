@@ -297,6 +297,7 @@ namespace Ownorent.Models
             DateCreated = DateTime.UtcNow.AddHours(8);
         }
 
+        [Key]
         public int TransactionGroupId { get; set; }
 
         public string UserId { get; set; }
@@ -316,6 +317,7 @@ namespace Ownorent.Models
             DateLastModified = DateTime.UtcNow.AddHours(8);
         }
 
+        [Key]
         public int TransactionId { get; set; }
         public string TransactionDescription { get; set; } // put details of payment terms here
 
@@ -336,8 +338,9 @@ namespace Ownorent.Models
 
         public DateTime? RentStartDate { get; set; }
         public DateTime? RentEndDate { get; set; }
+        public int? RentNumberOfDays { get; set; }
 
-        public int RentToOwnPaymentTermId { get; set; }
+        public int? RentToOwnPaymentTermId { get; set; }
         [ForeignKey("RentToOwnPaymentTermId")]
         public virtual RentToOwnPaymentTerm RentToOwnPaymentTerm { get; set; }
 
@@ -367,6 +370,7 @@ namespace Ownorent.Models
             DateLastModified = DateTime.UtcNow.AddHours(8);
         }
 
+        [Key]
         public int PaymentId { get; set; }
         public float Amount { get; set; }
         public byte ShippingType { get; set; }
@@ -391,7 +395,13 @@ namespace Ownorent.Models
 
     public class TransactionGroupPaymentAttempt 
     {
+        public TransactionGroupPaymentAttempt()
+        {
+            this.DateCreated = DateTime.UtcNow.AddHours(8);
+        }
+
         // this will handle installment payments/ multiple payments under one transaction
+        [Key]
         public int TransactionGroupPaymentAttemptId { get; set; }
         public string Code { get; set; }
         public byte Status { get; set; }
