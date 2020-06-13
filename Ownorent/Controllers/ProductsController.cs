@@ -357,6 +357,8 @@ namespace Ownorent.Controllers
             newOrder.application_context.return_url = HttpContext.Request.Url.GetLeftPart(UriPartial.Authority) + Url.Action("Receive", "Products");
             PaypalCreateOrderModel.PaypalPurchaseUnitModel mainPurchaseUnit = newOrder.purchase_units.FirstOrDefault();
 
+            float paypalTotal = 0f;
+
             #region cart item loop
             foreach (var item in cartItems)
             {
@@ -422,6 +424,7 @@ namespace Ownorent.Controllers
                         ProductPrice = price,
                         ProductDailyRentPrice = dailyRentPrice,
                         TransactionStatus = TransactionStatusConstant.PENDING,
+                        TransactionType = item.CartType
                     };
                     db.Transactions.Add(transactionPerProduct);
                     await db.SaveChangesAsync();
@@ -482,7 +485,7 @@ namespace Ownorent.Controllers
                             else
                             {
                                 // if rent is less than 30 days, settle in one payment
-                                totalRequiredAmount += (dailyRentPrice * 30);
+                                totalRequiredAmount += (dailyRentPrice * item.RentNumberOfDays.Value);
 
                                 db.Payments.Add(new Payment
                                 {
@@ -519,16 +522,16 @@ namespace Ownorent.Controllers
                 switch (item.CartType)
                 {
                     case CartTypeConstant.BUY:
-                        paypalProductValue = price * item.Quantity;
+                        paypalProductValue = price;
                         break;
                     case CartTypeConstant.RENT:
                         if (item.RentNumberOfDays > 30)
                         {
-                            paypalProductValue = dailyRentPrice * 30 * item.Quantity;
+                            paypalProductValue = dailyRentPrice * 30 ;
                         }
                         else
                         {
-                            paypalProductValue = dailyRentPrice * item.RentNumberOfDays.Value * item.Quantity;
+                            paypalProductValue = dailyRentPrice * item.RentNumberOfDays.Value;
                         }
                         break;
                     case CartTypeConstant.RENT_TO_OWN:
@@ -537,6 +540,8 @@ namespace Ownorent.Controllers
                         break;
                 }
 
+                paypalTotal += (float)Math.Round(paypalProductValue, 2);
+
                 mainPurchaseUnit.items.Add(new PaypalCreateOrderModel.PaypalPurchaseUnitModel.PaypalItemModel() {
                     name = item.Product.ProductName,
                     quantity = item.Quantity.ToString(),
@@ -544,14 +549,14 @@ namespace Ownorent.Controllers
                     description = item.Product.InvoiceDescription,
                     unit_amount = new PaypalCreateOrderModel.PaypalPurchaseUnitModel.PaypalUnitAmountModel { 
                         currency_code = "PHP",
-                        value = paypalProductValue.ToString()
+                        value = Math.Round(paypalProductValue, 2).ToString()
                     }
                 });
             }
             #endregion
-
-            mainPurchaseUnit.amount.value = Math.Round(totalRequiredAmount,2).ToString();
-            mainPurchaseUnit.amount.breakdown.item_total.value = Math.Round(totalRequiredAmount, 2).ToString();
+            
+            mainPurchaseUnit.amount.value = totalRequiredAmount.ToString();
+            mainPurchaseUnit.amount.breakdown.item_total.value = totalRequiredAmount.ToString();
             tgPaymentAttempt.TotalAmount = (float)Math.Round(totalRequiredAmount,2);
             tgPaymentAttempt.PlatformTaxOrder = platformTaxOrder;
             tgPaymentAttempt.AmountForSystem = platformTaxOrder * tgPaymentAttempt.TotalAmount;
@@ -614,17 +619,46 @@ namespace Ownorent.Controllers
         {
             if (token != null)
             {
-                TransactionGroupPaymentAttempt order = db.TransactionGroupPaymentAttempts.FirstOrDefault(o => o.Code == token);
+                TransactionGroupPaymentAttempt paymentAttempt = db.TransactionGroupPaymentAttempts.FirstOrDefault(o => o.Code == token);
                 
-                if (order != null)
+                if (paymentAttempt != null)
                 {
-                    order.Status = TransactionGroupPaymentStatusConstant.SUCCESS;
+                    #region paypal payment checkout success
+                    paymentAttempt.Status = TransactionGroupPaymentStatusConstant.SUCCESS;
+                    paymentAttempt.DatePaid = DateTime.UtcNow.AddHours(8);
+                    paymentAttempt.PayerId = PayerID;
 
-                    // change product availability here
-                    // remove products
+                    var transactions = db.Transactions.Where(t => t.TransactionGroupId == paymentAttempt.TransactionGroupId).ToList();
 
-                    TempData["Message"] = "<strong>Congratulations! We have received your payment.</strong> Please track your orders <a href='#'>here</a>.";
+                    // change product availability
+                    foreach(var transaction in transactions)
+                    {
+                        transaction.TransactionStatus = TransactionStatusConstant.SUCCESS;
+
+                        switch (transaction.TransactionType)
+                        {
+                            case TransactionTypeConstant.BUY:
+                                transaction.Product.ProductStatus = ProductStatusConstant.BOUGHT_PAID;
+                                break;
+                            case TransactionTypeConstant.RENT:
+                                transaction.Product.ProductStatus = ProductStatusConstant.RENT_PAID;
+                                break;
+                            case TransactionTypeConstant.RENT_TO_OWN:
+                                transaction.Product.ProductStatus = ProductStatusConstant.RENT_TO_OWN_PAID;
+                                break;
+                        }
+                    }
+
+                    // remove products from cart
+                    string userId = paymentAttempt.TransactionGroup.User.Id;
+                    var cartItems = db.Carts.Where(c => c.UserId == userId).ToList();
+                    db.Carts.RemoveRange(cartItems);
+
+                    db.SaveChanges();
+
+                    TempData["Message"] = "<strong>Congratulations! We have received your payment.</strong> You can track the status of your order at the Orders page.";
                     return RedirectToAction("Cart");
+                    #endregion
                 }
                 else
                 {

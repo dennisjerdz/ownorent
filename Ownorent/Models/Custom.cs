@@ -404,12 +404,14 @@ namespace Ownorent.Models
         [Key]
         public int TransactionGroupPaymentAttemptId { get; set; }
         public string Code { get; set; }
+        public string PayerId { get; set; }
         public byte Status { get; set; }
 
         public float TotalAmount { get; set; }
         public float PlatformTaxOrder { get; set; } // in percent
         public float AmountForSystem { get; set; }
         public float AmountForSeller { get; set; }
+        public DateTime? DatePaid { get; set; }
 
         public int TransactionGroupId { get; set; }
         [ForeignKey("TransactionGroupId")]
