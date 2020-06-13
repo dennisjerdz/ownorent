@@ -11,6 +11,10 @@ using Microsoft.AspNet.Identity;
 using System.Threading.Tasks;
 using System.IO;
 using System.Web.Helpers;
+using System.Net.Http;
+using Newtonsoft.Json;
+using System.Text;
+using System.Net.Http.Headers;
 
 namespace Ownorent.Controllers
 {
@@ -242,6 +246,7 @@ namespace Ownorent.Controllers
 
         public async Task<ActionResult> Checkout()
         {
+            #region message
             if (TempData["Error"] != null)
             {
                 ViewBag.Error = TempData["Error"];
@@ -250,15 +255,18 @@ namespace Ownorent.Controllers
             {
                 ViewBag.Message = TempData["Message"];
             }
+            #endregion
 
             string userId = User.Identity.GetUserId();
 
+            #region validate login
             if (userId == null)
             {
                 TempData["Error"] = "1";
                 TempData["Message"] = "<strong>Checkout failed.</strong> Please login.";
                 return RedirectToAction("Cart");
             }
+            #endregion
 
             var cartItems = await db.Carts.Include(c => c.Product).Include(c => c.PaymentTerm).Where(c => c.UserId == userId).ToListAsync();
 
@@ -310,68 +318,302 @@ namespace Ownorent.Controllers
                 TempData["Message"] = "<strong>Checkout failed.</strong> No User address found.";
                 return RedirectToAction("Cart");
             }
+            Address addressToUse = user.Addresses.FirstOrDefault(a => a.IsDefault);
+
+            if (addressToUse == null)
+            {
+                addressToUse = user.Addresses.FirstOrDefault(a => a.IsDefault);
+            }
             #endregion
 
+            float platformTaxOrder;
+            Setting platformTaxOrderSetting = db.Settings.FirstOrDefault(s => s.Code == "PLATFORM_TAX_ORDER");
+            platformTaxOrder = (platformTaxOrderSetting != null) ? (float.Parse(platformTaxOrderSetting.Value)/100) : (2/100);
+                        
             TransactionGroup tg = new TransactionGroup() {
                 UserId = userId
             };
 
             db.TransactionGroups.Add(tg);
 
-            Address addressToUse = user.Addresses.FirstOrDefault(a => a.IsDefault);
+            TransactionGroupPaymentAttempt tgPaymentAttempt = new TransactionGroupPaymentAttempt() {
+                TransactionGroupId = tg.TransactionGroupId
+            };
 
+            float totalRequiredAmount = 0f;
+            float totalAmountForSystem = 0f;
+            float totalAmountForSeller = 0f;
+
+            float price = 0f;
+            float dailyRentPrice = 0f;
+
+            List<int> productIdExcludeList;
+
+            PaypalCreateOrderModel newOrder = new PaypalCreateOrderModel();
+            newOrder.application_context.return_url = HttpContext.Request.Url.GetLeftPart(UriPartial.Authority) + Url.Action("Receive", "Products");
+            PaypalCreateOrderModel.PaypalPurchaseUnitModel mainPurchaseUnit = newOrder.purchase_units.FirstOrDefault();
+
+            #region cart item loop
             foreach (var item in cartItems)
             {
-                Product availableProduct = db.Products.FirstOrDefault(p => p.ProductTemplateId == item.ProductTemplateId
-                    && p.ProductStatus == ProductStatusConstant.AVAILABLE);
-
-                #region validate product availability
-                if (availableProduct == null)
-                {
-                    TempData["Error"] = "1";
-                    TempData["Message"] = "<strong>Checkout failed.</strong> No stock available for "+item.Product.ProductName+".";
-                    return RedirectToAction("Cart");
-                }
-                #endregion
-
-                Transaction transactionPerProduct = new Transaction() {
-                    TransactionGroupId = tg.TransactionGroupId,
-                    AddressId = addressToUse.AddressId,
-                    City = addressToUse.City,
-                    Country = addressToUse.Country,
-                    Line1 = addressToUse.Line1,
-                    Line2 = addressToUse.Line2,
-                    Line3 = addressToUse.Line3,
-                    Zip = addressToUse.Zip,
-                    ProductId = availableProduct.ProductId,
-                    TransactionStatus = TransactionStatusConstant.PENDING
-                };
+                #region database
+                productIdExcludeList = new List<int>();
 
                 #region determine price
                 if (item.Product.ProductPriceToUse == ProductPriceToUseConstant.SELLER_DEFINED_PRICE)
                 {
-                    transactionPerProduct.ProductPrice = item.Product.Price;
-                    transactionPerProduct.ProductDailyRentPrice = (item.Product.DailyRentPrice != null) ? item.Product.DailyRentPrice : item.Product.ComputedDailyRentPrice;
+                    price = item.Product.Price;
 
-                    if (item.Product.ComputedDailyRentPrice == null)
+                    if (item.Product.DailyRentPrice != null)
                     {
-                        transactionPerProduct.ProductDailyRentPrice = 0;
+                        dailyRentPrice = item.Product.DailyRentPrice.Value;
+                    }
+                    else
+                    {
+                        dailyRentPrice = (item.Product.ComputedDailyRentPrice != null) ? item.Product.ComputedDailyRentPrice.Value : 0;
                     }
                 }
                 else
                 {
-                    transactionPerProduct.ProductPrice = (item.Product.ComputedPrice != null) ? item.Product.ComputedPrice.Value : item.Product.Price;
-                    transactionPerProduct.ProductDailyRentPrice = (item.Product.ComputedDailyRentPrice != null) ? item.Product.ComputedPrice.Value : item.Product.DailyRentPrice;
+                    price = (item.Product.ComputedPrice != null) ? item.Product.ComputedPrice.Value : item.Product.Price;
 
-                    if (item.Product.DailyRentPrice == null)
+                    if (item.Product.ComputedDailyRentPrice != null)
                     {
-                        transactionPerProduct.ProductDailyRentPrice = 0;
+                        dailyRentPrice = item.Product.ComputedDailyRentPrice.Value;
+                    }
+                    else
+                    {
+                        dailyRentPrice = (item.Product.DailyRentPrice != null) ? item.Product.DailyRentPrice.Value : 0;
                     }
                 }
                 #endregion
-            }
 
-            return View("Cart", cartItems);
+                for (int quantityIndex = 0; quantityIndex < item.Quantity; quantityIndex++)
+                {
+                    Product availableProduct = db.Products.FirstOrDefault(p => p.ProductTemplateId == item.ProductTemplateId
+                    && p.ProductStatus == ProductStatusConstant.AVAILABLE && !productIdExcludeList.Contains(p.ProductId));
+
+                    productIdExcludeList.Add(availableProduct.ProductId);
+
+                    #region validate product availability
+                    if (availableProduct == null)
+                    {
+                        TempData["Error"] = "1";
+                        TempData["Message"] = "<strong>Checkout failed.</strong> Quantity requested exceeds available stocks for <strong>" + item.Product.ProductName + "</strong>.";
+                        return RedirectToAction("Cart");
+                    }
+                    #endregion
+
+                    Transaction transactionPerProduct = new Transaction()
+                    {
+                        TransactionGroupId = tg.TransactionGroupId,
+                        AddressId = addressToUse.AddressId,
+                        City = addressToUse.City,
+                        Country = addressToUse.Country,
+                        Line1 = addressToUse.Line1,
+                        Line2 = addressToUse.Line2,
+                        Line3 = addressToUse.Line3,
+                        Zip = addressToUse.Zip,
+                        ProductId = availableProduct.ProductId,
+                        TransactionStatus = TransactionStatusConstant.PENDING,
+                    };
+                    db.Transactions.Add(transactionPerProduct);
+
+                    switch (item.CartType)
+                    {
+                        case CartTypeConstant.BUY:
+                            db.Payments.Add(new Payment {
+                                Amount = price,
+                                TransactionId = transactionPerProduct.TransactionId,
+                                TransactionGroupPaymentAttemptId = tgPaymentAttempt.TransactionGroupPaymentAttemptId,
+                                DateDue = DateTime.UtcNow.AddHours(8)
+                            });
+
+                            totalRequiredAmount += price;
+                            break;
+                            case CartTypeConstant.RENT:
+                            #region rent
+                            if (item.RentNumberOfDays > 30)
+                            {
+                                // if rent is more than 30 days, break down in monthly payments
+                                int breakdown = 1;
+
+                                for (int rentNumberOfDays = item.RentNumberOfDays.Value; rentNumberOfDays > 0; rentNumberOfDays -= 30)
+                                {
+                                    if (rentNumberOfDays > 30)
+                                    {
+                                        if (breakdown == 1)
+                                        {
+                                            totalRequiredAmount += (dailyRentPrice * 30);
+                                        }
+
+                                        db.Payments.Add(new Payment
+                                        {
+                                            Amount = dailyRentPrice * 30,
+                                            TransactionId = transactionPerProduct.TransactionId,
+                                            TransactionGroupPaymentAttemptId = tgPaymentAttempt.TransactionGroupPaymentAttemptId,
+                                            DateDue = DateTime.UtcNow.AddHours(8)
+                                        });
+                                    }
+                                    else
+                                    {
+                                        // this is the last
+                                        db.Payments.Add(new Payment
+                                        {
+                                            Amount = dailyRentPrice * rentNumberOfDays,
+                                            TransactionId = transactionPerProduct.TransactionId,
+                                            TransactionGroupPaymentAttemptId = tgPaymentAttempt.TransactionGroupPaymentAttemptId,
+                                            DateDue = DateTime.UtcNow.AddHours(8)
+                                        });
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                // if rent is less than 30 days, settle in one payment
+                                totalRequiredAmount += (dailyRentPrice * 30);
+
+                                db.Payments.Add(new Payment
+                                {
+                                    Amount = dailyRentPrice * item.RentNumberOfDays.Value,
+                                    TransactionId = transactionPerProduct.TransactionId,
+                                    TransactionGroupPaymentAttemptId = tgPaymentAttempt.TransactionGroupPaymentAttemptId,
+                                    DateDue = DateTime.UtcNow.AddHours(8)
+                                });
+                            }
+                            #endregion
+                            break;
+                        case CartTypeConstant.RENT_TO_OWN:
+                            float ammortization = (price + (price * (item.PaymentTerm.InterestRate/100))) / item.PaymentTerm.Months;
+                            for (int paymentTermIndex = 0; paymentTermIndex < item.PaymentTerm.Months; paymentTermIndex++)
+                            {
+                                db.Payments.Add(new Payment
+                                {
+                                    Amount = ammortization,
+                                    TransactionId = transactionPerProduct.TransactionId,
+                                    TransactionGroupPaymentAttemptId = tgPaymentAttempt.TransactionGroupPaymentAttemptId,
+                                    DateDue = DateTime.UtcNow.AddHours(8)
+                                });
+                            }
+                            totalRequiredAmount += ammortization;
+                            break;
+                    }
+                }
+                #endregion
+
+                float paypalProductValue = 0f;
+                switch (item.CartType)
+                {
+                    case CartTypeConstant.BUY:
+                        paypalProductValue = price * item.Quantity;
+                        break;
+                    case CartTypeConstant.RENT:
+                        if (item.RentNumberOfDays > 30)
+                        {
+                            paypalProductValue = dailyRentPrice * 30 * item.Quantity;
+                        }
+                        else
+                        {
+                            paypalProductValue = dailyRentPrice * item.RentNumberOfDays.Value * item.Quantity;
+                        }
+                        break;
+                    case CartTypeConstant.RENT_TO_OWN:
+                        float ammortization = (price + (price * (item.PaymentTerm.InterestRate / 100))) / item.PaymentTerm.Months;
+                        paypalProductValue = ammortization;
+                        break;
+                }
+
+                mainPurchaseUnit.items.Add(new PaypalCreateOrderModel.PaypalPurchaseUnitModel.PaypalItemModel() {
+                    name = item.Product.ProductName,
+                    quantity = item.Quantity.ToString(),
+                    sku = "OWNO00-"+item.Product.ProductTemplateId,
+                    description = item.Product.ProductDescription,
+                    unit_amount = new PaypalCreateOrderModel.PaypalPurchaseUnitModel.PaypalUnitAmountModel { 
+                        currency_code = "PHP",
+                        value = paypalProductValue.ToString()
+                    }
+                });
+            }
+            #endregion
+
+            mainPurchaseUnit.amount.value = totalRequiredAmount.ToString();
+            mainPurchaseUnit.amount.breakdown.item_total.value = totalRequiredAmount.ToString();
+
+            #region checkout http request
+            PaypalCheckoutResultModel checkoutResult;
+            using (HttpClient client = new HttpClient())
+            {
+                if (ServicePointManager.SecurityProtocol != SecurityProtocolType.Tls12)
+                {
+                    ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+                }
+
+                try
+                {
+                    var uri = new Uri("https://api.sandbox.paypal.com/v2/checkout/orders");
+                    client.DefaultRequestHeaders.Authorization = OwnorentHelper.BasicAuthenticationHeader;
+                    var content = new StringContent(JsonConvert.SerializeObject(newOrder), Encoding.UTF8, "application/json");
+                    var result = await client.PostAsync(uri, content);
+                    string resultContent = await result.Content.ReadAsStringAsync();
+                    checkoutResult = JsonConvert.DeserializeObject<PaypalCheckoutResultModel>(resultContent);
+                }
+                catch(Exception ex)
+                {
+                    TempData["Error"] = "1";
+                    TempData["Message"] = "<strong>Sorry, checkout failed. Please send a screenshot of the error to an admin.</strong> " + ex.Message;
+                    return RedirectToAction("Cart");
+                }
+            }
+            #endregion
+
+            if (checkoutResult.status == "CREATED") {
+                // assign Transaction ID/ Reference ID from paypal to DB
+                tgPaymentAttempt.Code = checkoutResult.id;
+
+                // we could clear the cart and change product availability here
+                // or just wait for checkout but another customer might purchase
+
+                db.SaveChanges();
+
+                var checkoutLinkObject = checkoutResult.links.FirstOrDefault(l => l.rel == "approve");
+
+                if (checkoutLinkObject != null) {
+                    return Redirect(checkoutLinkObject.href);
+                } else {
+                    TempData["Error"] = "1";
+                    TempData["Message"] = "<strong>Sorry, checkout failed. Please send a screenshot of the error to an admin.</strong> Paypal link result doesn't contain APPROVE url.";
+                    return RedirectToAction("Cart");
+                }
+            } else {
+                TempData["Error"] = "1";
+                TempData["Message"] = "<strong>Sorry, checkout failed. Please send a screenshot of the error to an admin.</strong> Paypal checkout request result is not CREATED.";
+                return RedirectToAction("Cart");
+            }
+        }
+
+        public ActionResult Receive(string token, string PayerID)
+        {
+            if (token != null)
+            {
+                TransactionGroupPaymentAttempt order = db.TransactionGroupPaymentAttempts.FirstOrDefault(o => o.Code == token);
+                
+                if (order != null)
+                {
+                    // change product availability here
+                    // remove products
+
+                    TempData["Message"] = "<strong>Congratulations! We have received your payment.</strong> Please track your orders <a href='#'>here</a>.";
+                    return RedirectToAction("Cart");
+                }
+                else
+                {
+                    return HttpNotFound();
+                }
+            }
+            else
+            {
+                return HttpNotFound();
+            }
         }
 
         public ActionResult Index()

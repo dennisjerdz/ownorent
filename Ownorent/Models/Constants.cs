@@ -94,4 +94,9 @@ namespace Ownorent.Models
     }
 
     public class CartTypeConstant : TransactionTypeConstant { }
+
+    public class TransactionGroupPaymentStatusConstant {
+        public const int PENDING = 0;
+        public const int SUCCESS = 1;
+    }
 }

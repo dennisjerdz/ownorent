@@ -231,6 +231,18 @@
     <Compile Include="Migrations\202006111134562_transaction groups.Designer.cs">
       <DependentUpon>202006111134562_transaction groups.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202006122142278_db adjustments for paypal.cs" />
+    <Compile Include="Migrations\202006122142278_db adjustments for paypal.Designer.cs">
+      <DependentUpon>202006122142278_db adjustments for paypal.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202006122153493_rename entity.cs" />
+    <Compile Include="Migrations\202006122153493_rename entity.Designer.cs">
+      <DependentUpon>202006122153493_rename entity.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202006130038372_db adjustments for paypal again.cs" />
+    <Compile Include="Migrations\202006130038372_db adjustments for paypal again.Designer.cs">
+      <DependentUpon>202006130038372_db adjustments for paypal again.cs</DependentUpon>
+    </Compile>
     <Compile Include="OwnorentHelper.cs" />
     <Compile Include="Migrations\202005290332179_initial.cs" />
     <Compile Include="Migrations\202005290332179_initial.Designer.cs">
@@ -391,6 +403,15 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202006111134562_transaction groups.resx">
       <DependentUpon>202006111134562_transaction groups.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202006122142278_db adjustments for paypal.resx">
+      <DependentUpon>202006122142278_db adjustments for paypal.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202006122153493_rename entity.resx">
+      <DependentUpon>202006122153493_rename entity.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202006130038372_db adjustments for paypal again.resx">
+      <DependentUpon>202006130038372_db adjustments for paypal again.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

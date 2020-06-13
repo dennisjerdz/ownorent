@@ -67,6 +67,7 @@ namespace Ownorent.Models
         public DbSet<Address> Addresses { get; set; }
         public DbSet<Cart> Carts { get; set; }
         public DbSet<TransactionGroup> TransactionGroups { get; set; }
+        public DbSet<TransactionGroupPaymentAttempt> TransactionGroupPaymentAttempts { get; set; }
 
         public static ApplicationDbContext Create()
         {

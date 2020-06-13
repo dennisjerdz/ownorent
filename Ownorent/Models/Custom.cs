@@ -302,6 +302,7 @@ namespace Ownorent.Models
         public virtual ApplicationUser User { get; set; }
         
         public List<Transaction> Transactions { get; set; }
+        public List<TransactionGroupPaymentAttempt> TransactionGroupPaymentAttempts { get; set; }
 
         public DateTime DateCreated { get; set; }
     }
@@ -371,10 +372,6 @@ namespace Ownorent.Models
 
         public string PaypalTransactionId { get; set; }
 
-        public float? PlatformTaxBuy { get; set; }
-        public float? PlatformTaxDailyRent { get; set; }
-        public float? PlatformTaxRentToOwn { get; set; }
-
         public string LastModifiedBy { get; set; }
         public DateTime DateCreated { get; set; }
         public DateTime DateLastModified { get; set; }
@@ -384,6 +381,31 @@ namespace Ownorent.Models
         public int TransactionId { get; set; }
         [ForeignKey("TransactionId")]
         public virtual Transaction Transaction { get; set; }
+
+        public int TransactionGroupPaymentAttemptId { get; set; }
+        [ForeignKey("TransactionGroupPaymentAttemptId")]
+        public virtual TransactionGroupPaymentAttempt TransactionGroupPaymentAttempt { get; set; }
+    }
+
+    public class TransactionGroupPaymentAttempt 
+    {
+        // this will handle installment payments/ multiple payments under one transaction
+        public int TransactionGroupPaymentAttemptId { get; set; }
+        public string Code { get; set; }
+        public byte Status { get; set; }
+
+        public float TotalAmount { get; set; }
+        public float PlatformTaxOrder { get; set; } // in percent
+        public float AmountForSystem { get; set; }
+        public float AmountForSeller { get; set; }
+
+        public int TransactionGroupId { get; set; }
+        [ForeignKey("TransactionGroupId")]
+        public virtual TransactionGroup TransactionGroup { get; set; }
+
+        public virtual List<Payment> Payments { get; set; }
+
+        public DateTime DateCreated { get; set; }
     }
 
     public class RentToOwnPaymentTerm {
@@ -443,5 +465,108 @@ namespace Ownorent.Models
         }
         public bool Error { get; set; }
         public string Message { get; set; }
+    }
+
+    public class PaypalAccessTokenModel
+    {
+        public string scope { get; set; }
+        public string access_token { get; set; }
+        public string token_type { get; set; }
+        public string app_id { get; set; }
+        public string expires_in { get; set; }
+        public string nonce { get; set; }
+    }
+
+    public class PaypalCreateOrderModel
+    {
+        public PaypalCreateOrderModel()
+        {
+            this.intent = "CAPTURE";
+            this.application_context = new PaypalApplicationContextModel() {
+                brand_name = "Ownorent PH",
+                landing_page = "BILLING",
+                user_action = "PAY_NOW",
+                return_url = ""
+            };
+            this.purchase_units = new List<PaypalPurchaseUnitModel>()
+            {
+                new PaypalPurchaseUnitModel()
+                {
+                    amount = new PaypalPurchaseUnitModel.PaypalAmountModel()
+                    {
+                        currency_code = "PHP",
+                        value = "",
+                        breakdown = new PaypalPurchaseUnitModel.PaypalAmountModel.PaypalBreakdownModel()
+                        {
+                            item_total = new PaypalPurchaseUnitModel.PaypalUnitAmountModel()
+                            {
+                                currency_code = "PHP",
+                                value = ""
+                            }
+                        }
+                    },
+                    items = new List<PaypalPurchaseUnitModel.PaypalItemModel>()
+                }
+            };
+        }
+
+        public string intent { get; set; } // CAPTURE
+        public PaypalApplicationContextModel application_context { get; set; }
+	    public List<PaypalPurchaseUnitModel> purchase_units { get; set; }
+
+        public class PaypalApplicationContextModel
+        {
+            public string brand_name { get; set; } // Ownorent PH
+            public string landing_page { get; set; } // BILLING
+            public string user_action { get; set; } // PAY_NOW
+            public string return_url { get; set; } // http://localhost:54620/products/receive
+        }
+        
+        public class PaypalPurchaseUnitModel
+        {
+            public PaypalAmountModel amount { get; set; }
+            public List<PaypalItemModel> items { get; set; }
+
+            public class PaypalAmountModel
+            {
+                public string currency_code { get; set; } // PHP
+                public string value { get; set; } // total of order
+                public PaypalBreakdownModel breakdown { get; set; }
+
+                public class PaypalBreakdownModel
+                {
+                    public PaypalUnitAmountModel item_total { get; set; }
+                }
+            }
+
+            public class PaypalItemModel
+            {
+                public string name { get; set; }
+                public string quantity { get; set; }
+                public string sku { get; set; }
+                public string description { get; set; }
+                public PaypalUnitAmountModel unit_amount { get; set; }
+            }
+
+            public class PaypalUnitAmountModel
+            {
+                public string currency_code { get; set; } // PHP
+                public string value { get; set; } // total of order
+            }
+        }
+    }
+
+    public class PaypalCheckoutResultModel
+    {
+        public string id { get; set; } // Transaction ID
+        public List<PaypalLinksModel> links { get; set; }
+        public string status { get; set; }
+
+        public class PaypalLinksModel
+        {
+            public string href { get; set; }
+            public string rel { get; set; }
+            public string method { get; set; }
+        }
     }
 }

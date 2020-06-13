@@ -33,35 +33,13 @@ namespace Ownorent.Migrations
 
             /* Separator Separator Separator Separator Separator Separator Separator */
 
-            if (!context.Settings.Any(c => c.Code == "PLATFORM_TAX_BUY"))
+            if (!context.Settings.Any(c => c.Code == "PLATFORM_TAX_ORDER"))
             {
                 context.Settings.Add(new Setting()
                 {
-                    Code = "PLATFORM_TAX_BUY",
+                    Code = "PLATFORM_TAX_ORDER",
                     Value = "2",
-                    Description = "Percentage Taxed to Seller earnings when a Customer buys a product.",
-                    IsActive = true
-                });
-            }
-
-            if (!context.Settings.Any(c => c.Code == "PLATFORM_TAX_DAILY_RENT"))
-            {
-                context.Settings.Add(new Setting()
-                {
-                    Code = "PLATFORM_TAX_DAILY_RENT",
-                    Value = "2",
-                    Description = "Percentage Taxed to Seller earnings when a Customer pays for rent.",
-                    IsActive = true
-                });
-            }
-
-            if (!context.Settings.Any(c => c.Code == "PLATFORM_TAX_RENT_TO_OWN"))
-            {
-                context.Settings.Add(new Setting()
-                {
-                    Code = "PLATFORM_TAX_RENT_TO_OWN",
-                    Value = "2",
-                    Description = "Percentage Taxed to Seller earnings when a Customer pays rent to own bill.",
+                    Description = "Percentage Taxed to Seller earnings when a Customer buys/rents a product.",
                     IsActive = true
                 });
             }
