@@ -59,7 +59,7 @@ namespace Ownorent.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult EditProduct([Bind(Include = "ProductTemplateId,UserId,DateCreated,ProductTemplateStatus,TrackingNumber,ProductName,ProductDescription,ProductPriceToUse,Quantity,Price,DailyRentPrice,ComputedPrice,ComputedDailyRentPrice,AdminDefinedPrice,AdminDefinedDailyRentPrice,ShippingFee,ShippingFeeProvincial,DatePurchased,CategoryId,WarehouseId")] ProductTemplate productTemplate)
+        public ActionResult EditProduct([Bind(Include = "InvoiceDescription,ProductTemplateId,UserId,DateCreated,ProductTemplateStatus,TrackingNumber,ProductName,ProductDescription,ProductPriceToUse,Quantity,Price,DailyRentPrice,ComputedPrice,ComputedDailyRentPrice,AdminDefinedPrice,AdminDefinedDailyRentPrice,ShippingFee,ShippingFeeProvincial,DatePurchased,CategoryId,WarehouseId")] ProductTemplate productTemplate)
         {
             var actualTemplate = db.ProductTemplates.FirstOrDefault(p => p.ProductTemplateId == productTemplate.ProductTemplateId);
 
@@ -76,6 +76,7 @@ namespace Ownorent.Controllers
             actualTemplate.DatePurchased = productTemplate.DatePurchased;
             actualTemplate.LastModifiedBy = User.Identity.Name;
             actualTemplate.DateLastModified = DateTime.UtcNow.AddHours(8);
+            actualTemplate.InvoiceDescription = productTemplate.InvoiceDescription;
 
             actualTemplate.ShippingFee = productTemplate.ShippingFee;
             actualTemplate.ShippingFeeProvincial = productTemplate.ShippingFeeProvincial;
