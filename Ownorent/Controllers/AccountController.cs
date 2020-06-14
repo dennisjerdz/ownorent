@@ -107,9 +107,9 @@ namespace Ownorent.Controllers
         public async Task<ActionResult> Pay(List<PaymentPayModel> payments)
         {
             List<int> paymentIds = new List<int>();
-            payments.ForEach(p => paymentIds.Add(p.PaymentId));
+            payments.Where(p=>p.Include == true).ToList().ForEach(p => paymentIds.Add(p.PaymentId));
 
-            var paymentsToSend = db.Payments.Where(p => paymentIds.Contains(p.PaymentId));
+            var paymentsToSend = db.Payments.Where(p => paymentIds.Contains(p.PaymentId)).ToList();
 
             if (paymentsToSend != null)
             {

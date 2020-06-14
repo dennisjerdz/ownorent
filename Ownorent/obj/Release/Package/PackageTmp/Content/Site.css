@@ -548,6 +548,20 @@ table.dataTable thead .sorting_desc{
     border-top:none;
 }
 
+.ownorent-in-between{
+    margin-top:10px;
+}
+
+.ownorent-transaction-end{
+    border-top:5px dotted rgba(0,0,0,0.1);
+    margin:10px 40px 15px 40px;
+}
+
+.table-options-40-center{
+    width:40px !important;
+    text-align:center !important;
+}
+
 .table-options-70{
     width:70px !important;
     text-align:right !important;
