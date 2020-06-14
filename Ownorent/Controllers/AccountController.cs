@@ -184,7 +184,7 @@ namespace Ownorent.Controllers
                     {
                         TempData["Error"] = "1";
                         TempData["Message"] = "<strong>Sorry, payment failed. Please send a screenshot of the error to an admin.</strong> " + ex.Message;
-                        return RedirectToAction("ViewOrders", new { id = orderId });
+                        return RedirectToAction("ViewOrder", new { id = orderId });
                     }
                 }
                 #endregion
@@ -205,14 +205,14 @@ namespace Ownorent.Controllers
                     {
                         TempData["Error"] = "1";
                         TempData["Message"] = "<strong>Sorry, payment failed. Please send a screenshot of the error to an admin.</strong> Paypal link result doesn't contain APPROVE url.";
-                        return RedirectToAction("ViewOrders", new { id = orderId });
+                        return RedirectToAction("ViewOrder", new { id = orderId });
                     }
                 }
                 else
                 {
                     TempData["Error"] = "1";
                     TempData["Message"] = "<strong>Sorry, payment failed. Please send a screenshot of the error to an admin.</strong> Paypal checkout request result is not CREATED.";
-                    return RedirectToAction("ViewOrders", new { id = orderId });
+                    return RedirectToAction("ViewOrder", new { id = orderId });
                 }
             }
             else
@@ -239,6 +239,9 @@ namespace Ownorent.Controllers
 
                     var transactions = db.Transactions.Include(t => t.Payments).Where(t => t.TransactionGroupId == paymentAttempt.TransactionGroupId).ToList();
 
+                    // save now, payment check later
+                    db.SaveChanges();
+
                     // change product availability
                     foreach (var transaction in transactions)
                     {
@@ -258,7 +261,7 @@ namespace Ownorent.Controllers
                     db.SaveChanges();
 
                     TempData["Message"] = "<strong>Thank you! We have received your payment.</strong> The transaction has been updated.";
-                    return RedirectToAction("ViewOrders", new { id = paymentAttempt.TransactionGroupId });
+                    return RedirectToAction("ViewOrder", new { id = paymentAttempt.TransactionGroupId });
                     #endregion
                 }
                 else
