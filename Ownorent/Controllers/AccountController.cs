@@ -13,6 +13,10 @@ using System.Net.Mail;
 using System.Collections.Generic;
 using System.IO;
 using System.Data.Entity;
+using System.Net.Http;
+using System.Net;
+using Newtonsoft.Json;
+using System.Text;
 
 namespace Ownorent.Controllers
 {
@@ -65,9 +69,207 @@ namespace Ownorent.Controllers
 
             string userId = User.Identity.GetUserId();
             var orders = db.TransactionGroups
+                .Include(o=>o.Transactions)
                 .Where(p => p.UserId == userId);
 
             return View(orders.ToList());
+        }
+
+        public async Task<ActionResult> ViewOrder(int id)
+        {
+            if (TempData["Error"] != null)
+            {
+                ViewBag.Error = TempData["Error"];
+            }
+            if (TempData["Message"] != null)
+            {
+                ViewBag.Message = TempData["Message"];
+            }
+
+            string userId = User.Identity.GetUserId();
+            var order = db.TransactionGroups.Include(t => t.Transactions).FirstOrDefault(t => t.TransactionGroupId == id && t.UserId == userId);
+
+            if (order != null)
+            {
+                foreach (var transaction in order.Transactions)
+                {
+                    transaction.Payments = await db.Payments.Where(p => p.TransactionId == transaction.TransactionId).ToListAsync();
+                }
+
+                return View(order);
+            }
+            else
+            {
+                return HttpNotFound();
+            }
+        }
+
+        public async Task<ActionResult> Pay(List<PaymentPayModel> payments)
+        {
+            List<int> paymentIds = new List<int>();
+            payments.ForEach(p => paymentIds.Add(p.PaymentId));
+
+            var paymentsToSend = db.Payments.Where(p => paymentIds.Contains(p.PaymentId));
+
+            if (paymentsToSend != null)
+            {
+                int orderId = paymentsToSend.FirstOrDefault().Transaction.TransactionGroupId;
+
+                TransactionGroupPaymentAttempt paymentAttempt = new TransactionGroupPaymentAttempt() {
+                    TransactionGroupId = orderId,
+                    Status = TransactionGroupPaymentStatusConstant.PENDING
+                };
+                db.TransactionGroupPaymentAttempts.Add(paymentAttempt);
+                await db.SaveChangesAsync();
+
+                PaypalCreateOrderModel newOrder = new PaypalCreateOrderModel();
+                newOrder.application_context.return_url = HttpContext.Request.Url.GetLeftPart(UriPartial.Authority) + Url.Action("PaymentReceive", "Account");
+                PaypalCreateOrderModel.PaypalPurchaseUnitModel mainPurchaseUnit = newOrder.purchase_units.FirstOrDefault();
+
+                float paymentTotal = 0f;
+
+                #region pending payments loop
+                foreach (var payment in paymentsToSend)
+                {
+                    payment.TransactionGroupPaymentAttemptId = paymentAttempt.TransactionGroupPaymentAttemptId;
+
+                    float paymentAmount = (float)Math.Round(payment.Amount, 2);
+                    paymentTotal += paymentAmount;
+
+                    mainPurchaseUnit.items.Add(new PaypalCreateOrderModel.PaypalPurchaseUnitModel.PaypalItemModel()
+                    {
+                        name = payment.Transaction.Product.ProductName,
+                        quantity = "1",
+                        sku = "OWNO00-" + payment.Transaction.Product.ProductTemplateId,
+                        description = payment.Description,
+                        unit_amount = new PaypalCreateOrderModel.PaypalPurchaseUnitModel.PaypalUnitAmountModel
+                        {
+                            currency_code = "PHP",
+                            value = paymentAmount.ToString()
+                        }
+                    });
+                }
+                #endregion
+
+                float platformTaxOrder;
+                Setting platformTaxOrderSetting = db.Settings.FirstOrDefault(s => s.Code == "PLATFORM_TAX_ORDER");
+                platformTaxOrder = (platformTaxOrderSetting != null) ? (float.Parse(platformTaxOrderSetting.Value) / 100) : (2 / 100);
+                
+                mainPurchaseUnit.amount.value = paymentTotal.ToString();
+                mainPurchaseUnit.amount.breakdown.item_total.value = paymentTotal.ToString();
+                paymentAttempt.TotalAmount = paymentTotal;
+                paymentAttempt.PlatformTaxOrder = platformTaxOrder;
+                paymentAttempt.AmountForSystem = platformTaxOrder * paymentAttempt.TotalAmount;
+                paymentAttempt.AmountForSeller = paymentAttempt.TotalAmount - (platformTaxOrder * paymentAttempt.TotalAmount);
+
+                #region checkout http request
+                PaypalCheckoutResultModel checkoutResult;
+                using (HttpClient client = new HttpClient())
+                {
+                    if (ServicePointManager.SecurityProtocol != SecurityProtocolType.Tls12)
+                    {
+                        ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+                    }
+
+                    try
+                    {
+                        var uri = new Uri("https://api.sandbox.paypal.com/v2/checkout/orders");
+                        client.DefaultRequestHeaders.Authorization = OwnorentHelper.BasicAuthenticationHeader;
+                        var content = new StringContent(JsonConvert.SerializeObject(newOrder), Encoding.UTF8, "application/json");
+                        var result = await client.PostAsync(uri, content);
+                        string resultContent = await result.Content.ReadAsStringAsync();
+                        checkoutResult = JsonConvert.DeserializeObject<PaypalCheckoutResultModel>(resultContent);
+                    }
+                    catch (Exception ex)
+                    {
+                        TempData["Error"] = "1";
+                        TempData["Message"] = "<strong>Sorry, payment failed. Please send a screenshot of the error to an admin.</strong> " + ex.Message;
+                        return RedirectToAction("ViewOrders", new { id = orderId });
+                    }
+                }
+                #endregion
+
+                if (checkoutResult.status == "CREATED")
+                {
+                    // assign Transaction ID/ Reference ID from paypal to DB
+                    paymentAttempt.Code = checkoutResult.id;
+                    await db.SaveChangesAsync();
+
+                    var checkoutLinkObject = checkoutResult.links.FirstOrDefault(l => l.rel == "approve");
+
+                    if (checkoutLinkObject != null)
+                    {
+                        return Redirect(checkoutLinkObject.href);
+                    }
+                    else
+                    {
+                        TempData["Error"] = "1";
+                        TempData["Message"] = "<strong>Sorry, payment failed. Please send a screenshot of the error to an admin.</strong> Paypal link result doesn't contain APPROVE url.";
+                        return RedirectToAction("ViewOrders", new { id = orderId });
+                    }
+                }
+                else
+                {
+                    TempData["Error"] = "1";
+                    TempData["Message"] = "<strong>Sorry, payment failed. Please send a screenshot of the error to an admin.</strong> Paypal checkout request result is not CREATED.";
+                    return RedirectToAction("ViewOrders", new { id = orderId });
+                }
+            }
+            else
+            {
+                TempData["Error"] = "1";
+                TempData["Message"] = "<strong>Payment attempt failed.</strong> No payments selected.";
+                return RedirectToAction("Orders");
+            }
+        }
+
+        [AllowAnonymous]
+        public ActionResult PaymentReceive(string token, string PayerID)
+        {
+            if (token != null)
+            {
+                TransactionGroupPaymentAttempt paymentAttempt = db.TransactionGroupPaymentAttempts.FirstOrDefault(o => o.Code == token);
+
+                if (paymentAttempt != null)
+                {
+                    #region paypal payment checkout success
+                    paymentAttempt.Status = TransactionGroupPaymentStatusConstant.SUCCESS;
+                    paymentAttempt.DatePaid = DateTime.UtcNow.AddHours(8);
+                    paymentAttempt.PayerId = PayerID;
+
+                    var transactions = db.Transactions.Include(t => t.Payments).Where(t => t.TransactionGroupId == paymentAttempt.TransactionGroupId).ToList();
+
+                    // change product availability
+                    foreach (var transaction in transactions)
+                    {
+                        if (transaction.Payments.Any(p => p.TransactionGroupPaymentAttemptId == null || p.TransactionGroupPaymentAttempt.Status != TransactionGroupPaymentStatusConstant.SUCCESS))
+                        {
+                            // if payment attempt is not done for the transaction
+                            // or the payments are pending
+                            transaction.TransactionStatus = TransactionStatusConstant.PARTIALLY_PAID;
+                        }
+                        else
+                        {
+                            // if the payment attempt is paid
+                            transaction.TransactionStatus = TransactionStatusConstant.PAID;
+                        }
+                    }
+
+                    db.SaveChanges();
+
+                    TempData["Message"] = "<strong>Thank you! We have received your payment.</strong> The transaction has been updated.";
+                    return RedirectToAction("ViewOrders", new { id = paymentAttempt.TransactionGroupId });
+                    #endregion
+                }
+                else
+                {
+                    return HttpNotFound();
+                }
+            }
+            else
+            {
+                return HttpNotFound();
+            }
         }
 
         [Authorize(Roles = "Admin")]

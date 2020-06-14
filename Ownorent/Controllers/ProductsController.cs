@@ -345,8 +345,6 @@ namespace Ownorent.Controllers
             await db.SaveChangesAsync();
 
             float totalRequiredAmount = 0f;
-            float totalAmountForSystem = 0f;
-            float totalAmountForSeller = 0f;
 
             float price = 0f;
             float dailyRentPrice = 0f;
@@ -450,14 +448,15 @@ namespace Ownorent.Controllers
                             if (item.RentNumberOfDays > 30)
                             {
                                 // if rent is more than 30 days, break down in monthly payments
-                                int breakdown = 1;
+                                int breakdown = 0;
 
                                 for (int rentNumberOfDays = item.RentNumberOfDays.Value; rentNumberOfDays > 0; rentNumberOfDays -= 30)
                                 {
                                     if (rentNumberOfDays > 30)
                                     {
                                         int? paymentAttemptId = null;
-                                        if (breakdown == 1)
+                                        
+                                        if (breakdown == 0)
                                         {
                                             totalRequiredAmount += (dailyRentPrice * 30);
                                             paymentAttemptId = tgPaymentAttempt.TransactionGroupPaymentAttemptId;
@@ -468,7 +467,8 @@ namespace Ownorent.Controllers
                                             Amount = dailyRentPrice * 30,
                                             TransactionId = transactionPerProduct.TransactionId,
                                             TransactionGroupPaymentAttemptId = paymentAttemptId,
-                                            DateDue = DateTime.UtcNow.AddHours(8)
+                                            Description = "Payment "+(breakdown+1).ToString(),
+                                            DateDue = DateTime.UtcNow.AddHours(8).AddMonths(breakdown)
                                         });
                                     }
                                     else
@@ -479,7 +479,8 @@ namespace Ownorent.Controllers
                                             Amount = dailyRentPrice * rentNumberOfDays,
                                             TransactionId = transactionPerProduct.TransactionId,
                                             TransactionGroupPaymentAttemptId = null,
-                                            DateDue = DateTime.UtcNow.AddHours(8)
+                                            Description = "Payment " + breakdown.ToString(),
+                                            DateDue = DateTime.UtcNow.AddHours(8).AddMonths(breakdown - 1)
                                         });
                                     }
 
@@ -519,7 +520,8 @@ namespace Ownorent.Controllers
                                     Amount = ammortization,
                                     TransactionId = transactionPerProduct.TransactionId,
                                     TransactionGroupPaymentAttemptId = paymentAttempt,
-                                    DateDue = DateTime.UtcNow.AddHours(8)
+                                    Description = "Payment " + (paymentTermIndex + 1).ToString(),
+                                    DateDue = DateTime.UtcNow.AddHours(8).AddMonths(paymentTermIndex)
                                 });
                             }
                             totalRequiredAmount += ammortization;
@@ -638,13 +640,30 @@ namespace Ownorent.Controllers
                     paymentAttempt.DatePaid = DateTime.UtcNow.AddHours(8);
                     paymentAttempt.PayerId = PayerID;
 
-                    var transactions = db.Transactions.Where(t => t.TransactionGroupId == paymentAttempt.TransactionGroupId).ToList();
+                    var transactions = db.Transactions.Include(t=>t.Payments).Where(t => t.TransactionGroupId == paymentAttempt.TransactionGroupId).ToList();
 
                     // change product availability
                     foreach(var transaction in transactions)
                     {
-                        transaction.TransactionStatus = TransactionStatusConstant.SUCCESS;
-
+                        if (transaction.TransactionType == TransactionTypeConstant.BUY)
+                        {
+                            transaction.TransactionStatus = TransactionStatusConstant.PAID;
+                        }
+                        else
+                        {
+                            if (transaction.Payments.Any(p=>p.TransactionGroupPaymentAttemptId == null || p.TransactionGroupPaymentAttempt.Status != TransactionGroupPaymentStatusConstant.SUCCESS))
+                            {
+                                // if payment attempt is not done for the transaction
+                                // or the payments are pending
+                                transaction.TransactionStatus = TransactionStatusConstant.PARTIALLY_PAID;
+                            }
+                            else
+                            {
+                                // if the payment attempt is paid
+                                transaction.TransactionStatus = TransactionStatusConstant.PAID;
+                            }
+                        }
+                        
                         switch (transaction.TransactionType)
                         {
                             case TransactionTypeConstant.BUY:
@@ -666,7 +685,7 @@ namespace Ownorent.Controllers
 
                     db.SaveChanges();
 
-                    TempData["Message"] = "<strong>Congratulations! We have received your payment.</strong> You can track the status of your order at the Orders page.";
+                    TempData["Message"] = "<strong>Thank you! We have received your payment.</strong> You can track the status of your order at the Orders page.";
                     return RedirectToAction("Cart");
                     #endregion
                 }

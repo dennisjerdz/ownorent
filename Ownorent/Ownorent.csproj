@@ -263,6 +263,10 @@
     <Compile Include="Migrations\202006140018187_nullable payment attempt id in payments.Designer.cs">
       <DependentUpon>202006140018187_nullable payment attempt id in payments.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202006140704569_payment description property to indicate what month.cs" />
+    <Compile Include="Migrations\202006140704569_payment description property to indicate what month.Designer.cs">
+      <DependentUpon>202006140704569_payment description property to indicate what month.cs</DependentUpon>
+    </Compile>
     <Compile Include="OwnorentHelper.cs" />
     <Compile Include="Migrations\202005290332179_initial.cs" />
     <Compile Include="Migrations\202005290332179_initial.Designer.cs">
@@ -383,6 +387,8 @@
     <Content Include="Views\Admin\Images.cshtml" />
     <Content Include="Views\Products\p.cshtml" />
     <Content Include="Views\Products\Cart.cshtml" />
+    <Content Include="Views\Account\Orders.cshtml" />
+    <Content Include="Views\Account\ViewOrder.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -447,6 +453,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202006140018187_nullable payment attempt id in payments.resx">
       <DependentUpon>202006140018187_nullable payment attempt id in payments.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202006140704569_payment description property to indicate what month.resx">
+      <DependentUpon>202006140704569_payment description property to indicate what month.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

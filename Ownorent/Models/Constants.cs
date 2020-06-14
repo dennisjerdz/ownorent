@@ -83,8 +83,8 @@ namespace Ownorent.Models
 
     public class TransactionStatusConstant {
         public const int PENDING = 0;
-        public const int SUCCESS = 1;
-        public const int FAILED = 2;
+        public const int PARTIALLY_PAID = 1;
+        public const int PAID = 2;
     }
 
     public class ShippingTypeConstant {

@@ -372,6 +372,7 @@ namespace Ownorent.Models
 
         [Key]
         public int PaymentId { get; set; }
+        public string Description { get; set; }
         public float Amount { get; set; }
         public byte ShippingType { get; set; }
         public float ShippingFee { get; set; }
@@ -582,5 +583,11 @@ namespace Ownorent.Models
             public string rel { get; set; }
             public string method { get; set; }
         }
+    }
+
+    public class PaymentPayModel
+    {
+        public int PaymentId { get; set; }
+        public bool Include { get; set; }
     }
 }

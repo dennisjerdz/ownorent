@@ -1,0 +1,459 @@
+﻿@model Ownorent.Models.TransactionGroup
+@using Ownorent.Models
+@using System.Globalization
+@{
+    ViewBag.Title = "Orders";
+    ViewBag.bgColor = "#f8fafc";
+    int paymentIndex = 0;
+}
+
+<div class="row">
+    <div class="col-md-3 col-md-push-9">
+        <div class="ownorent-panel ownorent-panel-white marginTop15">
+            <div class="ownorent-panel-header" style="background-color:#71cd14; color:white;">
+
+            </div>
+
+            <div class="ownorent-panel-body ownorent-panel-tools">
+                <hr style="margin-top:4px; margin-bottom:4px;" />
+
+                <p style="margin-bottom:10px; font-size:0.9em;">
+                    Selected Total:
+                    <span class="ownorent-text-ygreen total-amount" style="float:right;">
+                        ₱ 0
+                    </span>
+                </p>
+
+                <img style="width:100%; margin-bottom:10px;" src="https://www.paypalobjects.com/digitalassets/c/website/marketing/apac/C2/logos-buttons/optimize/Full_Online_Tray_RGB.png" />
+                @Html.ActionLink("Pay Now", "Checkout", new { }, new { @class = "btn btn-md btn-block btn-info pay-btn ownorent-bg-paypal-blue", @style = "letter-spacing:0.9px; font-size:1.1em; font-style:italic; font-weight:600;" })
+
+                @Html.ActionLink("< Continue Shopping", "p", new { }, new { @class = "btn btn-xs btn-block btn-default" })
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-9 col-md-pull-3">
+        @using (Html.BeginForm("Pay", "Account", FormMethod.Post, new { @id = "payment-form", @class = "", role = "form" }))
+        {
+            <div class="ownorent-panel ownorent-panel-white marginTop15">
+                @foreach (var transaction in Model.Transactions)
+                {
+                    switch (transaction.TransactionType)
+                    {
+                        case TransactionTypeConstant.BUY:
+                            <div class="ownorent-panel-body ownorent-panel-table">
+                                <table class="table no-border-top table-rent-to-own table-condensed table-hover ownorent-compact-table">
+                                    <thead>
+                                        <tr>
+                                            <th class="table-options-40-center">ID</th>
+                                            <th>NAME</th>
+                                            <th class="table-options-120">STATUS</th>
+                                            <th class="table-options-120"></th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        <tr>
+                                            <td style="text-align:center;">@transaction.TransactionId</td>
+                                            <td>@transaction.Product.ProductName</td>
+                                            <td style="text-align:right;">
+                                                @switch(transaction.TransactionStatus)
+                                                {
+                                                    case TransactionStatusConstant.PAID:
+                                                        <span class="ownorent-text-ygreen">PAID</span>
+                                                        break;
+                                                    case TransactionStatusConstant.PARTIALLY_PAID:
+                                                        <span class="ownorent-text-orange">PARTIALLY PAID</span>
+                                                        break;
+                                                    case TransactionStatusConstant.PENDING:
+                                                        <span class="ownorent-text-gray">PENDING</span>
+                                                        break;
+                                                }
+                                            </td>
+                                            <td style="text-align:right;">
+
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <div class="ownorent-in-between"></div>
+
+                                <table class="table no-border-top table-rent-to-own table-condensed table-hover ownorent-compact-table">
+                                    <thead>
+                                        <tr>
+                                            <th class="table-options-40-center"></th>
+                                            <th>DESCRIPTION</th>
+                                            <th class="table-options-90">DUE DATE</th>
+                                            <th class="table-options-120">STATUS</th>
+                                            <th class="table-options-120">AMOUNT</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        @foreach (var payment in transaction.Payments)
+                                        {
+                                            <tr>
+                                                <td style="text-align:center;">
+                                                    @if (payment.TransactionGroupPaymentAttempt != null)
+                                                    {
+                                                        if (payment.TransactionGroupPaymentAttempt.Status == TransactionGroupPaymentStatusConstant.SUCCESS)
+                                                        {
+                                                            <input type="checkbox" disabled />
+                                                        }
+                                                        else
+                                                        {
+                                                            <input name="payments[@paymentIndex].Include" data-amount="@Math.Round(payment.Amount,2)" value="true" class="pay-checkbox" type="checkbox" />
+                                                            <input name="payments[@paymentIndex].PaymentId" value="@payment.PaymentId" type="hidden" />
+
+                                                            paymentIndex++;
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        <input name="payments[@paymentIndex].Include" data-amount="@Math.Round(payment.Amount,2)" value="true" class="pay-checkbox" type="checkbox" />
+                                                        <input name="payments[@paymentIndex].PaymentId" value="@payment.PaymentId" type="hidden" />
+
+                                                        paymentIndex++;
+                                                    }
+                                                </td>
+                                                <td>
+                                                    @if (string.IsNullOrEmpty(payment.Description))
+                                                    {
+                                                        <text>Payment</text>
+                                                    }
+                                                    else
+                                                    {
+                                                        <text>@payment.Description</text>
+                                                    }
+                                                </td>
+                                                <td style="text-align:right;">
+                                                    @if (payment.DateDue != null)
+                                                    {
+                                                        <text>@payment.DateDue.Value.ToString("MM-dd-yyyy")</text>
+                                                    }
+                                                </td>
+                                                <td style="text-align:right;">
+                                                    @if (payment.TransactionGroupPaymentAttempt != null)
+                                                    {
+                                                        switch (payment.TransactionGroupPaymentAttempt.Status)
+                                                        {
+                                                            case TransactionGroupPaymentStatusConstant.PENDING:
+                                                                <span class="ownorent-text-gray">PENDING</span>
+                                                                break;
+                                                            case TransactionGroupPaymentStatusConstant.SUCCESS:
+                                                                <span class="ownorent-text-ygreen">PAID</span>
+                                                                break;
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="ownorent-text-gray">PENDING</span>
+                                                    }
+                                                </td>
+                                                <td style="text-align:right;">
+                                                    @payment.Amount.ToString("C2", CultureInfo.GetCultureInfo("fil-PH"))
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+
+                                <div class="ownorent-transaction-end"></div>
+                            </div>
+                            break;
+                        case TransactionTypeConstant.RENT:
+                            <div class="ownorent-panel-body ownorent-panel-table">
+                                <table class="table no-border-top table-rent-to-own table-condensed table-hover ownorent-compact-table">
+                                    <thead>
+                                        <tr>
+                                            <th class="table-options-40-center">ID</th>
+                                            <th>NAME</th>
+                                            <th class="table-options-90">Rent Start</th>
+                                            <th class="table-options-90">Rent End</th>
+                                            <th class="table-options-120">STATUS</th>
+                                            <th class="table-options-120"></th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        <tr>
+                                            <td style="text-align:center;">@transaction.TransactionId</td>
+                                            <td>@transaction.Product.ProductName</td>
+                                            <td style="text-align:right;">@transaction.RentStartDate.Value.ToString("MM-dd-yyyy")</td>
+                                            <td style="text-align:right;">@transaction.RentEndDate.Value.ToString("MM-dd-yyyy")</td>
+                                            <td style="text-align:right;">
+                                                @switch (transaction.TransactionStatus)
+                                                {
+                                                    case TransactionStatusConstant.PAID:
+                                                        <span class="ownorent-text-ygreen">PAID</span>
+                                                        break;
+                                                    case TransactionStatusConstant.PARTIALLY_PAID:
+                                                        <span class="ownorent-text-orange">PARTIALLY PAID</span>
+                                                        break;
+                                                    case TransactionStatusConstant.PENDING:
+                                                        <span class="ownorent-text-gray">PENDING</span>
+                                                        break;
+                                                }
+                                            </td>
+                                            <td style="text-align:right;"></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <div class="ownorent-in-between"></div>
+
+                                <table class="table no-border-top table-rent-to-own table-condensed table-hover ownorent-compact-table">
+                                    <thead>
+                                        <tr>
+                                            <th class="table-options-40-center"></th>
+                                            <th>DESCRIPTION</th>
+                                            <th class="table-options-90">DUE DATE</th>
+                                            <th class="table-options-120">STATUS</th>
+                                            <th class="table-options-120">AMOUNT</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        @foreach (var payment in transaction.Payments)
+                                        {
+                                            <tr>
+                                                <td style="text-align:center;">
+                                                    @if (payment.TransactionGroupPaymentAttempt != null)
+                                                    {
+                                                        if (payment.TransactionGroupPaymentAttempt.Status == TransactionGroupPaymentStatusConstant.SUCCESS)
+                                                        {
+                                                            <input type="checkbox" disabled />
+                                                        }
+                                                        else
+                                                        {
+                                                            <input name="payments[@paymentIndex].Include" data-amount="@Math.Round(payment.Amount,2)" value="true" class="pay-checkbox" type="checkbox" />
+                                                            <input name="payments[@paymentIndex].PaymentId" value="@payment.PaymentId" type="hidden" />
+
+                                                            paymentIndex++;
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        <input name="payments[@paymentIndex].Include" data-amount="@Math.Round(payment.Amount,2)" value="true" class="pay-checkbox" type="checkbox" />
+                                                        <input name="payments[@paymentIndex].PaymentId" value="@payment.PaymentId" type="hidden" />
+
+                                                        paymentIndex++;
+                                                    }
+                                                </td>
+                                                <td>
+                                                    @if (string.IsNullOrEmpty(payment.Description))
+                                                    {
+                                                        <text>Payment</text>
+                                                    }
+                                                    else
+                                                    {
+                                                        <text>@payment.Description</text>
+                                                    }
+                                                </td>
+                                                <td style="text-align:right;">
+                                                    @if (payment.DateDue != null)
+                                                    {
+                                                        <text>@payment.DateDue.Value.ToString("MM-dd-yyyy")</text>
+                                                    }
+                                                </td>
+                                                <td style="text-align:right;">
+                                                    @if (payment.TransactionGroupPaymentAttempt != null)
+                                                    {
+                                                        switch (payment.TransactionGroupPaymentAttempt.Status)
+                                                        {
+                                                            case TransactionGroupPaymentStatusConstant.PENDING:
+                                                                <span class="ownorent-text-gray">PENDING</span>
+                                                                break;
+                                                            case TransactionGroupPaymentStatusConstant.SUCCESS:
+                                                                <span class="ownorent-text-ygreen">PAID</span>
+                                                                break;
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="ownorent-text-gray">PENDING</span>
+                                                    }
+                                                </td>
+                                                <td style="text-align:right;">
+                                                    @payment.Amount.ToString("C2", CultureInfo.GetCultureInfo("fil-PH"))
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+
+                                <div class="ownorent-transaction-end"></div>
+                            </div>
+                            break;
+                        case TransactionTypeConstant.RENT_TO_OWN:
+                            <div class="ownorent-panel-body ownorent-panel-table">
+                                <table class="table no-border-top table-rent-to-own table-condensed table-hover ownorent-compact-table">
+                                    <thead>
+                                        <tr>
+                                            <th class="table-options-40-center">ID</th>
+                                            <th>NAME</th>
+                                            <th class="table-options-90">Months</th>
+                                            <th class="table-options-90">Interest</th>
+                                            <th class="table-options-120">STATUS</th>
+                                            <th class="table-options-120"></th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        <tr>
+                                            <td style="text-align:center;">@transaction.TransactionId</td>
+                                            <td>@transaction.Product.ProductName</td>
+                                            <td style="text-align:right;">@transaction.RentToOwnPaymentTerm.Months</td>
+                                            <td style="text-align:right;">@transaction.RentToOwnPaymentTerm.InterestRate.ToString("#.##") %</td>
+                                            <td style="text-align:right;">
+                                                @switch (transaction.TransactionStatus)
+                                                {
+                                                    case TransactionStatusConstant.PAID:
+                                                        <span class="ownorent-text-ygreen">PAID</span>
+                                                        break;
+                                                    case TransactionStatusConstant.PARTIALLY_PAID:
+                                                        <span class="ownorent-text-orange">PARTIALLY PAID</span>
+                                                        break;
+                                                    case TransactionStatusConstant.PENDING:
+                                                        <span class="ownorent-text-gray">PENDING</span>
+                                                        break;
+                                                }
+                                            </td>
+                                            <td style="text-align:right;"></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <div class="ownorent-in-between"></div>
+
+                                <table class="table no-border-top table-rent-to-own table-condensed table-hover ownorent-compact-table">
+                                    <thead>
+                                        <tr>
+                                            <th class="table-options-40-center"></th>
+                                            <th>DESCRIPTION</th>
+                                            <th class="table-options-90">DUE DATE</th>
+                                            <th class="table-options-120">STATUS</th>
+                                            <th class="table-options-120">AMOUNT</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        @foreach (var payment in transaction.Payments)
+                                        {
+                                            <tr>
+                                                <td style="text-align:center;">
+                                                    @if (payment.TransactionGroupPaymentAttempt != null)
+                                                    {
+                                                        if (payment.TransactionGroupPaymentAttempt.Status == TransactionGroupPaymentStatusConstant.SUCCESS)
+                                                        {
+                                                            <input type="checkbox" disabled />
+                                                        }
+                                                        else
+                                                        {
+                                                            <input name="payments[@paymentIndex].Include" data-amount="@Math.Round(payment.Amount,2)" value="true" class="pay-checkbox" type="checkbox" />
+                                                            <input name="payments[@paymentIndex].PaymentId" value="@payment.PaymentId" type="hidden" />
+
+                                                            paymentIndex++;
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        <input name="payments[@paymentIndex].Include" data-amount="@Math.Round(payment.Amount,2)" value="true" class="pay-checkbox" type="checkbox" />
+                                                        <input name="payments[@paymentIndex].PaymentId" value="@payment.PaymentId" type="hidden" />
+
+                                                        paymentIndex++;
+                                                    }
+                                                </td>
+                                                <td>
+                                                    @if (string.IsNullOrEmpty(payment.Description))
+                                                    {
+                                                        <text>Payment</text>
+                                                    }
+                                                    else
+                                                    {
+                                                        <text>@payment.Description</text>
+                                                    }
+                                                </td>
+                                                <td style="text-align:right;">
+                                                    @if (payment.DateDue != null)
+                                                    {
+                                                        <text>@payment.DateDue.Value.ToString("MM-dd-yyyy")</text>
+                                                    }
+                                                </td>
+                                                <td style="text-align:right;">
+                                                    @if (payment.TransactionGroupPaymentAttempt != null)
+                                                    {
+                                                        switch (payment.TransactionGroupPaymentAttempt.Status)
+                                                        {
+                                                            case TransactionGroupPaymentStatusConstant.PENDING:
+                                                                <span class="ownorent-text-gray">PENDING</span>
+                                                                break;
+                                                            case TransactionGroupPaymentStatusConstant.SUCCESS:
+                                                                <span class="ownorent-text-ygreen">PAID</span>
+                                                                break;
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="ownorent-text-gray">PENDING</span>
+                                                    }
+                                                </td>
+                                                <td style="text-align:right;">
+                                                    @payment.Amount.ToString("C2", CultureInfo.GetCultureInfo("fil-PH"))
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+
+                                <div class="ownorent-transaction-end"></div>
+                            </div>
+                            break;
+                    }
+                }
+                <div class="ownorent-panel-body ownorent-panel-table">
+                    <table class="table no-border-top table-rent-to-own table-condensed table-hover ownorent-compact-table"></table>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@section scripts{
+    <script>
+        $(document).ready(function () {
+            var payTotal = 0;
+
+            $(".pay-btn").click(function (e) {
+                e.preventDefault();
+                $("#payment-form").submit();
+            });
+
+            $(".pay-checkbox").click(function () {
+                if ($(this).is(':checked')) {
+                    payTotal += $(this).data("amount");
+                }
+                else
+                {
+                    payTotal -= $(this).data("amount");
+                }
+
+                $(".total-amount").html("₱ " + payTotal.toLocaleString(undefined, { maximumFractionDigits: 2 }));
+            })
+
+            $("table").each(function () {
+                var datatable = $(this).DataTable({
+                    paging: true,
+                    "pageLength": 10,
+                    "dom": "<'table-window'<'table-responsive'rt>>",
+                    "ordering": false
+                });
+            })
+            
+            $(".all-search").keyup(function () {
+                datatable.search($(this).val()).draw();
+            })
+        });
+    </script>
+}
