@@ -388,7 +388,7 @@ namespace Ownorent.Models
         [ForeignKey("TransactionId")]
         public virtual Transaction Transaction { get; set; }
 
-        public int TransactionGroupPaymentAttemptId { get; set; }
+        public int? TransactionGroupPaymentAttemptId { get; set; }
         [ForeignKey("TransactionGroupPaymentAttemptId")]
         public virtual TransactionGroupPaymentAttempt TransactionGroupPaymentAttempt { get; set; }
     }

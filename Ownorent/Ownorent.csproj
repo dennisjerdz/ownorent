@@ -259,6 +259,10 @@
     <Compile Include="Migrations\202006131818434_capture more paypal info.Designer.cs">
       <DependentUpon>202006131818434_capture more paypal info.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202006140018187_nullable payment attempt id in payments.cs" />
+    <Compile Include="Migrations\202006140018187_nullable payment attempt id in payments.Designer.cs">
+      <DependentUpon>202006140018187_nullable payment attempt id in payments.cs</DependentUpon>
+    </Compile>
     <Compile Include="OwnorentHelper.cs" />
     <Compile Include="Migrations\202005290332179_initial.cs" />
     <Compile Include="Migrations\202005290332179_initial.Designer.cs">
@@ -440,6 +444,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202006131818434_capture more paypal info.resx">
       <DependentUpon>202006131818434_capture more paypal info.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202006140018187_nullable payment attempt id in payments.resx">
+      <DependentUpon>202006140018187_nullable payment attempt id in payments.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

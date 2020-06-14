@@ -456,16 +456,18 @@ namespace Ownorent.Controllers
                                 {
                                     if (rentNumberOfDays > 30)
                                     {
+                                        int? paymentAttemptId = null;
                                         if (breakdown == 1)
                                         {
                                             totalRequiredAmount += (dailyRentPrice * 30);
+                                            paymentAttemptId = tgPaymentAttempt.TransactionGroupPaymentAttemptId;
                                         }
 
                                         db.Payments.Add(new Payment
                                         {
                                             Amount = dailyRentPrice * 30,
                                             TransactionId = transactionPerProduct.TransactionId,
-                                            TransactionGroupPaymentAttemptId = tgPaymentAttempt.TransactionGroupPaymentAttemptId,
+                                            TransactionGroupPaymentAttemptId = paymentAttemptId,
                                             DateDue = DateTime.UtcNow.AddHours(8)
                                         });
                                     }
@@ -476,10 +478,12 @@ namespace Ownorent.Controllers
                                         {
                                             Amount = dailyRentPrice * rentNumberOfDays,
                                             TransactionId = transactionPerProduct.TransactionId,
-                                            TransactionGroupPaymentAttemptId = tgPaymentAttempt.TransactionGroupPaymentAttemptId,
+                                            TransactionGroupPaymentAttemptId = null,
                                             DateDue = DateTime.UtcNow.AddHours(8)
                                         });
                                     }
+
+                                    breakdown++;
                                 }
                             }
                             else
@@ -504,11 +508,17 @@ namespace Ownorent.Controllers
                             float ammortization = (price + (price * (item.PaymentTerm.InterestRate/100))) / item.PaymentTerm.Months;
                             for (int paymentTermIndex = 0; paymentTermIndex < item.PaymentTerm.Months; paymentTermIndex++)
                             {
+                                int? paymentAttempt = null;
+                                if (paymentTermIndex == 0)
+                                {
+                                    paymentAttempt = tgPaymentAttempt.TransactionGroupPaymentAttemptId;
+                                }
+
                                 db.Payments.Add(new Payment
                                 {
                                     Amount = ammortization,
                                     TransactionId = transactionPerProduct.TransactionId,
-                                    TransactionGroupPaymentAttemptId = tgPaymentAttempt.TransactionGroupPaymentAttemptId,
+                                    TransactionGroupPaymentAttemptId = paymentAttempt,
                                     DateDue = DateTime.UtcNow.AddHours(8)
                                 });
                             }
@@ -540,7 +550,7 @@ namespace Ownorent.Controllers
                         break;
                 }
 
-                paypalTotal += (float)Math.Round(paypalProductValue, 2);
+                paypalTotal += ((float)Math.Round(paypalProductValue, 2) * item.Quantity);
 
                 mainPurchaseUnit.items.Add(new PaypalCreateOrderModel.PaypalPurchaseUnitModel.PaypalItemModel() {
                     name = item.Product.ProductName,
@@ -555,8 +565,8 @@ namespace Ownorent.Controllers
             }
             #endregion
             
-            mainPurchaseUnit.amount.value = totalRequiredAmount.ToString();
-            mainPurchaseUnit.amount.breakdown.item_total.value = totalRequiredAmount.ToString();
+            mainPurchaseUnit.amount.value = paypalTotal.ToString();
+            mainPurchaseUnit.amount.breakdown.item_total.value = paypalTotal.ToString();
             tgPaymentAttempt.TotalAmount = (float)Math.Round(totalRequiredAmount,2);
             tgPaymentAttempt.PlatformTaxOrder = platformTaxOrder;
             tgPaymentAttempt.AmountForSystem = platformTaxOrder * tgPaymentAttempt.TotalAmount;

@@ -96,3 +96,4 @@ C:\Users\Jerdz\Documents\Visual Studio 2015\Projects\Ownorent\Ownorent\obj\Relea
 C:\Users\Jerdz\Documents\Visual Studio 2015\Projects\Ownorent\Ownorent\obj\Release\Ownorent.Migrations.invoicedescriptiononproducttemplate.resources
 C:\Users\Jerdz\Documents\Visual Studio 2015\Projects\Ownorent\Ownorent\obj\Release\Ownorent.Migrations.nullablerentpaymenttermid.resources
 C:\Users\Jerdz\Documents\Visual Studio 2015\Projects\Ownorent\Ownorent\obj\Release\Ownorent.Migrations.rentnumberofdays.resources
+C:\Users\Jerdz\Documents\Visual Studio 2015\Projects\Ownorent\Ownorent\obj\Release\Ownorent.Migrations.capturemorepaypalinfo.resources

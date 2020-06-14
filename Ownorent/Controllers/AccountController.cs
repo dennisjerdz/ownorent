@@ -58,6 +58,18 @@ namespace Ownorent.Controllers
             }
         }
 
+        public ActionResult Orders()
+        {
+            ViewBag.Error = TempData["Error"];
+            ViewBag.Message = TempData["Message"];
+
+            string userId = User.Identity.GetUserId();
+            var orders = db.TransactionGroups
+                .Where(p => p.UserId == userId);
+
+            return View(orders.ToList());
+        }
+
         [Authorize(Roles = "Admin")]
         public ActionResult Accounts()
         {
