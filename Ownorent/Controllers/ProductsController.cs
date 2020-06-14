@@ -534,20 +534,20 @@ namespace Ownorent.Controllers
                 switch (item.CartType)
                 {
                     case CartTypeConstant.BUY:
-                        paypalProductValue = price;
+                        paypalProductValue = (float)Math.Round(price,2);
                         break;
                     case CartTypeConstant.RENT:
                         if (item.RentNumberOfDays > 30)
                         {
-                            paypalProductValue = dailyRentPrice * 30 ;
+                            paypalProductValue = (float)Math.Round(dailyRentPrice, 2) * 30 ;
                         }
                         else
                         {
-                            paypalProductValue = dailyRentPrice * item.RentNumberOfDays.Value;
+                            paypalProductValue = (float)Math.Round(dailyRentPrice, 2) * item.RentNumberOfDays.Value;
                         }
                         break;
                     case CartTypeConstant.RENT_TO_OWN:
-                        float ammortization = (price + (price * (item.PaymentTerm.InterestRate / 100))) / item.PaymentTerm.Months;
+                        float ammortization = ((float)Math.Round(price, 2) + ((float)Math.Round(price, 2) * (item.PaymentTerm.InterestRate / 100))) / item.PaymentTerm.Months;
                         paypalProductValue = ammortization;
                         break;
                 }
@@ -567,8 +567,8 @@ namespace Ownorent.Controllers
             }
             #endregion
             
-            mainPurchaseUnit.amount.value = paypalTotal.ToString();
-            mainPurchaseUnit.amount.breakdown.item_total.value = paypalTotal.ToString();
+            mainPurchaseUnit.amount.value = Math.Round(paypalTotal,2).ToString();
+            mainPurchaseUnit.amount.breakdown.item_total.value = Math.Round(paypalTotal, 2).ToString();
             tgPaymentAttempt.TotalAmount = (float)Math.Round(totalRequiredAmount,2);
             tgPaymentAttempt.PlatformTaxOrder = platformTaxOrder;
             tgPaymentAttempt.AmountForSystem = platformTaxOrder * tgPaymentAttempt.TotalAmount;
