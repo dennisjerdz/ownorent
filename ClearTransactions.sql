@@ -9,3 +9,5 @@ select * from Transactions;
 select * from TransactionGroupPaymentAttempts;
 select * from TransactionGroups;
 select * from Products;
+
+select MobileNumber,* from ApplicationUsers

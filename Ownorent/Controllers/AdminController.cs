@@ -19,15 +19,15 @@ namespace Ownorent.Controllers
     {
         private ApplicationDbContext db = new ApplicationDbContext();
 
-        public ActionResult Products()
+        public async Task<ActionResult> Products()
         {
             ViewBag.Error = TempData["Error"];
             ViewBag.Message = TempData["Message"];
 
             var productTemplates = db.ProductTemplates
-                .Include(p => p.Category);
+                .Include(p => p.Category).Include(p=>p.Products);
 
-            return View(productTemplates.ToList());
+            return View(await productTemplates.ToListAsync());
         }
 
         public ActionResult EditProduct(int? id)
