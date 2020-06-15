@@ -17,6 +17,7 @@ using System.Net.Http;
 using System.Net;
 using Newtonsoft.Json;
 using System.Text;
+using System.Diagnostics;
 
 namespace Ownorent.Controllers
 {
@@ -259,6 +260,21 @@ namespace Ownorent.Controllers
                     }
 
                     db.SaveChanges();
+
+                    #region Send SMS to Customer
+                    try
+                    {
+                        string userId = paymentAttempt.TransactionGroup.UserId;
+                        Task.Run(() =>
+                        {
+                            new SMSController().SendSMS(userId, "We have received your payment for Transaction: OWNO-OR-" + paymentAttempt.TransactionGroupId + ". Please see the orders page to view details.");
+                        });
+                    }
+                    catch (Exception e)
+                    {
+                        Trace.TraceInformation("SMS Send Failed for OWNO-OR-" + paymentAttempt.TransactionGroupId + ": " + e.Message);
+                    }
+                    #endregion
 
                     TempData["Message"] = "<strong>Thank you! We have received your payment.</strong> The transaction has been updated.";
                     return RedirectToAction("ViewOrder", new { id = paymentAttempt.TransactionGroupId });
