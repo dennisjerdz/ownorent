@@ -715,7 +715,7 @@ namespace Ownorent.Controllers
             }
         }
 
-        public ActionResult Index()
+        public async Task<ActionResult> Index()
         {
             ViewBag.Error = TempData["Error"];
             ViewBag.Message = TempData["Message"];
@@ -723,10 +723,11 @@ namespace Ownorent.Controllers
             string userId = User.Identity.GetUserId();
             var productTemplates = db.ProductTemplates
                 .Include(p => p.Category)
+                .Include(p=>p.Products)
                 .Where(p => p.UserId == userId);
                 // .GroupBy(p=>p.Category.CategoryName);
 
-            return View(productTemplates.ToList());
+            return View(await productTemplates.ToListAsync());
         }
 
         public async Task<ActionResult> Index2()
