@@ -14,6 +14,16 @@ namespace Ownorent
 {
     public static class OwnorentHelper
     {
+        public static string ShortCode = "21581828";
+
+        public static string RandomString(int length)
+        {
+            Random random = new Random();
+            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            return new string(Enumerable.Repeat(chars, length)
+              .Select(s => s[random.Next(s.Length)]).ToArray());
+        }
+
         /*  Paypal App and Accounts
             Paypal Login
             ownorent@gmail.com // Ownorent@123
@@ -82,13 +92,6 @@ namespace Ownorent
             }
         */
 
-        public static string RandomString(int length)
-        {
-            Random random = new Random();
-            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-            return new string(Enumerable.Repeat(chars, length)
-              .Select(s => s[random.Next(s.Length)]).ToArray());
-        }
 
         // Paypal doesn't need access token IF you pass basic authentication header for every request
         public static async Task<string> GetAccessToken()

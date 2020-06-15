@@ -15,17 +15,16 @@ namespace Ownorent.Controllers
     {
         private ApplicationSignInManager _signInManager;
         private ApplicationUserManager _userManager;
+        private ApplicationDbContext db = new ApplicationDbContext();
 
         public ManageController()
         {
         }
-
         public ManageController(ApplicationUserManager userManager, ApplicationSignInManager signInManager)
         {
             UserManager = userManager;
             SignInManager = signInManager;
         }
-
         public ApplicationSignInManager SignInManager
         {
             get
@@ -37,7 +36,6 @@ namespace Ownorent.Controllers
                 _signInManager = value; 
             }
         }
-
         public ApplicationUserManager UserManager
         {
             get
@@ -49,11 +47,18 @@ namespace Ownorent.Controllers
                 _userManager = value;
             }
         }
-
-        //
-        // GET: /Manage/Index
+        
         public async Task<ActionResult> Index(ManageMessageId? message)
         {
+            if (TempData["Error"] != null)
+            {
+                ViewBag.Error = TempData["Error"];
+            }
+            if (TempData["Message"] != null)
+            {
+                ViewBag.Message = TempData["Message"];
+            }
+
             ViewBag.StatusMessage =
                 message == ManageMessageId.ChangePasswordSuccess ? "Your password has been changed."
                 : message == ManageMessageId.SetPasswordSuccess ? "Your password has been set."
@@ -64,15 +69,41 @@ namespace Ownorent.Controllers
                 : "";
 
             var userId = User.Identity.GetUserId();
+
+            var user = db.Users.FirstOrDefault(u => u.Id == userId);
+
             var model = new IndexViewModel
             {
                 HasPassword = HasPassword(),
                 PhoneNumber = await UserManager.GetPhoneNumberAsync(userId),
                 TwoFactor = await UserManager.GetTwoFactorEnabledAsync(userId),
                 Logins = await UserManager.GetLoginsAsync(userId),
-                BrowserRemembered = await AuthenticationManager.TwoFactorBrowserRememberedAsync(userId)
+                BrowserRemembered = await AuthenticationManager.TwoFactorBrowserRememberedAsync(userId),
+                MobileNumber = user?.MobileNumber,
+                MobileNumberCode = user?.MobileNumberCode
             };
             return View(model);
+        }
+
+        public ActionResult Edit (EditViewModel model)
+        {
+            string userId = User.Identity.GetUserId();
+            var user = db.Users.FirstOrDefault(u => u.Id == userId);
+
+            if (db.Users.Where(u=>u.MobileNumber == model.MobileNumber).ToList().Count > 1)
+            {
+                TempData["Message"] = "<strong>Update Account info failed.</strong> Mobile Number in the system already exists.";
+                return RedirectToAction("Index");
+            }
+            else
+            {
+                user.MobileNumber = model.MobileNumber;
+                db.SaveChanges();
+
+                TempData["Message"] = "<strong>Account info updated successfully.</strong>";
+                return RedirectToAction("Index");
+            }
+            
         }
 
         //

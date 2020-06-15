@@ -2,14 +2,42 @@
 @{
     ViewBag.Title = "Manage";
 }
-
-<h2>@ViewBag.Title.</h2>
-
 <p class="text-success">@ViewBag.StatusMessage</p>
 <div>
-    <h4>Change your account settings</h4>
-    <hr />
-    <dl class="dl-horizontal">
+    
+    <div class="row">
+        <div class="col-md-3">
+            <div class="ownorent-panel ownorent-panel-white marginTop15">
+                <div class="ownorent-panel-header" style="background-color:#71cd14; color:white;">
+
+                </div>
+
+                <div class="ownorent-panel-body ownorent-panel-tools">
+                    <h2>@ViewBag.Title.</h2>
+                    <h4>Change your account settings</h4>
+
+                    @using (Html.BeginForm("Edit", "Manage", FormMethod.Post, new { @class = "form-horizontal" }))
+                    {
+                        <div class="form-group">
+                            <div class="col-md-12">
+                                <label class="control-label">Mobile Number</label>
+                                @if (Model.MobileNumberCode != null)
+                                {
+
+                                }
+                                <input name="MobileNumber" class="form-control" value="@Model.MobileNumber" placeholder="09xxxxxxxxx" type="number" step="1" />
+                                <hr />
+                                <button type="submit" class="btn btn-xs btn-info btn-block">Save</button>
+                            </div>
+                        </div>
+
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-9">
+            <dl class="dl-horizontal">
         <dt>Password:</dt>
         <dd>
             [
@@ -20,7 +48,7 @@
             else
             {
                 @Html.ActionLink("Create", "SetPassword")
-            }
+                }
             ]
         </dd>
         <dt>External Logins:</dt>
@@ -84,4 +112,6 @@
                 }*@
         </dd>
     </dl>
+        </div>
+    </div>
 </div>
