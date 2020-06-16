@@ -63,7 +63,7 @@ namespace Ownorent.Controllers
                 p.DateLastModified = now;
             }
 
-            db.Settings.FirstOrDefault(s => s.Code == "UPDATE_PRICE_LAST_RAN").Value = now.ToString("MM-dd-yyyy hh:mm a");
+            db.Settings.FirstOrDefault(s => s.Code == "UPDATE_PRICE_LAST_RAN").Value = now.ToString("MM-dd-yyyy hh:mmtt");
 
             db.SaveChanges();
             TempData["Message"] = "<strong>Update Price ran successfully.</strong> Computed and Computed Daily Rent price have been updated.";
