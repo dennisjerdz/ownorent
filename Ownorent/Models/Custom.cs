@@ -323,6 +323,7 @@ namespace Ownorent.Models
 
         public byte TransactionType { get; set; }
         public byte TransactionStatus { get; set; }
+        public int ShippingStatus { get; set; }
 
         public int AddressId { get; set; }
         [ForeignKey("AddressId")]
@@ -356,11 +357,29 @@ namespace Ownorent.Models
         [ForeignKey("TransactionGroupId")]
         public virtual TransactionGroup TransactionGroup { get; set; }
 
+        public virtual List<TransactionNote> TransactionNotes { get; set; }
+
         public List<Payment> Payments { get; set; }
 
         public string LastModifiedBy { get; set; }
         public DateTime DateCreated { get; set; }
         public DateTime DateLastModified { get; set; }
+    }
+
+    public class TransactionNote
+    {
+        public TransactionNote()
+        {
+            DateCreated = DateTime.UtcNow.AddHours(8);
+        }
+
+        public int TransactionNoteId { get; set; }
+        public string Note { get; set; }
+        public DateTime DateCreated { get; set; }
+
+        public int TransactionId { get; set; }
+        [ForeignKey("TransactionId")]
+        public Transaction Transaction { get; set; }
     }
 
     public class Payment {
@@ -589,5 +608,11 @@ namespace Ownorent.Models
     {
         public int PaymentId { get; set; }
         public bool Include { get; set; }
+    }
+
+    public class TransactionEditModel
+    {
+        public int TransactionId { get; set; }
+        public int ShippingStatus { get; set; }
     }
 }

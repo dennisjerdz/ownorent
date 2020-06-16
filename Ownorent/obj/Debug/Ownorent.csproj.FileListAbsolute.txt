@@ -100,3 +100,5 @@ C:\Users\Jerdz\Documents\Visual Studio 2015\Projects\Ownorent\Ownorent\obj\Debug
 C:\Users\Jerdz\Documents\Visual Studio 2015\Projects\Ownorent\Ownorent\obj\Debug\Ownorent.Migrations.nullablepaymentattemptidinpayments.resources
 C:\Users\Jerdz\Documents\Visual Studio 2015\Projects\Ownorent\Ownorent\obj\Debug\Ownorent.Migrations.paymentdescriptionpropertytoindicatewhatmonth.resources
 C:\Users\Jerdz\Documents\Visual Studio 2015\Projects\Ownorent\Ownorent\bin\GlobeLabs.dll
+C:\Users\Jerdz\Documents\Visual Studio 2015\Projects\Ownorent\Ownorent\obj\Debug\Ownorent.Migrations.transactionhistoryornotes.resources
+C:\Users\Jerdz\Documents\Visual Studio 2015\Projects\Ownorent\Ownorent\obj\Debug\Ownorent.Migrations.transactionshippingstatus.resources

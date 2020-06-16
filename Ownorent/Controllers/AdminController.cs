@@ -11,6 +11,8 @@ using Microsoft.AspNet.Identity;
 using System.IO;
 using System.Net.Mail;
 using System.Threading.Tasks;
+using System.Text;
+using System.Diagnostics;
 
 namespace Ownorent.Controllers
 {
@@ -19,10 +21,159 @@ namespace Ownorent.Controllers
     {
         private ApplicationDbContext db = new ApplicationDbContext();
 
+        public async Task<ActionResult> Orders()
+        {
+            if (TempData["Error"] != null)
+            {
+                ViewBag.Error = TempData["Error"];
+            }
+            if (TempData["Message"] != null)
+            {
+                ViewBag.Message = TempData["Message"];
+            }
+
+            var orders = db.TransactionGroups
+                .Include(o => o.Transactions)
+                .Where(o => !o.Transactions.Any(t => t.TransactionStatus == TransactionStatusConstant.PENDING));
+
+            return View(await orders.ToListAsync());
+        }
+
+        public async Task<ActionResult> ManageOrder(int id)
+        {
+            if (TempData["Error"] != null)
+            {
+                ViewBag.Error = TempData["Error"];
+            }
+            if (TempData["Message"] != null)
+            {
+                ViewBag.Message = TempData["Message"];
+            }
+            
+            var order = db.TransactionGroups.Include(t => t.Transactions).FirstOrDefault(t => t.TransactionGroupId == id);
+
+            if (order != null)
+            {
+                foreach (var transaction in order.Transactions)
+                {
+                    transaction.Payments = await db.Payments.Where(p => p.TransactionId == transaction.TransactionId).ToListAsync();
+                }
+
+                return View(order);
+            }
+            else
+            {
+                return HttpNotFound();
+            }
+        }
+
+        public async Task<ActionResult> EditOrders(List<TransactionEditModel> transactionItems)
+        {
+            int? transactionGroupId = null;
+            TransactionGroup order = null;
+
+            int packageCount = 0;
+            int pickUpCount = 0;
+            int transitCount = 0;
+            int deliveredCount = 0;
+            int failedCount = 0;
+
+            foreach (var item in transactionItems)
+            {
+                var transaction = db.Transactions.FirstOrDefault(t => t.TransactionId == item.TransactionId);
+
+                if(order == null)
+                {
+                    order = transaction.TransactionGroup;
+                    transactionGroupId = transaction.TransactionGroupId;
+                }
+
+                if (transaction != null)
+                {
+                    transaction.ShippingStatus = item.ShippingStatus;
+
+                    switch (item.ShippingStatus)
+                    {
+                        case ShippingStatusConstant.PACKAGED:
+                            packageCount++;
+                            break;
+                        case ShippingStatusConstant.READY_FOR_PICK_UP:
+                            pickUpCount++;
+                            break;
+                        case ShippingStatusConstant.IN_TRANSIT:
+                            transitCount++;
+                            break;
+                        case ShippingStatusConstant.DELIVERED:
+                            deliveredCount++;
+                            break;
+                        case ShippingStatusConstant.FAILED_DELIVERY:
+                            failedCount++;
+                            break;
+                    }
+                }
+                else
+                {
+                    TempData["Error"] = "1";
+                    TempData["Message"] = "<strong>Transaction update failed.</strong> A transaction item does not exist in the database.";
+                    return RedirectToAction("Orders");
+                }
+            }
+
+            await db.SaveChangesAsync();
+
+            #region shipping status breakdown
+            StringBuilder msg = new StringBuilder();
+            msg.Append("Your order with ID: OWNO-OR-" + transactionGroupId + " has been updated.");
+            if (packageCount>0)
+            {
+                msg.Append("Packaged " + packageCount+". ");
+            }
+            if (pickUpCount > 0)
+            {
+                msg.Append("READY FOR PICK UP " + pickUpCount + ". ");
+            }
+            if (transitCount > 0)
+            {
+                msg.Append("IN TRANSIT " + transitCount + ". ");
+            }
+            if (deliveredCount > 0)
+            {
+                msg.Append("DELIVERED " + deliveredCount + ". ");
+            }
+            if (failedCount > 0)
+            {
+                msg.Append("FAILED DELIVERY " + failedCount + ". ");
+            }
+            #endregion
+
+            #region Send SMS to Customer
+            try
+            {
+                Task.Run(() =>
+                {
+                    new SMSController().SendSMS(order.UserId, msg.ToString());
+                });
+            }
+            catch (Exception e)
+            {
+                Trace.TraceInformation("SMS Send Failed for OWNO-OR-" + order.TransactionGroupId + ": " + e.Message);
+            }
+            #endregion
+
+            TempData["Message"] = "<strong>Transaction updated successfully.</strong> The customer will be notified.";
+            return RedirectToAction("ManageOrder", new { id = transactionGroupId });
+        }
+
         public async Task<ActionResult> Products()
         {
-            ViewBag.Error = TempData["Error"];
-            ViewBag.Message = TempData["Message"];
+            if (TempData["Error"] != null)
+            {
+                ViewBag.Error = TempData["Error"];
+            }
+            if (TempData["Message"] != null)
+            {
+                ViewBag.Message = TempData["Message"];
+            }
 
             var productTemplates = db.ProductTemplates
                 .Include(p => p.Category).Include(p=>p.Products);

@@ -62,7 +62,7 @@ namespace Ownorent.Controllers
                 _userManager = value;
             }
         }
-
+        
         public ActionResult Orders()
         {
             ViewBag.Error = TempData["Error"];
@@ -71,7 +71,7 @@ namespace Ownorent.Controllers
             string userId = User.Identity.GetUserId();
             var orders = db.TransactionGroups
                 .Include(o=>o.Transactions)
-                .Where(p => p.UserId == userId);
+                .Where(o => o.UserId == userId && !o.Transactions.Any(t=>t.TransactionStatus == TransactionStatusConstant.PENDING));
 
             return View(orders.ToList());
         }

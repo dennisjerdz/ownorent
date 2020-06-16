@@ -423,7 +423,8 @@ namespace Ownorent.Controllers
                         ProductPrice = price,
                         ProductDailyRentPrice = dailyRentPrice,
                         TransactionStatus = TransactionStatusConstant.PENDING,
-                        TransactionType = item.CartType
+                        TransactionType = item.CartType,
+                        ShippingStatus = ShippingStatusConstant.PENDING
                     };
                     db.Transactions.Add(transactionPerProduct);
                     await db.SaveChangesAsync();
@@ -646,6 +647,9 @@ namespace Ownorent.Controllers
                     // change product availability
                     foreach(var transaction in transactions)
                     {
+                        // update shipping status to review, this will add the transaction to "TO SHIP" navigation
+                        transaction.ShippingStatus = ShippingStatusConstant.REVIEW;
+
                         if (transaction.TransactionType == TransactionTypeConstant.BUY)
                         {
                             transaction.TransactionStatus = TransactionStatusConstant.PAID;

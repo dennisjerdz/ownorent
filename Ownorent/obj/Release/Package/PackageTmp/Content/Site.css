@@ -577,6 +577,11 @@ table.dataTable thead .sorting_desc{
     text-align:right !important;
 }
 
+.table-options-120-center{
+    width:120px !important;
+    text-align:center !important;
+}
+
 .floating-cart{
     position:fixed;
     z-index: 999999999999999999;
@@ -614,6 +619,19 @@ table.dataTable thead .sorting_desc{
     border-radius:0px;
     border:none;
     border-bottom:1px solid rgba(0,0,0,0.2);
+}
+
+.table-inline-select{
+    font-size:0.95em;
+    width:120px !important;
+    display:inline-block !important;
+    text-align:right;
+    padding:0px;
+    height:auto !important;
+    border-radius:0px;
+    border:none;
+    border-bottom:1px solid rgba(0,0,0,0.2);
+    color:black;
 }
 
 .table-inline-input-date{

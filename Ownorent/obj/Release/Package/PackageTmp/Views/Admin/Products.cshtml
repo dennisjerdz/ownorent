@@ -102,7 +102,7 @@
                                     }
                                 </td>
                                 <td>
-                                    @item.Quantity
+                                    @item.Products.Count(p=>p.ProductStatus == ProductStatusConstant.AVAILABLE)
                                 </td>
                                 <td>
                                     @item.Price.ToString("C2", CultureInfo.GetCultureInfo("fil-PH"))

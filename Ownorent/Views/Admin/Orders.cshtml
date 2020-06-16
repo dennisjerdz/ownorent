@@ -1,0 +1,135 @@
+﻿@model IEnumerable<Ownorent.Models.TransactionGroup>
+@using Ownorent.Models
+@using System.Globalization
+@{
+    ViewBag.Title = "Orders";
+    ViewBag.bgColor = "#f8fafc";
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="ownorent-panel ownorent-panel-white marginTop15">
+            <div class="ownorent-panel-header" style="background-color:#71cd14; color:white;">
+
+            </div>
+
+            <div class="ownorent-panel-body ownorent-panel-tools">
+                <div class="row">
+                    <div class="col-md-4">
+                        <p>
+                            ORDERS
+
+                            @*
+                                @Html.ActionLink("Add Product", "Create", "Products", new { }, new { @class = "btn btn-xs btn-info" })
+                            *@
+                        </p>
+                    </div>
+                    <div class="col-md-3 col-md-offset-5">
+                        <input class="form-control all-search width100" placeholder="Search ..." />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="ownorent-panel ownorent-panel-white marginTop10">
+            <div class="ownorent-panel-header" style="background-color:#71cd14; color:white;">
+
+            </div>
+
+            <div class="ownorent-panel-body ownorent-panel-table">
+                <table class="table table-condensed table-hover ownorent-compact-table">
+                    <thead>
+                        <tr>
+                            <th>
+                                ID
+                            </th>
+                            <th>
+                                SHIPPING
+                            </th>
+                            <th>
+                                PAYMENT
+                            </th>
+                            <th>
+                                CREATED
+                            </th>
+                            <th></th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    OWNO-OR-<text>@item.TransactionGroupId</text>
+                                </td>
+                                <td style="font-size:0.9em;">
+                                    @if (item.Transactions.Any(t=>t.ShippingStatus == ShippingStatusConstant.REVIEW))
+                                    {
+                                        <span class="ownorent-text-orange">REVIEW </span>
+                                    }
+                                    @if (item.Transactions.Any(t => t.ShippingStatus == ShippingStatusConstant.PACKAGED))
+                                    {
+                                        <span class="ownorent-text-orange">PACKAGED </span>
+                                    }
+                                    @if (item.Transactions.Any(t => t.ShippingStatus == ShippingStatusConstant.IN_TRANSIT))
+                                    {
+                                        <span class="ownorent-text-orange">TRANSIT </span>
+                                    }
+                                    @if (item.Transactions.Any(t => t.ShippingStatus == ShippingStatusConstant.DELIVERED))
+                                    {
+                                        <span class="ownorent-text-ygreen">DELIVERED </span>
+                                    }
+                                    @if (item.Transactions.Any(t => t.ShippingStatus == ShippingStatusConstant.DELIVERED))
+                                    {
+                                        <span class="ownorent-text-red">FAILED </span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (item.Transactions.Any(t => t.TransactionStatus == TransactionStatusConstant.PARTIALLY_PAID))
+                                    {
+                                        <span class="ownorent-text-orange">PARTIALLY PAID</span>
+                                    }
+                                    else if (item.Transactions.Any(t => t.TransactionStatus == TransactionStatusConstant.PENDING))
+                                    {
+                                        <span class="ownorent-text-red">PENDING - NOT YET PAID</span>
+                                    }
+                                    else if (item.Transactions.Any(t => t.TransactionStatus == TransactionStatusConstant.PAID))
+                                    {
+                                        <span class="ownorent-text-ygreen">PAID</span>
+                                    }
+                                </td>
+                                <td>
+                                    @item.DateCreated.ToString("MM-dd-yyyy")
+                                </td>
+                                <td style="text-align:right;">
+                                    @Html.ActionLink("Manage", "ManageOrder", "Admin", new { id = item.TransactionGroupId }, new { @class = "btn btn-xs btn-primary" })
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script>
+        $(document).ready(function () {
+            var datatable = $("table").DataTable({
+                paging: true,
+                "pageLength": 10,
+                "dom": "<'table-window'<'table-responsive'rt>><'window-footer'<'col-md-6'i><'col-md-6'p>>",
+                "columnDefs": [
+                    { "orderable": false, "targets": 3 }
+                ]
+            });
+
+            $(".all-search").keyup(function () {
+                datatable.search($(this).val()).draw();
+            })
+        });
+    </script>
+}

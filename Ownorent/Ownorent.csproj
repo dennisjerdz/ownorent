@@ -275,6 +275,14 @@
     <Compile Include="Migrations\202006140704569_payment description property to indicate what month.Designer.cs">
       <DependentUpon>202006140704569_payment description property to indicate what month.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202006160805066_transaction history or notes.cs" />
+    <Compile Include="Migrations\202006160805066_transaction history or notes.Designer.cs">
+      <DependentUpon>202006160805066_transaction history or notes.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202006160847452_transaction shipping status.cs" />
+    <Compile Include="Migrations\202006160847452_transaction shipping status.Designer.cs">
+      <DependentUpon>202006160847452_transaction shipping status.cs</DependentUpon>
+    </Compile>
     <Compile Include="OwnorentHelper.cs" />
     <Compile Include="Migrations\202005290332179_initial.cs" />
     <Compile Include="Migrations\202005290332179_initial.Designer.cs">
@@ -397,10 +405,13 @@
     <Content Include="Views\Products\Cart.cshtml" />
     <Content Include="Views\Account\Orders.cshtml" />
     <Content Include="Views\Account\ViewOrder.cshtml" />
+    <Content Include="Views\Admin\Orders.cshtml" />
+    <Content Include="Views\Admin\ManageOrder.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Content\Uploads\Requirements\" />
+    <Folder Include="Migrations\202006160804450_transaction history\" />
     <Folder Include="Views\SMS\" />
   </ItemGroup>
   <ItemGroup>
@@ -465,6 +476,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202006140704569_payment description property to indicate what month.resx">
       <DependentUpon>202006140704569_payment description property to indicate what month.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202006160805066_transaction history or notes.resx">
+      <DependentUpon>202006160805066_transaction history or notes.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202006160847452_transaction shipping status.resx">
+      <DependentUpon>202006160847452_transaction shipping status.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
