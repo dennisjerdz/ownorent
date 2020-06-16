@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Ownorent.Models.TransactionGroup>
+﻿@model IEnumerable<Ownorent.Models.Category>
 @using Ownorent.Models
 @using System.Globalization
 @{
@@ -17,7 +17,7 @@
                 <div class="row">
                     <div class="col-md-4">
                         <p>
-                            ORDERS
+                            CATEGORIES
 
                             @*
                                 @Html.ActionLink("Add Product", "Create", "Products", new { }, new { @class = "btn btn-xs btn-info" })
@@ -41,16 +41,19 @@
                     <thead>
                         <tr>
                             <th>
-                                ID
+                                NAME
                             </th>
                             <th>
-                                SHIPPING
+                                NO OF PRODUCTS
                             </th>
                             <th>
-                                PAYMENT
+                                USEFUL LIFE
                             </th>
                             <th>
                                 CREATED
+                            </th>
+                            <th>
+                                LAST MODIFIED
                             </th>
                             <th></th>
                         </tr>
@@ -61,49 +64,27 @@
                         {
                             <tr>
                                 <td>
-                                    OWNO-OR-<text>@item.TransactionGroupId</text>
-                                </td>
-                                <td style="font-size:0.9em;">
-                                    @if (item.Transactions.Any(t=>t.ShippingStatus == ShippingStatusConstant.REVIEW))
-                                    {
-                                        <span class="ownorent-text-orange">REVIEW </span>
-                                    }
-                                    @if (item.Transactions.Any(t => t.ShippingStatus == ShippingStatusConstant.PACKAGED))
-                                    {
-                                        <span class="ownorent-text-orange">PACKAGED </span>
-                                    }
-                                    @if (item.Transactions.Any(t => t.ShippingStatus == ShippingStatusConstant.IN_TRANSIT))
-                                    {
-                                        <span class="ownorent-text-orange">TRANSIT </span>
-                                    }
-                                    @if (item.Transactions.Any(t => t.ShippingStatus == ShippingStatusConstant.DELIVERED))
-                                    {
-                                        <span class="ownorent-text-ygreen">DELIVERED </span>
-                                    }
-                                    @if (item.Transactions.Any(t => t.ShippingStatus == ShippingStatusConstant.DELIVERED))
-                                    {
-                                        <span class="ownorent-text-red">FAILED </span>
-                                    }
+                                    @item.CategoryName
                                 </td>
                                 <td>
-                                    @if (item.Transactions.Any(t => t.TransactionStatus == TransactionStatusConstant.PARTIALLY_PAID))
-                                    {
-                                        <span class="ownorent-text-orange">PARTIALLY PAID</span>
-                                    }
-                                    else if (item.Transactions.Any(t => t.TransactionStatus == TransactionStatusConstant.PENDING))
-                                    {
-                                        <span class="ownorent-text-red">PENDING - NOT YET PAID</span>
-                                    }
-                                    else if (item.Transactions.Any(t => t.TransactionStatus == TransactionStatusConstant.PAID))
-                                    {
-                                        <span class="ownorent-text-ygreen">PAID</span>
-                                    }
+                                    @item.ProductTemplates.Count()
+                                </td>
+                                <td>
+                                   @item.UsefulLifeSpan years
                                 </td>
                                 <td>
                                     @item.DateCreated.ToString("MM-dd-yyyy")
                                 </td>
+                                <td>
+                                    @item.DateLastModified.ToString("MM-dd-yyyy")
+                                </td>
                                 <td style="text-align:right;">
-                                    @Html.ActionLink("View", "ViewOrder", "Account", new { id = item.TransactionGroupId }, new { @class="btn btn-xs btn-primary" })
+                                    @Html.ActionLink("Edit", "EditCategory", "Admin", new { id = item.CategoryId }, new { @class = "btn btn-xs btn-primary" })
+
+                                    @if (item.ProductTemplates.Count == 0)
+                                    {
+                                        @Html.ActionLink("Delete", "DeleteCategory", "Admin", new { id = item.CategoryId }, new { @class = "btn btn-xs btn-danger" })
+                                    }
                                 </td>
                             </tr>
                         }
@@ -123,7 +104,7 @@
                 "pageLength": 10,
                 "dom": "<'table-window'<'table-responsive'rt>><'window-footer'<'col-md-6'i><'col-md-6'p>>",
                 "columnDefs": [
-                    { "orderable": false, "targets": 4 }
+                    { "orderable": false, "targets": 5 }
                 ]
             });
 

@@ -33,6 +33,17 @@ namespace Ownorent.Migrations
 
             /* Separator Separator Separator Separator Separator Separator Separator */
 
+            if (!context.Settings.Any(c => c.Code == "UPDATE_PRICE_LAST_RAN"))
+            {
+                context.Settings.Add(new Setting()
+                {
+                    Code = "UPDATE_PRICE_LAST_RAN",
+                    Value = "N/A",
+                    Description = "Indicates the date when the Update Price Task was last ran successfully.",
+                    IsActive = true
+                });
+            }
+
             if (!context.Settings.Any(c => c.Code == "PLATFORM_TAX_ORDER"))
             {
                 context.Settings.Add(new Setting()

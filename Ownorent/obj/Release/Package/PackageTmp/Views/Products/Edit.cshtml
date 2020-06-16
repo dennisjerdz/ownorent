@@ -261,20 +261,25 @@
                     var difference = dateDiff(datePurchased, dateNow);
 
                     var differenceInYears = (difference.years + (difference.months/12) + ((difference.days/30)/10));
-                    var differenceInYearsFinal = Math.round((differenceInYears + Number.EPSILON) * 100) / 100;
+                    // var differenceInYearsFinal = Math.round((differenceInYears + Number.EPSILON) * 100) / 100;
+                    var differenceInYearsFinal = differenceInYears;
 
                     var salvageValue = (price*(salvageValuePercent/100));
-                    var salvageValueFinal = Math.round((salvageValue + Number.EPSILON) * 100) / 100;
+                    // var salvageValueFinal = Math.round((salvageValue + Number.EPSILON) * 100) / 100;
+                    var salvageValueFinal = salvageValue.toFixed(2);
 
                     var salvageRentValue = price*(salvageRentValuePercent/100);
-                    var salvageRentValueFinal = Math.round((salvageRentValue + Number.EPSILON) * 100) / 100;
+                    // var salvageRentValueFinal = Math.round((salvageRentValue + Number.EPSILON) * 100) / 100;
+                    var salvageRentValueFinal = salvageRentValue.toFixed(2);
 
                     var annualDepreciation = (price - salvageValue) / usefulLife;
                     var computedPrice = price-(annualDepreciation*differenceInYearsFinal);
-                    var computedPriceFinal = Math.round((computedPrice + Number.EPSILON) * 100) / 100;
+                    // var computedPriceFinal = Math.round((computedPrice + Number.EPSILON) * 100) / 100;
+                    var computedPriceFinal = computedPrice.toFixed(2);
 
                     var computedDailyRentPrice = (computedPrice * (dailyRentPercentage/100));
-                    var computedDailyRentPriceFinal = Math.round((computedDailyRentPrice + Number.EPSILON) * 100) / 100;
+                    // var computedDailyRentPriceFinal = Math.round((computedDailyRentPrice + Number.EPSILON) * 100) / 100;
+                    var computedDailyRentPriceFinal = computedDailyRentPrice.toFixed(2);
 
                     if(computedPrice < salvageValue){
                         $("#ComputedPrice").val(salvageValueFinal);

@@ -730,6 +730,8 @@ namespace Ownorent.Controllers
                 .Include(p=>p.Products)
                 .Where(p => p.UserId == userId);
                 // .GroupBy(p=>p.Category.CategoryName);
+            
+            ViewBag.LastUpdate = db.Settings.FirstOrDefault(s => s.Code == "UPDATE_PRICE_LAST_RAN").Value;
 
             return View(await productTemplates.ToListAsync());
         }

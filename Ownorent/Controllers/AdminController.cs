@@ -63,6 +63,8 @@ namespace Ownorent.Controllers
                 p.DateLastModified = now;
             }
 
+            db.Settings.FirstOrDefault(s => s.Code == "UPDATE_PRICE_LAST_RAN").Value = now.ToString("MM-dd-yyyy hh:mm a");
+
             db.SaveChanges();
             TempData["Message"] = "<strong>Update Price ran successfully.</strong> Computed and Computed Daily Rent price have been updated.";
             return RedirectToAction("Products");
@@ -303,6 +305,8 @@ namespace Ownorent.Controllers
 
             var productTemplates = db.ProductTemplates
                 .Include(p => p.Category).Include(p=>p.Products);
+
+            ViewBag.LastUpdate = db.Settings.FirstOrDefault(s => s.Code == "UPDATE_PRICE_LAST_RAN").Value;
 
             return View(await productTemplates.ToListAsync());
         }
