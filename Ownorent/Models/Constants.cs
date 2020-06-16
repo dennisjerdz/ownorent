@@ -136,6 +136,7 @@ namespace Ownorent.Models
         public const int IN_TRANSIT = 4;
         public const int DELIVERED = 5;
         public const int FAILED_DELIVERY = 6;
+        public const int RETURNED = 7;
 
         public static List<ShippingStatusModel> StatusList = new List<ShippingStatusModel>()
         {
@@ -145,7 +146,8 @@ namespace Ownorent.Models
             new ShippingStatusModel() { Value = 3, Code = "READY_FOR_PICK_UP", Description = "READY FOR PICK UP" },
             new ShippingStatusModel() { Value = 4, Code = "IN_TRANSIT", Description = "IN TRANSIT" },
             new ShippingStatusModel() { Value = 5, Code = "DELIVERED", Description = "DELIVERED" },
-            new ShippingStatusModel() { Value = 6, Code = "FAILED_DELIVERY", Description = "FAILED DELIVERY" }
+            new ShippingStatusModel() { Value = 6, Code = "FAILED_DELIVERY", Description = "FAILED DELIVERY" },
+            new ShippingStatusModel() { Value = 7, Code = "RETURNED", Description = "RETURNED" }
         };
     }
 

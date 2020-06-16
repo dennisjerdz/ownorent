@@ -1,0 +1,64 @@
+﻿@model Ownorent.Models.Category
+@using Ownorent.Models
+@{
+    ViewBag.Title = "Edit Category";
+    ViewBag.bgColor = "#f8fafc";
+}
+
+<div class="row">
+    <div class="col-md-offset-3 col-md-6">
+        <div class="account-card">
+
+            <div class="ownorent-header-internal">
+                Edit Category: @Model.CategoryName
+            </div>
+
+            <!--<center>
+                <img src="~/Content/Images/logo.png" style="width:300px; transform:translate(0px)" />
+            </center>-->
+
+            @using (Html.BeginForm("EditCategory", "Admin", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+            {
+                @Html.AntiForgeryToken()
+                @Html.ValidationSummary("", new { @class = "text-danger" })
+                @Html.HiddenFor(s => s.CategoryId)
+
+                <div class="form-group">
+                    <div class="col-md-12">
+                        @Html.LabelFor(m => m.CategoryName, new { @class = "control-label" })
+                        @Html.TextBoxFor(m => m.CategoryName, new { @class = "form-control", @required = "true" })
+                    </div>
+                </div>
+
+                    <div class="form-group">
+                        <div class="col-md-12">
+                            @Html.LabelFor(m => m.UsefulLifeSpan, new { @class = "control-label" })
+                            @Html.TextBoxFor(m => m.UsefulLifeSpan, new { @class = "form-control", @type="number", @step="0.01" })
+                        </div>
+                    </div>
+
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <br />
+                        <input type="submit" class="btn btn-info btn-block" value="Save" />
+                        <br />
+                        <center>
+                            <p class="ownorent-text-orange">
+                                If Useful Life will be updated. Please run "Update Prices" Task.
+                            </p>
+                        </center>
+                        <br />
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script>
+        $(document).ready(function () {
+
+        });
+    </script>
+}

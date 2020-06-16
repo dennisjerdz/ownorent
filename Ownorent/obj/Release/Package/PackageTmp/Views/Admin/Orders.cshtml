@@ -44,6 +44,9 @@
                                 ID
                             </th>
                             <th>
+                                BUYER
+                            </th>
+                            <th>
                                 SHIPPING
                             </th>
                             <th>
@@ -62,6 +65,9 @@
                             <tr>
                                 <td>
                                     OWNO-OR-<text>@item.TransactionGroupId</text>
+                                </td>
+                                <td>
+                                    @item.User.Email
                                 </td>
                                 <td style="font-size:0.9em;">
                                     @if (item.Transactions.Any(t=>t.ShippingStatus == ShippingStatusConstant.REVIEW))
@@ -123,7 +129,7 @@
                 "pageLength": 10,
                 "dom": "<'table-window'<'table-responsive'rt>><'window-footer'<'col-md-6'i><'col-md-6'p>>",
                 "columnDefs": [
-                    { "orderable": false, "targets": 3 }
+                    { "orderable": false, "targets": 5 }
                 ]
             });
 

@@ -76,7 +76,7 @@ namespace Ownorent.Models
         public DateTime DateCreated { get; set; }
         public DateTime DateLastModified { get; set; }
 
-        public List<ProductTemplate> ProductTemplates { get; set; }
+        public virtual List<ProductTemplate> ProductTemplates { get; set; }
     }
 
     public class ProductTemplate {

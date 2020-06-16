@@ -21,6 +21,132 @@ namespace Ownorent.Controllers
     {
         private ApplicationDbContext db = new ApplicationDbContext();
 
+        public ActionResult UpdatePrices()
+        {
+            List<string> salvageProperties = new List<string>() { "COMPUTE_SALVAGE_VALUE_PERCENTAGE", "COMPUTE_SALVAGE_RENT_VALUE_PERCENTAGE", "COMPUTE_DAILY_RENT_PERCENTAGE" };
+            var salvageSettings = db.Settings.Where(s => salvageProperties.Contains(s.Code)).ToList();
+            var salvageValueSetting = salvageSettings.FirstOrDefault(s => s.Code == "COMPUTE_SALVAGE_VALUE_PERCENTAGE");
+            var salvageRentValueSetting = salvageSettings.FirstOrDefault(s => s.Code == "COMPUTE_SALVAGE_RENT_VALUE_PERCENTAGE");
+            var dailyRentPercentageSetting = salvageSettings.FirstOrDefault(s => s.Code == "COMPUTE_DAILY_RENT_PERCENTAGE");
+            
+            var products = db.ProductTemplates.Where(p => p.ProductTemplateStatus != ProductTemplateStatusConstant.REMOVED).ToList();
+
+            float salvageValuePercent = float.Parse(salvageValueSetting.Value) / 100;
+            float salvageRentValuePercent = float.Parse(salvageRentValueSetting.Value) / 100;
+            float dailyRentPercentage = float.Parse(dailyRentPercentageSetting.Value) / 100;
+
+            float salvageValue;
+            float salvageRentValue;
+            float annualDepreciation;
+            float computedPrice;
+            float computedDailyRentPrice;
+
+            DateTime datePurchased;
+            DateTime now = DateTime.UtcNow.AddHours(8);
+
+            foreach (var p in products)
+            {
+                datePurchased = p.DatePurchased;
+
+                var totalDays = Math.Round((now - datePurchased).TotalDays, 2);
+                float totalYears = (float) totalDays / 365;
+
+                salvageValue = (float)Math.Round((p.Price * salvageValuePercent), 2);
+                salvageRentValue = (float)Math.Round((p.Price * salvageRentValuePercent), 2);
+
+                annualDepreciation = (float)((p.Price - salvageValue) / p.Category.UsefulLifeSpan);
+                computedPrice = (float) Math.Round(p.Price - (annualDepreciation * totalYears), 2);
+                computedDailyRentPrice = (float) Math.Round((computedPrice * dailyRentPercentage), 2);
+
+                p.ComputedPrice = (computedPrice < salvageValue) ? salvageValue : computedPrice;
+                p.ComputedDailyRentPrice = (computedDailyRentPrice < salvageRentValue) ? salvageRentValue : computedDailyRentPrice;
+                p.DateLastModified = now;
+            }
+
+            db.SaveChanges();
+            TempData["Message"] = "<strong>Update Price ran successfully.</strong> Computed and Computed Daily Rent price have been updated.";
+            return RedirectToAction("Products");
+        }
+
+        public ActionResult Categories()
+        {
+            if (TempData["Error"] != null)
+            {
+                ViewBag.Error = TempData["Error"];
+            }
+            if (TempData["Message"] != null)
+            {
+                ViewBag.Message = TempData["Message"];
+            }
+
+            return View(db.Categories.ToList());
+        }
+
+        public ActionResult EditCategory(int id)
+        {
+            Category category = db.Categories.FirstOrDefault(c => c.CategoryId == id);
+
+            if (category != null)
+            {
+                return View(category);
+            }
+            else
+            {
+                return HttpNotFound();
+            }
+        }
+
+        [HttpPost]
+        public ActionResult EditCategory(Category category)
+        {
+            var editCategory = db.Categories.FirstOrDefault(c => c.CategoryId == category.CategoryId);
+
+            if (category != null)
+            {
+                editCategory.CategoryName = category.CategoryName;
+                editCategory.UsefulLifeSpan = category.UsefulLifeSpan;
+                editCategory.DateLastModified = DateTime.UtcNow.AddHours(8);
+                db.SaveChanges();
+
+                TempData["Message"] = "<strong>Category updated successfully.</strong> New useful life will be used on recompute.";
+            }
+            else
+            {
+                TempData["Error"] = "1";
+                TempData["Message"] = "<strong>Category update failed.</strong> Category ID not found.";
+            }
+
+            return RedirectToAction("Categories");
+        }
+
+        public ActionResult DeleteCategory(int id)
+        {
+            Category category = db.Categories.FirstOrDefault(c => c.CategoryId == id);
+
+            if (category != null)
+            {
+                if (category.ProductTemplates.Count > 0)
+                {
+                    TempData["Error"] = "1";
+                    TempData["Message"] = "<strong>Category deletion failed.</strong> There are Products using this Category.";
+                    return RedirectToAction("Categories");
+                }
+                else
+                {
+                    db.Categories.Remove(category);
+                    db.SaveChanges();
+                    TempData["Message"] = "<strong>Category deleted successfully.</strong>";
+                    return RedirectToAction("Categories");
+                }
+            }
+            else
+            {
+                TempData["Error"] = "1";
+                TempData["Message"] = "<strong>Category deletion failed.</strong> Category ID not found.";
+                return RedirectToAction("Categories");
+            }
+        }
+
         public async Task<ActionResult> Orders()
         {
             if (TempData["Error"] != null)
