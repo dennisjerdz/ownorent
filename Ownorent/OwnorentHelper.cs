@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Net.Mail;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
@@ -92,7 +93,6 @@ namespace Ownorent
             }
         */
 
-
         // Paypal doesn't need access token IF you pass basic authentication header for every request
         public static async Task<string> GetAccessToken()
         {
@@ -140,5 +140,38 @@ namespace Ownorent
                 return new AuthenticationHeaderValue("Basic", Convert.ToBase64String(BasicAuthenticationHeaderByte));
             }    
         }
+
+        public static void SendEmail(string email, string firstName, string msg)
+        {
+            Task.Run(() =>
+            {
+                string body = msg;
+
+                MailAddress fromAddress = new MailAddress("ownorent@gmail.com", "Ownorent Registration Service");
+                MailAddress toAddress = new MailAddress(email, firstName);
+                string fromPassword = "ownorent$123456";
+                string subject = "Ownorent Product Application - " + DateTime.UtcNow.AddHours(8).ToString("MM-dd-yy");
+
+                SmtpClient smtp = new SmtpClient()
+                {
+                    Host = "smtp.gmail.com",
+                    Port = 587,
+                    EnableSsl = true,
+                    DeliveryMethod = SmtpDeliveryMethod.Network,
+                    UseDefaultCredentials = false,
+                    Credentials = new System.Net.NetworkCredential(fromAddress.Address, fromPassword)
+                };
+
+                MailMessage message = new MailMessage(fromAddress, toAddress)
+                {
+                    Subject = subject,
+                    Body = body
+                };
+                message.CC.Add(new MailAddress(email));
+
+                smtp.Send(message);
+            });
+        }
+
     }
 }

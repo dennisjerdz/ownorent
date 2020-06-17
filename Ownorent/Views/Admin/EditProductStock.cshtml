@@ -1,0 +1,51 @@
+﻿@model Ownorent.Models.Product
+@using Ownorent.Models
+@{
+    ViewBag.Title = "Edit Product";
+    ViewBag.bgColor = "#f8fafc";
+}
+
+<div class="row">
+    <div class="col-md-offset-3 col-md-6">
+        <div class="account-card">
+
+            <div class="ownorent-header-internal">
+                Edit Product: @Model.ProductName
+            </div>
+
+            <!--<center>
+                <img src="~/Content/Images/logo.png" style="width:300px; transform:translate(0px)" />
+            </center>-->
+
+            @using (Html.BeginForm("EditProductStock", "Admin", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+            {
+                @Html.AntiForgeryToken()
+                @Html.ValidationSummary("", new { @class = "text-danger" })
+                @Html.HiddenFor(s => s.ProductId)
+
+                <div class="form-group">
+                    <div class="col-md-12">
+                        @Html.LabelFor(m => m.ProductSerialNumber, new { @class = "control-label" })
+                        @Html.TextBoxFor(m => m.ProductSerialNumber, new { @class = "form-control", @required = "true" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <br />
+                        <input type="submit" class="btn btn-info btn-block" value="Save" />
+                        <br />
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script>
+        $(document).ready(function () {
+
+        });
+    </script>
+}

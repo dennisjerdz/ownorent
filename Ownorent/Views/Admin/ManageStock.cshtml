@@ -1,0 +1,116 @@
+﻿@model IEnumerable<Ownorent.Models.Product>
+@using Ownorent.Models
+@using System.Globalization
+@{
+    ViewBag.Title = "Orders";
+    ViewBag.bgColor = "#f8fafc";
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="ownorent-panel ownorent-panel-white marginTop15">
+            <div class="ownorent-panel-header" style="background-color:#71cd14; color:white;">
+
+            </div>
+
+            <div class="ownorent-panel-body ownorent-panel-tools">
+                <div class="row">
+                    <div class="col-md-9">
+                        <p>
+                            PRODUCT STOCKS
+
+                            @*
+                                @Html.ActionLink("Add Product", "Create", "Products", new { }, new { @class = "btn btn-xs btn-info" })
+                            *@
+                        </p>
+                    </div>
+                    <div class="col-md-3">
+                        <input class="form-control all-search width100" placeholder="Search ..." />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="ownorent-panel ownorent-panel-white marginTop10">
+            <div class="ownorent-panel-header" style="background-color:#71cd14; color:white;">
+
+            </div>
+
+            <div class="ownorent-panel-body ownorent-panel-table">
+                <table class="table table-condensed table-hover ownorent-compact-table">
+                    <thead>
+                        <tr>
+                            <th>
+                                NAME
+                            </th>
+                            <th>
+                                SERIAL NUMBER
+                            </th>
+                            <th>
+                                STATUS
+                            </th>
+                            <th>
+                                CREATED
+                            </th>
+                            <th>
+                                LAST MODIFIED
+                            </th>
+                            <th></th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    @item.ProductName
+                                </td>
+                                <td>
+                                    @item.ProductSerialNumber
+                                </td>
+                                <td>
+                                   @ProductStatusConstant.StatusList.FirstOrDefault(s => s.Value == item.ProductStatus).Description
+                                </td>
+                                <td>
+                                    @item.DateCreated.ToString("MM-dd-yyyy")
+                                </td>
+                                <td>
+                                    @item.DateLastModified.ToString("MM-dd-yyyy")
+                                </td>
+                                <td style="text-align:right;">
+                                    @Html.ActionLink("Edit", "EditProductStock", "Admin", new { id = item.ProductId }, new { @class = "btn btn-xs btn-info" })
+
+                                    @if (item.ProductStatus == ProductStatusConstant.REQUESTED_REMOVAL)
+                                    {
+                                        @Html.ActionLink("Approve PULL OUT", "ApprovePullout", "Admin", new { id = item.ProductId }, new { @class = "btn btn-xs btn-warning", @title="Cancel Pull out Request" })
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script>
+        $(document).ready(function () {
+            var datatable = $("table").DataTable({
+                paging: true,
+                "pageLength": 10,
+                "dom": "<'table-window'<'table-responsive'rt>><'window-footer'<'col-md-6'i><'col-md-6'p>>",
+                "columnDefs": [
+                    { "orderable": false, "targets": 5 }
+                ]
+            });
+
+            $(".all-search").keyup(function () {
+                datatable.search($(this).val()).draw();
+            })
+        });
+    </script>
+}

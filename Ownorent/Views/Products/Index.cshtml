@@ -116,12 +116,20 @@
                                     @item.DateCreated.ToString("MM-dd-yyyy")
                                 </td>
                                 <td style="text-align:right;">
-                                    @if (item.ProductTemplateStatus != ProductTemplateStatusConstant.REMOVED && item.ProductTemplateStatus != ProductTemplateStatusConstant.PENDING_REVIEW)
-                                    {
-                                        @Html.ActionLink("Edit", "Edit", new { id = item.ProductTemplateId }, new { @class = "btn btn-xs btn-warning" })
-                                    }
-
-                                    @Html.ActionLink("Images", "Images", new { id = item.ProductTemplateId }, new { @class="btn btn-xs btn-primary" })
+                                    <div class="dropdown ownorent-dropdown-button">
+                                        <button class="btn btn-xs btn-default ownorent-dropdown-button dropdown-toggle" type="button" data-toggle="dropdown">
+                                            Options
+                                            <span class="caret"></span>
+                                        </button>
+                                        <ul class="dropdown-menu ownorent-dropdown-menu ownorent-dropdown-menu-right">
+                                            @if (item.ProductTemplateStatus != ProductTemplateStatusConstant.REMOVED && item.ProductTemplateStatus != ProductTemplateStatusConstant.PENDING_REVIEW)
+                                            {
+                                                <li>@Html.ActionLink("Edit", "Edit", new { id = item.ProductTemplateId }, new { })</li>
+                                            }
+                                            <li>@Html.ActionLink("Images", "Images", new { id = item.ProductTemplateId })</li>
+                                            <li>@Html.ActionLink("Manage Stock", "ManageStock", new { id = item.ProductTemplateId })</li>
+                                        </ul>
+                                    </div>
 
                                     @if (item.ProductTemplateStatus == ProductTemplateStatusConstant.PENDING_REVIEW || item.ProductTemplateStatus == ProductTemplateStatusConstant.PENDING_WAREHOUSE_ARRIVAL)
                                     {

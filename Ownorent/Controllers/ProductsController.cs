@@ -23,6 +23,96 @@ namespace Ownorent.Controllers
     {
         private ApplicationDbContext db = new ApplicationDbContext();
 
+        public ActionResult ManageStock(int id)
+        {
+            if (TempData["Error"] != null)
+            {
+                ViewBag.Error = TempData["Error"];
+            }
+            if (TempData["Message"] != null)
+            {
+                ViewBag.Message = TempData["Message"];
+            }
+
+            var products = db.Products.Where(p => p.ProductTemplateId == id).ToList();
+
+            return View(products);
+        }
+
+        public ActionResult EditProductStock(int id)
+        {
+            Product editProduct = db.Products.FirstOrDefault(p => p.ProductId == id);
+
+            if (editProduct != null)
+            {
+                return View(editProduct);
+            }
+            else
+            {
+                TempData["Error"] = "1";
+                TempData["Message"] = "<strong>Product access failed.</strong> Product ID does not exist in the DB.";
+                return RedirectToAction("Products");
+            }
+        }
+
+        public ActionResult RequestPullOut(int id)
+        {
+            Product product = db.Products.FirstOrDefault(p => p.ProductId == id);
+
+            if (product != null)
+            {
+                TempData["Message"] = "<strong>Product status updated successfully.</strong> Product has been requested for PULL OUT.";
+                product.ProductStatus = ProductStatusConstant.REQUESTED_REMOVAL;
+                db.SaveChanges();
+            }
+            else
+            {
+                TempData["Error"] = "1";
+                TempData["Message"] = "<strong>Product update failed.</strong> Product ID does not exist in the DB.";
+            }
+
+            return RedirectToAction("ManageStock", new { id = product.ProductTemplateId });
+        }
+
+        public ActionResult CancelPullOut(int id)
+        {
+            Product product = db.Products.FirstOrDefault(p => p.ProductId == id);
+
+            if (product != null)
+            {
+                TempData["Message"] = "<strong>Product status updated successfully.</strong> PULL OUT request has been cancelled.";
+                product.ProductStatus = ProductStatusConstant.AVAILABLE;
+                db.SaveChanges();
+            }
+            else
+            {
+                TempData["Error"] = "1";
+                TempData["Message"] = "<strong>Product update failed.</strong> Product ID does not exist in the DB.";
+            }
+
+            return RedirectToAction("ManageStock", new { id = product.ProductTemplateId });
+        }
+
+        [HttpPost]
+        public ActionResult EditProductStock(Product product)
+        {
+            Product editProduct = db.Products.FirstOrDefault(p => p.ProductId == product.ProductId);
+
+            if (editProduct != null)
+            {
+                TempData["Message"] = "<strong>Product updated successfully.</strong>";
+                editProduct.ProductSerialNumber = product.ProductSerialNumber;
+                db.SaveChanges();
+            }
+            else
+            {
+                TempData["Error"] = "1";
+                TempData["Message"] = "<strong>Product update failed.</strong> Product ID does not exist in the DB.";
+            }
+
+            return RedirectToAction("ManageStock", new { id = editProduct.ProductTemplateId });
+        }
+
         public async Task<ActionResult> p(string search, int? page, int? category)
         {
             IQueryable<ProductTemplate> products;

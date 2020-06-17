@@ -21,6 +21,103 @@ namespace Ownorent.Controllers
     {
         private ApplicationDbContext db = new ApplicationDbContext();
 
+        public ActionResult ProductsRequestedPullOut()
+        {
+            if (TempData["Error"] != null)
+            {
+                ViewBag.Error = TempData["Error"];
+            }
+            if (TempData["Message"] != null)
+            {
+                ViewBag.Message = TempData["Message"];
+            }
+
+            ViewBag.LastUpdate = db.Settings.FirstOrDefault(s => s.Code == "UPDATE_PRICE_LAST_RAN").Value;
+
+            return View("Products", db.ProductTemplates.Include(t=>t.Products).Where(t=>t.Products.Any(p=>p.ProductStatus == ProductStatusConstant.REQUESTED_REMOVAL)).ToList());
+        }
+
+        public ActionResult ManageStock(int id)
+        {
+            if (TempData["Error"] != null)
+            {
+                ViewBag.Error = TempData["Error"];
+            }
+            if (TempData["Message"] != null)
+            {
+                ViewBag.Message = TempData["Message"];
+            }
+
+            var products = db.Products.Where(p => p.ProductTemplateId == id).ToList();
+
+            return View(products);
+        }
+
+        public ActionResult EditProductStock(int id)
+        {
+            Product editProduct = db.Products.FirstOrDefault(p => p.ProductId == id);
+
+            if (editProduct != null)
+            {
+                return View(editProduct);
+            }
+            else
+            {
+                TempData["Error"] = "1";
+                TempData["Message"] = "<strong>Product access failed.</strong> Product ID does not exist in the DB.";
+                return RedirectToAction("Products");
+            }
+        }
+
+        public ActionResult ApprovePullOut(int id)
+        {
+            Product product = db.Products.FirstOrDefault(p => p.ProductId == id);
+
+            if (product != null)
+            {
+                TempData["Message"] = "<strong>Product status updated successfully.</strong> PULL OUT has been approved. User will be notified for instructions.";
+                product.ProductStatus = ProductStatusConstant.REMOVED;
+                db.SaveChanges();
+
+                try
+                {
+                    string msg = $"Your pull out request for product; {product.ProductName} has been approved. Please contact us for additional shipping/pickup instructions.";
+                    OwnorentHelper.SendEmail(product.ProductTemplate.User.Email, product.ProductTemplate.User.FirstName, msg);
+                }
+                catch (Exception e)
+                {
+
+                }
+            }
+            else
+            {
+                TempData["Error"] = "1";
+                TempData["Message"] = "<strong>Product update failed.</strong> Product ID does not exist in the DB.";
+            }
+
+            return RedirectToAction("ManageStock", new { id = product.ProductTemplateId });
+        }
+
+        [HttpPost]
+        public ActionResult EditProductStock(Product product)
+        {
+            Product editProduct = db.Products.FirstOrDefault(p => p.ProductId == product.ProductId);
+
+            if (editProduct != null)
+            {
+                TempData["Message"] = "<strong>Product updated successfully.</strong>";
+                editProduct.ProductSerialNumber = product.ProductSerialNumber;
+                db.SaveChanges();
+            }
+            else
+            {
+                TempData["Error"] = "1";
+                TempData["Message"] = "<strong>Product update failed.</strong> Product ID does not exist in the DB.";
+            }
+
+            return RedirectToAction("ManageStock", new { id = editProduct.ProductTemplateId });
+        }
+
         public ActionResult UpdatePrices()
         {
             List<string> salvageProperties = new List<string>() { "COMPUTE_SALVAGE_VALUE_PERCENTAGE", "COMPUTE_SALVAGE_RENT_VALUE_PERCENTAGE", "COMPUTE_DAILY_RENT_PERCENTAGE" };
