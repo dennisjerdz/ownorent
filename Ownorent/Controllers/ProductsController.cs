@@ -34,6 +34,8 @@ namespace Ownorent.Controllers
                     ProductId = product.ProductTemplateId,
                     ProductName = product.ProductName,
                     Attachments = product.Attachment,
+                    SellerEmail = product.User.Email,
+                    SellerFirstName = product.User.FirstName,
                     ProductDescription = product.ProductDescription
                 };
 

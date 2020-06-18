@@ -21,8 +21,11 @@
 
             <div class="col-md-5">
                 <h4>@Model.ProductName</h4>
-
+                <hr style="margin:8px;"/>
                 <div>@Html.Raw(Model.ProductDescription)</div>
+                <hr style="margin:8px;" />
+                <p>Sold by:</p>
+                <h6>@Model.SellerEmail - @Model.SellerFirstName</h6>
             </div>
         </div>
     </div>

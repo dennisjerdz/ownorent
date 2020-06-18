@@ -623,6 +623,8 @@ namespace Ownorent.Models
         public int ProductId { get; set; }
         public string ProductName { get; set; }
         public string ProductDescription { get; set; }
+        public string SellerEmail { get; set; }
+        public string SellerFirstName { get; set; }
         public List<ProductTemplateAttachment> Attachments { get; set; }
     }
 }
