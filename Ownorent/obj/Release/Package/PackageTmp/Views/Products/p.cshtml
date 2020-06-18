@@ -85,18 +85,23 @@
                             }
                         </div>
 
-                        @if (item.Attachment.FirstOrDefault() != null)
+                        @using (Ajax.BeginForm("ViewProductInfo", new { productId = item.ProductTemplateId }, new AjaxOptions { OnComplete = "ViewProductInfoDone", HttpMethod = "GET", InsertionMode = InsertionMode.Replace, UpdateTargetId = "ViewProductInfoModal-body" }, new { @id = "ViewProductInfo-form" }))
                         {
-                            <div class="ownorent-product-card-bg-container">
-                                <div class="ownorent-product-card-bg" style="background:url('@Url.Content("~/Content/Uploads/Images/"+item.Attachment.FirstOrDefault().Location)')"></div>
-                                <div class="ownorent-product-card-img" style="background:url('@Url.Content("~/Content/Uploads/Images/"+item.Attachment.FirstOrDefault().Location)')"></div>
-                            </div>
-                        }
-                        else
-                        {
-                            <div class="ownorent-product-card-bg-container">
-                                <div class="ownorent-product-card-img-no-pic ownorent-bg-silver" style="background:url('https://cdn0.iconfinder.com/data/icons/gray-business-toolbar/512/product-3-512.png')"></div>
-                            </div>
+                            <input type="hidden" name="id" value="@item.ProductTemplateId" />
+
+                            if (item.Attachment.FirstOrDefault() != null)
+                            {
+                                <div class="ownorent-product-card-bg-container product-view-trigger">
+                                    <div class="ownorent-product-card-bg" style="background:url('@Url.Content("~/Content/Uploads/Images/"+item.Attachment.FirstOrDefault().Location)')"></div>
+                                    <div class="ownorent-product-card-img" style="background:url('@Url.Content("~/Content/Uploads/Images/"+item.Attachment.FirstOrDefault().Location)')"></div>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="ownorent-product-card-bg-container product-view-trigger">
+                                    <div class="ownorent-product-card-img-no-pic ownorent-bg-silver" style="background:url('https://cdn0.iconfinder.com/data/icons/gray-business-toolbar/512/product-3-512.png')"></div>
+                                </div>
+                            }
                         }
 
                         <div class="ownorent-product-card-info">
@@ -197,9 +202,23 @@
     </div>
 </div>
 
+<div id="ViewProductInfoModal" class="modal fade" role="dialog">
+    <div class="modal-dialog" id="ViewProductInfoModal-body">
+
+    </div>
+</div>
+
 @section scripts{
     <script>
+        function ViewProductInfoDone() {
+            $("#ViewProductInfoModal").modal('show');
+        }
+
         $(document).ready(function () {
+
+            $(".product-view-trigger").click(function () {
+                $(this).closest("#ViewProductInfo-form").submit();
+            });
 
             $(".all-search").keyup(function () {
                 datatable.search($(this).val()).draw();
