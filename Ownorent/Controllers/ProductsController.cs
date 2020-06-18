@@ -25,13 +25,14 @@ namespace Ownorent.Controllers
 
         public PartialViewResult ViewProductInfo(int id, int productId)
         {
-            var product = db.ProductTemplates.FirstOrDefault(p => p.ProductTemplateId == id);
+            var product = db.ProductTemplates.Include(p=>p.Attachment).FirstOrDefault(p => p.ProductTemplateId == id);
 
             if (product != null)
             {
                 ProductViewInfoModel viewModel = new ProductViewInfoModel()
                 {
                     ProductId = product.ProductTemplateId,
+                    ProductName = product.ProductName,
                     Attachments = product.Attachment,
                     ProductDescription = product.ProductDescription
                 };

@@ -85,7 +85,7 @@
                             }
                         </div>
 
-                        @using (Ajax.BeginForm("ViewProductInfo", new { productId = item.ProductTemplateId }, new AjaxOptions { OnComplete = "ViewProductInfo", HttpMethod = "GET", InsertionMode = InsertionMode.Replace, UpdateTargetId = "#ViewProductInfoModal-body" }, new { @id = "ViewProductInfo-form" }))
+                        @using (Ajax.BeginForm("ViewProductInfo", new { productId = item.ProductTemplateId }, new AjaxOptions { OnComplete = "ViewProductInfoDone", HttpMethod = "GET", InsertionMode = InsertionMode.Replace, UpdateTargetId = "ViewProductInfoModal-body" }, new { @id = "ViewProductInfo-form" }))
                         {
                             <input type="hidden" name="id" value="@item.ProductTemplateId" />
 
@@ -203,36 +203,21 @@
 </div>
 
 <div id="ViewProductInfoModal" class="modal fade" role="dialog">
-    <div class="modal-dialog">
-
-        <!-- Modal content-->
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">Modal Header</h4>
-            </div>
-            <div class="modal-body" id="ViewProductInfoModal-body">
-                <p>Some text in the modal.</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-            </div>
-        </div>
+    <div class="modal-dialog" id="ViewProductInfoModal-body">
 
     </div>
 </div>
 
 @section scripts{
     <script>
-        function ViewProductInfo() {
-            $(".ViewProductInfoModal").modal('show');
-            alert("Done!");
+        function ViewProductInfoDone() {
+            $("#ViewProductInfoModal").modal('show');
         }
 
         $(document).ready(function () {
 
             $(".product-view-trigger").click(function () {
-                $("#ViewProductInfo-form").submit();
+                $(this).closest("#ViewProductInfo-form").submit();
             });
 
             $(".all-search").keyup(function () {

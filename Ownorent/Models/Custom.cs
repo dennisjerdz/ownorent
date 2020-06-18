@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Web;
+using System.Web.Mvc;
 
 namespace Ownorent.Models
 {
@@ -101,6 +102,7 @@ namespace Ownorent.Models
         public string ProductName { get; set; }
         [Required]
         [Display(Name = "Description")]
+        [AllowHtml]
         public string ProductDescription { get; set; }
         [Display(Name = "Invoice Description")]
         public string InvoiceDescription { get; set; }
@@ -619,6 +621,7 @@ namespace Ownorent.Models
     public class ProductViewInfoModel
     {
         public int ProductId { get; set; }
+        public string ProductName { get; set; }
         public string ProductDescription { get; set; }
         public List<ProductTemplateAttachment> Attachments { get; set; }
     }

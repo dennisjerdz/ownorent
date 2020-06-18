@@ -3,5 +3,30 @@
     ViewBag.Title = "_productViewInfo";
 }
 
-<h1>@Model.ProductId</h1>
+<div class="modal-content">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">@Model.ProductName</h4>
+    </div>
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-md-8">
+                <div class="photo-slider" style="overflow-y:auto;">
+                    @foreach (var item in Model.Attachments)
+                    {
+                        <img style="width:100%; display:block; margin-bottom:12px;" src="@Url.Content("~/Content/Uploads/Images/"+item.Location)" />
+                    }
+                </div>
+            </div>
 
+            <div class="col-md-4">
+                <h4>@Model.ProductName</h4>
+
+                <div>@Html.Raw(Model.ProductDescription)</div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+    </div>
+</div>
