@@ -11,7 +11,7 @@
     <div class="modal-body">
         <div class="row">
             <div class="col-md-7">
-                <div class="photo-slider" style="overflow-y:auto;">
+                <div class="photo-slider" style="overflow-y:auto; max-height:700px;">
                     @foreach (var item in Model.Attachments)
                     {
                         <img style="width:100%; display:block; margin-bottom:12px;" src="@Url.Content("~/Content/Uploads/Images/"+item.Location)" />
