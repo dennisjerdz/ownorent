@@ -6,6 +6,10 @@
     Dark Gray #1b222c
 */
 
+.product-view-trigger{
+    cursor: pointer;
+}
+
 .ownorent-dropdown-menu-right{
     left:unset !important;
     right:0;

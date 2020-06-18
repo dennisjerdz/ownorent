@@ -23,6 +23,25 @@ namespace Ownorent.Controllers
     {
         private ApplicationDbContext db = new ApplicationDbContext();
 
+        public PartialViewResult ViewProductInfo(int id, int productId)
+        {
+            var product = db.ProductTemplates.FirstOrDefault(p => p.ProductTemplateId == id);
+
+            if (product != null)
+            {
+                ProductViewInfoModel viewModel = new ProductViewInfoModel()
+                {
+                    ProductId = product.ProductTemplateId,
+                    Attachments = product.Attachment,
+                    ProductDescription = product.ProductDescription
+                };
+
+                return PartialView("_productViewInfo", viewModel);
+            }
+
+            return PartialView("_productViewInfo", null);
+        }
+
         public ActionResult ManageStock(int id)
         {
             if (TempData["Error"] != null)

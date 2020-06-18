@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Ownorent.Models.Category>
+﻿@model IEnumerable<Ownorent.Models.Product>
 @using Ownorent.Models
 @using System.Globalization
 @{
@@ -15,15 +15,16 @@
 
             <div class="ownorent-panel-body ownorent-panel-tools">
                 <div class="row">
-                    <div class="col-md-4">
+                    <div class="col-md-9">
                         <p>
-                            CATEGORIES
+                            PRODUCT STOCKS
 
-                            
-                            @Html.ActionLink("Add Category", "AddCategory", "Admin", new { }, new { @class = "btn btn-xs btn-info" })
+                            @*
+                                @Html.ActionLink("Add Product", "Create", "Products", new { }, new { @class = "btn btn-xs btn-info" })
+                            *@
                         </p>
                     </div>
-                    <div class="col-md-3 col-md-offset-5">
+                    <div class="col-md-3">
                         <input class="form-control all-search width100" placeholder="Search ..." />
                     </div>
                 </div>
@@ -43,10 +44,10 @@
                                 NAME
                             </th>
                             <th>
-                                NO OF PRODUCTS
+                                SERIAL NUMBER
                             </th>
                             <th>
-                                USEFUL LIFE
+                                STATUS
                             </th>
                             <th>
                                 CREATED
@@ -63,13 +64,13 @@
                         {
                             <tr>
                                 <td>
-                                    @item.CategoryName
+                                    @item.ProductName
                                 </td>
                                 <td>
-                                    @item.ProductTemplates.Count()
+                                    @item.ProductSerialNumber
                                 </td>
                                 <td>
-                                   @item.UsefulLifeSpan years
+                                   @ProductStatusConstant.StatusList.FirstOrDefault(s => s.Value == item.ProductStatus).Description
                                 </td>
                                 <td>
                                     @item.DateCreated.ToString("MM-dd-yyyy")
@@ -78,11 +79,16 @@
                                     @item.DateLastModified.ToString("MM-dd-yyyy")
                                 </td>
                                 <td style="text-align:right;">
-                                    @Html.ActionLink("Edit", "EditCategory", "Admin", new { id = item.CategoryId }, new { @class = "btn btn-xs btn-primary" })
+                                    @Html.ActionLink("Edit", "EditProductStock", "Products", new { id = item.ProductId }, new { @class = "btn btn-xs btn-info" })
 
-                                    @if (item.ProductTemplates.Count == 0)
+                                    @if (item.ProductStatus == ProductStatusConstant.AVAILABLE)
                                     {
-                                        @Html.ActionLink("Delete", "DeleteCategory", "Admin", new { id = item.CategoryId }, new { @class = "btn btn-xs btn-danger" })
+                                        @Html.ActionLink("Request PULL OUT", "RequestPullOut", "Products", new { id = item.ProductId }, new { @class = "btn btn-xs btn-danger" })
+                                    }
+
+                                    @if (item.ProductStatus == ProductStatusConstant.REQUESTED_REMOVAL)
+                                    {
+                                        @Html.ActionLink("Cancel PULL OUT Request", "CancelPullOut", "Products", new { id = item.ProductId }, new { @class = "btn btn-xs btn-warning" })
                                     }
                                 </td>
                             </tr>

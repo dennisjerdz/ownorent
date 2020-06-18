@@ -181,6 +181,36 @@ namespace Ownorent.Controllers
             return View(db.Categories.ToList());
         }
 
+        public ActionResult AddCategory()
+        {
+            if (TempData["Error"] != null)
+            {
+                ViewBag.Error = TempData["Error"];
+            }
+            if (TempData["Message"] != null)
+            {
+                ViewBag.Message = TempData["Message"];
+            }
+
+            return View();
+        }
+
+        [HttpPost]
+        public ActionResult AddCategory(Category category)
+        {
+            if (ModelState.IsValid)
+            {
+                db.Categories.Add(new Category() { CategoryName = category.CategoryName, UsefulLifeSpan = category.UsefulLifeSpan });
+                db.SaveChanges();
+                TempData["Message"] = "<strong>Category has been added successfully.</strong>";
+                return RedirectToAction("Categories");
+            }
+            else
+            {
+                return View(category);
+            }
+        }
+
         public ActionResult EditCategory(int id)
         {
             Category category = db.Categories.FirstOrDefault(c => c.CategoryId == id);

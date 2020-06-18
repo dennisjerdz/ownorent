@@ -615,4 +615,11 @@ namespace Ownorent.Models
         public int TransactionId { get; set; }
         public int ShippingStatus { get; set; }
     }
+
+    public class ProductViewInfoModel
+    {
+        public int ProductId { get; set; }
+        public string ProductDescription { get; set; }
+        public List<ProductTemplateAttachment> Attachments { get; set; }
+    }
 }
