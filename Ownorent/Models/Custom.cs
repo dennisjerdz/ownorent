@@ -405,11 +405,12 @@ namespace Ownorent.Models
         public DateTime DateLastModified { get; set; }
 
         public DateTime? DateDue { get; set; }
+        public int SellerPaymentStatus { get; set; }
 
         public int TransactionId { get; set; }
         [ForeignKey("TransactionId")]
         public virtual Transaction Transaction { get; set; }
-
+        
         public int? TransactionGroupPaymentAttemptId { get; set; }
         [ForeignKey("TransactionGroupPaymentAttemptId")]
         public virtual TransactionGroupPaymentAttempt TransactionGroupPaymentAttempt { get; set; }

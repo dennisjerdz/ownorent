@@ -170,4 +170,12 @@ namespace Ownorent.Models
         public const int PENDING = 0;
         public const int SUCCESS = 1;
     }
+
+    public class SellerPayoutStatusConstant
+    {
+        public const int PENDING = 0;
+        public const int REQUESTED = 1;
+        public const int APPROVED = 2;
+        public const int SENT = 3;
+    }
 }

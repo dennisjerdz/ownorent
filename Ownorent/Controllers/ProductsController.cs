@@ -548,6 +548,7 @@ namespace Ownorent.Controllers
                                 Amount = price,
                                 TransactionId = transactionPerProduct.TransactionId,
                                 TransactionGroupPaymentAttemptId = tgPaymentAttempt.TransactionGroupPaymentAttemptId,
+                                SellerPaymentStatus = SellerPayoutStatusConstant.PENDING,
                                 DateDue = DateTime.UtcNow.AddHours(8)
                             });
 
@@ -582,6 +583,7 @@ namespace Ownorent.Controllers
                                             TransactionId = transactionPerProduct.TransactionId,
                                             TransactionGroupPaymentAttemptId = paymentAttemptId,
                                             Description = "Payment "+(breakdown+1).ToString(),
+                                            SellerPaymentStatus = SellerPayoutStatusConstant.PENDING,
                                             DateDue = DateTime.UtcNow.AddHours(8).AddMonths(breakdown)
                                         });
                                     }
@@ -594,6 +596,7 @@ namespace Ownorent.Controllers
                                             TransactionId = transactionPerProduct.TransactionId,
                                             TransactionGroupPaymentAttemptId = null,
                                             Description = "Payment " + breakdown.ToString(),
+                                            SellerPaymentStatus = SellerPayoutStatusConstant.PENDING,
                                             DateDue = DateTime.UtcNow.AddHours(8).AddMonths(breakdown - 1)
                                         });
                                     }
@@ -611,6 +614,7 @@ namespace Ownorent.Controllers
                                     Amount = dailyRentPrice * item.RentNumberOfDays.Value,
                                     TransactionId = transactionPerProduct.TransactionId,
                                     TransactionGroupPaymentAttemptId = tgPaymentAttempt.TransactionGroupPaymentAttemptId,
+                                    SellerPaymentStatus = SellerPayoutStatusConstant.PENDING,
                                     DateDue = DateTime.UtcNow.AddHours(8)
                                 });
                             }
@@ -635,6 +639,7 @@ namespace Ownorent.Controllers
                                     TransactionId = transactionPerProduct.TransactionId,
                                     TransactionGroupPaymentAttemptId = paymentAttempt,
                                     Description = "Payment " + (paymentTermIndex + 1).ToString(),
+                                    SellerPaymentStatus = SellerPayoutStatusConstant.PENDING,
                                     DateDue = DateTime.UtcNow.AddHours(8).AddMonths(paymentTermIndex)
                                 });
                             }

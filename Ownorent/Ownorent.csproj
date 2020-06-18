@@ -283,6 +283,10 @@
     <Compile Include="Migrations\202006160847452_transaction shipping status.Designer.cs">
       <DependentUpon>202006160847452_transaction shipping status.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202006181130079_seller payment status for payment.cs" />
+    <Compile Include="Migrations\202006181130079_seller payment status for payment.Designer.cs">
+      <DependentUpon>202006181130079_seller payment status for payment.cs</DependentUpon>
+    </Compile>
     <Compile Include="OwnorentHelper.cs" />
     <Compile Include="Migrations\202005290332179_initial.cs" />
     <Compile Include="Migrations\202005290332179_initial.Designer.cs">
@@ -492,6 +496,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202006160847452_transaction shipping status.resx">
       <DependentUpon>202006160847452_transaction shipping status.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202006181130079_seller payment status for payment.resx">
+      <DependentUpon>202006181130079_seller payment status for payment.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

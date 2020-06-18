@@ -63,6 +63,17 @@ namespace Ownorent.Controllers
             }
         }
         
+        public async Task<ActionResult> Wallet()
+        {
+            string userId = User.Identity.GetUserId();
+
+            var payments = await db.Payments.Where(p => 
+                    p.Transaction.Product.ProductTemplate.UserId == userId && 
+                    p.Transaction.TransactionStatus != TransactionStatusConstant.PENDING).ToListAsync();
+
+            return View(payments);
+        }
+
         public ActionResult Orders()
         {
             ViewBag.Error = TempData["Error"];
