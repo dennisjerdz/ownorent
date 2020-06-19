@@ -21,6 +21,134 @@ namespace Ownorent.Controllers
     {
         private ApplicationDbContext db = new ApplicationDbContext();
 
+        public async Task<ActionResult> Payouts()
+        {
+            if (TempData["Error"] != null)
+            {
+                ViewBag.Error = TempData["Error"];
+            }
+            if (TempData["Message"] != null)
+            {
+                ViewBag.Message = TempData["Message"];
+            }
+           
+            var payments = await db.Payments.Where(p =>
+                    p.Transaction.TransactionStatus != TransactionStatusConstant.PENDING &&
+                    p.TransactionGroupPaymentAttempt.Status == TransactionGroupPaymentStatusConstant.SUCCESS).ToListAsync();
+
+            var platformTaxCashout = db.Settings.FirstOrDefault(s => s.Code == "PLATFORM_TAX_CASHOUT");
+            ViewBag.platformTaxCashout = (platformTaxCashout != null) ? platformTaxCashout.Value : "1";
+
+            return View(payments);
+        }
+
+        public ActionResult MarkPayoutAsSent(int id)
+        {
+            string userId = User.Identity.GetUserId();
+
+            var payment = db.Payments.FirstOrDefault(p => p.PaymentId == id);
+
+            if (payment != null)
+            {
+                payment.SellerPaymentStatus = SellerPayoutStatusConstant.SENT;
+                db.SaveChanges();
+
+                try
+                {
+                    string msg = $"Your payout request for Transaction; OWNO-OR-{payment.TransactionId} has been sent with Confirmation Number; {payment.ConfirmationNumber}. NOTE: Payouts sent might reflect on the next banking day. Please contact us if there would be any issues.";
+                    OwnorentHelper.SendEmail(payment.Transaction.Product.ProductTemplate.User.Email, payment.Transaction.Product.ProductTemplate.User.FirstName, msg);
+                }
+                catch (Exception e)
+                {
+
+                }
+
+                TempData["Message"] = "<strong>Payout marked as SENT.</strong> Seller will be notified.";
+            }
+            else
+            {
+                TempData["Error"] = "1";
+                TempData["Message"] = "<strong>Mark Payout as SENT failed.</strong> Payment ID does not exist in the DB.";
+            }
+
+            return RedirectToAction("Payouts");
+        }
+
+        public ActionResult ApprovePayout(int id)
+        {
+            string userId = User.Identity.GetUserId();
+
+            var payment = db.Payments.FirstOrDefault(p => p.PaymentId == id);
+
+            if (payment != null)
+            {
+                payment.SellerPaymentStatus = SellerPayoutStatusConstant.APPROVED;
+                db.SaveChanges();
+
+                try
+                {
+                    string msg = $"Your payout request for Transaction; OWNO-OR-{payment.TransactionId} has been approved. Your payout will now be processed. Another email will be sent when the payout has been sent.";
+                    OwnorentHelper.SendEmail(payment.Transaction.Product.ProductTemplate.User.Email, payment.Transaction.Product.ProductTemplate.User.FirstName, msg);
+                }
+                catch (Exception e)
+                {
+
+                }
+
+                TempData["Message"] = "<strong>Payout approved successfully.</strong> Seller will be notified.";
+            }
+            else
+            {
+                TempData["Error"] = "1";
+                TempData["Message"] = "<strong>Approve Payout failed.</strong> Payment ID does not exist in the DB.";
+            }
+
+            return RedirectToAction("Payouts");
+        }
+
+        public ActionResult EditPayout(int id)
+        {
+            string userId = User.Identity.GetUserId();
+
+            var payment = db.Payments.FirstOrDefault(p => p.PaymentId == id);
+
+            if (payment != null)
+            {
+                return View(payment);
+            }
+            else
+            {
+                TempData["Error"] = "1";
+                TempData["Message"] = "<strong>Request payout failed.</strong> Payment ID does not exist in the DB.";
+                return RedirectToAction("Payouts");
+            }
+        }
+
+        [HttpPost]
+        public ActionResult EditPayout(Payment payment)
+        {
+            string userId = User.Identity.GetUserId();
+            int paymentId = payment.PaymentId;
+
+            var editPayment = db.Payments.FirstOrDefault(p => p.PaymentId == paymentId);
+
+            if (payment != null)
+            {
+                editPayment.Bank = payment.Bank;
+                editPayment.AccountNumber = payment.AccountNumber;
+                editPayment.ConfirmationNumber = payment.ConfirmationNumber;
+                db.SaveChanges();
+                TempData["Message"] = "<strong>Payment request edited successfully.</strong>.";
+            }
+            else
+            {
+                TempData["Error"] = "1";
+                TempData["Message"] = "<strong>Request payout failed.</strong> Payment ID does not exist in the DB.";
+            }
+
+            return RedirectToAction("Payouts");
+        }
+
         public ActionResult ProductsRequestedPullOut()
         {
             if (TempData["Error"] != null)

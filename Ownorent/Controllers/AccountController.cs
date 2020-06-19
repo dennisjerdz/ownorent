@@ -65,13 +65,110 @@ namespace Ownorent.Controllers
         
         public async Task<ActionResult> Wallet()
         {
+            if (TempData["Error"] != null)
+            {
+                ViewBag.Error = TempData["Error"];
+            }
+            if (TempData["Message"] != null)
+            {
+                ViewBag.Message = TempData["Message"];
+            }
+
             string userId = User.Identity.GetUserId();
 
             var payments = await db.Payments.Where(p => 
                     p.Transaction.Product.ProductTemplate.UserId == userId && 
-                    p.Transaction.TransactionStatus != TransactionStatusConstant.PENDING).ToListAsync();
+                    p.Transaction.TransactionStatus != TransactionStatusConstant.PENDING &&
+                    p.TransactionGroupPaymentAttempt.Status == TransactionGroupPaymentStatusConstant.SUCCESS).ToListAsync();
+
+            var platformTaxCashout = db.Settings.FirstOrDefault(s => s.Code == "PLATFORM_TAX_CASHOUT");
+            ViewBag.platformTaxCashout = (platformTaxCashout != null) ? platformTaxCashout.Value : "1";
 
             return View(payments);
+        }
+
+        public ActionResult EditPayout(int id)
+        {
+            string userId = User.Identity.GetUserId();
+
+            var payment = db.Payments.FirstOrDefault(p => p.PaymentId == id);
+
+            if (payment != null)
+            {
+                return View(payment);
+            }
+            else
+            {
+                TempData["Error"] = "1";
+                TempData["Message"] = "<strong>Request payout failed.</strong> Payment ID does not exist in the DB.";
+                return RedirectToAction("Wallet");
+            }
+        }
+
+        [HttpPost]
+        public ActionResult EditPayout(Payment payment)
+        {
+            string userId = User.Identity.GetUserId();
+            int paymentId = payment.PaymentId;
+
+            var editPayment = db.Payments.FirstOrDefault(p => p.PaymentId == paymentId);
+
+            if (payment != null)
+            {
+                editPayment.Bank = payment.Bank;
+                editPayment.AccountNumber = payment.AccountNumber;
+                db.SaveChanges();
+                TempData["Message"] = "<strong>Payment request edited successfully.</strong>.";
+            }
+            else
+            {
+                TempData["Error"] = "1";
+                TempData["Message"] = "<strong>Request payout failed.</strong> Payment ID does not exist in the DB.";
+            }
+
+            return RedirectToAction("Wallet");
+        }
+
+        public ActionResult RequestPayout(int id)
+        {
+            string userId = User.Identity.GetUserId();
+
+            var payment = db.Payments.FirstOrDefault(p => p.PaymentId == id);
+
+            if (payment != null)
+            {
+                payment.SellerPaymentStatus = SellerPayoutStatusConstant.REQUESTED;
+                db.SaveChanges();
+                TempData["Message"] = "<strong>Payout requested successfully.</strong> Please wait for an admin to review.";
+            }
+            else
+            {
+                TempData["Error"] = "1";
+                TempData["Message"] = "<strong>Request payout failed.</strong> Payment ID does not exist in the DB.";
+            }
+
+            return RedirectToAction("Wallet");
+        }
+
+        public ActionResult CancelRequestPayout(int id)
+        {
+            string userId = User.Identity.GetUserId();
+
+            var payment = db.Payments.FirstOrDefault(p => p.PaymentId == id);
+
+            if (payment != null)
+            {
+                payment.SellerPaymentStatus = SellerPayoutStatusConstant.PENDING;
+                db.SaveChanges();
+                TempData["Message"] = "<strong>Payout request cancelled.</strong>.";
+            }
+            else
+            {
+                TempData["Error"] = "1";
+                TempData["Message"] = "<strong>Request payout cancellation failed.</strong> Payment ID does not exist in the DB.";
+            }
+
+            return RedirectToAction("Wallet");
         }
 
         public ActionResult Orders()

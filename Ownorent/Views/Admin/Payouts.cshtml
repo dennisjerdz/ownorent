@@ -1,0 +1,181 @@
+﻿@model IEnumerable<Ownorent.Models.Payment>
+@using Ownorent.Models
+@using System.Globalization
+@{
+    ViewBag.Title = "Payouts";
+    ViewBag.bgColor = "#f8fafc";
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="ownorent-panel ownorent-panel-white marginTop15">
+            <div class="ownorent-panel-header" style="background-color:#71cd14; color:white;">
+
+            </div>
+
+            <div class="ownorent-panel-body ownorent-panel-tools">
+                <div class="row">
+                    <div class="col-md-4">
+                        <p>
+                            Payouts
+
+                            <!--<a href="#" class="btn btn-xs btn-success totalAmount"></a>-->
+                        </p>
+                    </div>
+                    <div class="col-md-3 col-md-offset-5">
+                        <input class="form-control all-search width100" placeholder="Search ..." />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="ownorent-panel ownorent-panel-white marginTop10">
+            <div class="ownorent-panel-header" style="background-color:#71cd14; color:white;">
+
+            </div>
+
+            <div class="ownorent-panel-body ownorent-panel-table">
+                <table class="table table-condensed table-hover ownorent-compact-table">
+                    <thead>
+                        <tr>
+                            <th>
+                                USER
+                            </th>
+                            <th>
+                                PRODUCT
+                            </th>
+                            <th>
+                                TRANSACTION
+                            </th>
+                            <th>
+                                TYPE
+                            </th>
+                            <th>
+                                DESC
+                            </th>
+                            <th>
+                                AMOUNT
+                            </th>
+                            <th>
+                                STATUS
+                            </th>
+                            <th>
+                                CONFIRMATION #
+                            </th>
+                            <th></th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    @item.Transaction.Product.ProductTemplate.User.Email
+                                </td>
+                                <td>
+                                    @item.Transaction.Product.ProductName
+                                </td>
+                                <td>
+                                    OWNO-OR-<text>@item.TransactionId</text>
+                                </td>
+                                <td>
+                                    @switch (item.Transaction.TransactionType)
+                                    {
+                                        case TransactionTypeConstant.BUY:
+                                            <text>BUY</text>
+                                            break;
+                                        case TransactionTypeConstant.RENT:
+                                            <text>RENT</text>
+                                            break;
+                                        case TransactionTypeConstant.RENT_TO_OWN:
+                                            <text>RENT-TO-OWN</text>
+                                            break;
+                                    }
+                                </td>
+                                <td>
+                                    @item.Description
+                                </td>
+                                <td>
+                                    @{
+                                        float tax = (item.Amount * (float.Parse(ViewBag.platformTaxCashout) / 100));
+                                        float netAmount = item.Amount - tax;
+                                        <span data-value="@netAmount" style="cursor:pointer;" class="ownorent-text-ygreen amount" title="Cashout Tax is @ViewBag.platformTaxCashout %: @item.Amount - @tax = @netAmount">
+                                            @netAmount.ToString("C2", CultureInfo.GetCultureInfo("fil-PH"))
+                                        </span>
+                                    }
+                                </td>
+                                <td>
+                                    @switch (item.SellerPaymentStatus)
+                                    {
+                                        case SellerPayoutStatusConstant.PENDING:
+                                            <span class="ownorent-text-gray">PENDING</span>
+                                            break;
+                                        case SellerPayoutStatusConstant.REVISE:
+                                            <span class="ownorent-text-red">REVISE</span>
+                                            break;
+                                        case SellerPayoutStatusConstant.REQUESTED:
+                                            <span class="ownorent-text-orange">REQUESTED</span>
+                                            break;
+                                        case SellerPayoutStatusConstant.APPROVED:
+                                            <span class="ownorent-text-ygreen">APPROVED</span>
+                                            break;
+                                        case SellerPayoutStatusConstant.SENT:
+                                            <span class="ownorent-text-ygreen">SENT</span>
+                                            break;
+                                    }
+                                </td>
+                                <td></td>
+                                <td style="text-align:right;">
+                                    @Html.ActionLink("Edit", "EditPayout", "Admin", new { id = item.PaymentId }, new { @class = "btn btn-xs btn-primary" })
+
+                                    @if (item.SellerPaymentStatus == SellerPayoutStatusConstant.REQUESTED || item.SellerPaymentStatus == SellerPayoutStatusConstant.REVISE)
+                                    {
+                                        @Html.ActionLink("Approve", "ApprovePayout", "Admin", new { id = item.PaymentId }, new { @class = "btn btn-xs btn-success" })
+                                    }
+
+                                    @if (item.SellerPaymentStatus == SellerPayoutStatusConstant.APPROVED && string.IsNullOrEmpty(item.ConfirmationNumber))
+                                    {
+                                        <a href="#" title="Please edit and provide a Confirmation/Transaction number first." class="btn btn-success btn-xs">Mark As Sent</a>
+                                    }
+
+                                    @if (item.SellerPaymentStatus == SellerPayoutStatusConstant.APPROVED && !string.IsNullOrEmpty(item.ConfirmationNumber))
+                                    {
+                                        @Html.ActionLink("Mark as Sent", "MarkPayoutAsSent", "Admin", new { id = item.PaymentId }, new { @class = "btn btn-xs btn-success" })
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script>
+        $(document).ready(function () {
+            var datatable = $("table").DataTable({
+                paging: true,
+                "pageLength": 10,
+                "dom": "<'table-window'<'table-responsive'rt>><'window-footer'<'col-md-6'i><'col-md-6'p>>",
+                "columnDefs": [
+                    { "orderable": false, "targets": 8 }
+                ]
+            });
+
+            $(".all-search").keyup(function () {
+                datatable.search($(this).val()).draw();
+            });
+
+            var totalAmount = 0;
+            $(".amount").each(function () {
+                totalAmount += $(this).data("value");
+            });
+
+            $(".totalAmount").html("Total Amount: ₱ " + totalAmount.toLocaleString());
+        });
+    </script>
+}

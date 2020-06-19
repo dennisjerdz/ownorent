@@ -405,7 +405,12 @@ namespace Ownorent.Models
         public DateTime DateLastModified { get; set; }
 
         public DateTime? DateDue { get; set; }
+
         public int SellerPaymentStatus { get; set; }
+        public string Bank { get; set; }
+        public string AccountNumber { get; set; }
+        public string ConfirmationNumber { get; set; }
+        public float? PlatformTax { get; set; }
 
         public int TransactionId { get; set; }
         [ForeignKey("TransactionId")]

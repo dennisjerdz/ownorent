@@ -175,7 +175,8 @@ namespace Ownorent.Models
     {
         public const int PENDING = 0;
         public const int REQUESTED = 1;
-        public const int APPROVED = 2;
-        public const int SENT = 3;
+        public const int REVISE = 2;
+        public const int APPROVED = 3;
+        public const int SENT = 4;
     }
 }

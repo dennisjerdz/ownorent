@@ -102,3 +102,5 @@ C:\Users\Jerdz\Documents\Visual Studio 2015\Projects\Ownorent\Ownorent\bin\Globe
 C:\Users\Jerdz\Documents\Visual Studio 2015\Projects\Ownorent\Ownorent\obj\Debug\Ownorent.Migrations.transactionhistoryornotes.resources
 C:\Users\Jerdz\Documents\Visual Studio 2015\Projects\Ownorent\Ownorent\obj\Debug\Ownorent.Migrations.transactionshippingstatus.resources
 C:\Users\Jerdz\Documents\Visual Studio 2015\Projects\Ownorent\Ownorent\obj\Debug\Ownorent.Migrations.sellerpaymentstatusforpayment.resources
+C:\Users\Jerdz\Documents\Visual Studio 2015\Projects\Ownorent\Ownorent\obj\Debug\Ownorent.csprojResolveAssemblyReference.cache
+C:\Users\Jerdz\Documents\Visual Studio 2015\Projects\Ownorent\Ownorent\obj\Debug\Ownorent.Migrations.payoutupdatepaymenttable.resources

@@ -11,3 +11,6 @@ select * from TransactionGroups;
 select * from Products;
 
 select MobileNumber,* from ApplicationUsers
+
+select * from settings
+update settings SET Value = '1' where code = 'PLATFORM_TAX_CASHOUT'

@@ -60,8 +60,8 @@ namespace Ownorent.Migrations
                 context.Settings.Add(new Setting()
                 {
                     Code = "PLATFORM_TAX_CASHOUT",
-                    Value = "0.8",
-                    Description = "Percentage Taxed to Seller cashout amount whenever withdraws money.",
+                    Value = "1",
+                    Description = "Percentage Taxed to Seller cashout amount whenever money is withdrawn.",
                     IsActive = true
                 });
             }

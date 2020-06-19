@@ -287,6 +287,10 @@
     <Compile Include="Migrations\202006181130079_seller payment status for payment.Designer.cs">
       <DependentUpon>202006181130079_seller payment status for payment.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202006190716163_payout update payment table.cs" />
+    <Compile Include="Migrations\202006190716163_payout update payment table.Designer.cs">
+      <DependentUpon>202006190716163_payout update payment table.cs</DependentUpon>
+    </Compile>
     <Compile Include="OwnorentHelper.cs" />
     <Compile Include="Migrations\202005290332179_initial.cs" />
     <Compile Include="Migrations\202005290332179_initial.Designer.cs">
@@ -421,6 +425,10 @@
     <Content Include="Views\Admin\EditProductStock.cshtml" />
     <Content Include="Views\Admin\AddCategory.cshtml" />
     <Content Include="Views\Products\_productViewInfo.cshtml" />
+    <Content Include="Views\Account\Wallet.cshtml" />
+    <Content Include="Views\Account\EditPayout.cshtml" />
+    <Content Include="Views\Admin\EditPayout.cshtml" />
+    <Content Include="Views\Admin\Payouts.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -499,6 +507,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202006181130079_seller payment status for payment.resx">
       <DependentUpon>202006181130079_seller payment status for payment.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202006190716163_payout update payment table.resx">
+      <DependentUpon>202006190716163_payout update payment table.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

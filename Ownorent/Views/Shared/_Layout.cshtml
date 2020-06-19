@@ -53,6 +53,7 @@
                             <li>@Html.ActionLink("ACCOUNTS", "Accounts", "Account")</li>
                             <li>@Html.ActionLink("PRODUCTS", "Products", "Admin")</li>
                             <li>@Html.ActionLink("ORDERS", "Orders", "Admin")</li>
+                            <li>@Html.ActionLink("PAYOUTS", "Payouts", "Admin")</li>
                             <li>@Html.ActionLink("CATEGORIES", "Categories", "Admin")</li>
                             <li>@Html.ActionLink("PULLOUT", "ProductsRequestedPullOut", "Admin")</li>
                         }
@@ -60,6 +61,7 @@
                         {
                             <li>@Html.ActionLink("MANAGE PRODUCTS", "Index", "Products")</li>
                             <li>@Html.ActionLink("REQUIREMENTS", "Requirements", "Account")</li>
+                            <li>@Html.ActionLink("WALLET & PAYOUTS", "wallet", "Account")</li>
                         }
                         @if (User.IsInRole("Customer"))
                         {
