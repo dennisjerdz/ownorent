@@ -136,7 +136,7 @@
 
                                     @if (item.SellerPaymentStatus == SellerPayoutStatusConstant.APPROVED && string.IsNullOrEmpty(item.ConfirmationNumber))
                                     {
-                                        <a href="#" title="Please edit and provide a Confirmation/Transaction number first." class="btn btn-success btn-xs">Mark As Sent</a>
+                                        <a href="#" title="Please edit and provide a Confirmation/Transaction number first." class="btn btn-success btn-xs" style="cursor:not-allowed;">Mark As Sent</a>
                                     }
 
                                     @if (item.SellerPaymentStatus == SellerPayoutStatusConstant.APPROVED && !string.IsNullOrEmpty(item.ConfirmationNumber))
