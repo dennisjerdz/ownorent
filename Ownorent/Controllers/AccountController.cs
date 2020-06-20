@@ -713,6 +713,35 @@ namespace Ownorent.Controllers
 
                     if (user!=null)
                     {
+                        DateTime today = DateTime.UtcNow.AddHours(8);
+                        string role = "N/A";
+
+                        switch (user.AccountType)
+                        {
+                            case AccountTypeConstant.SELLER:
+                                role = "SELLER";
+                                break;
+                            case AccountTypeConstant.CUSTOMER:
+                                role = "CUSTOMER";
+                                break;
+                            case AccountTypeConstant.ADMIN:
+                                role = "ADMIN";
+                                break;
+                        }
+
+                        var loginList = db.LoginHistories.Where(h => h.UserId == user.Id).ToList();
+
+                        if (!loginList.Any(h=>h.DateCreated.Date == today.Date))
+                        {
+                            db.LoginHistories.Add(new LoginHistory
+                            {
+                                UserId = user.Id,
+                                Role = role,
+                                DateCreated = today
+                            });
+                            db.SaveChanges();
+                        }
+
                         if (user.AccountType == AccountTypeConstant.SELLER)
                         {
                             if (user.AccountStatus == AccountStatusConstant.PENDING_REQUIREMENTS || user.AccountStatus == AccountStatusConstant.PENDING_REVIEW)

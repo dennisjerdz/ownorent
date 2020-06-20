@@ -11,6 +11,18 @@ namespace Ownorent.Models
     // Straight Line Depreciation
     // https://bench.co/blog/accounting/straight-line-depreciation/
 
+    public class LoginHistory
+    {
+        public int LoginHistoryId { get; set; }
+        public string Role { get; set; }
+
+        public string UserId { get; set; }
+        [ForeignKey("UserId")]
+        public virtual ApplicationUser User { get; set; }
+
+        public DateTime DateCreated { get; set; }
+    }
+
     public class Warehouse {
         public Warehouse() {
             DateCreated = DateTime.UtcNow.AddHours(8);

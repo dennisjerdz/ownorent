@@ -291,6 +291,10 @@
     <Compile Include="Migrations\202006190716163_payout update payment table.Designer.cs">
       <DependentUpon>202006190716163_payout update payment table.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202006200650379_login history.cs" />
+    <Compile Include="Migrations\202006200650379_login history.Designer.cs">
+      <DependentUpon>202006200650379_login history.cs</DependentUpon>
+    </Compile>
     <Compile Include="OwnorentHelper.cs" />
     <Compile Include="Migrations\202005290332179_initial.cs" />
     <Compile Include="Migrations\202005290332179_initial.Designer.cs">
@@ -510,6 +514,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202006190716163_payout update payment table.resx">
       <DependentUpon>202006190716163_payout update payment table.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202006200650379_login history.resx">
+      <DependentUpon>202006200650379_login history.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

@@ -69,6 +69,7 @@ namespace Ownorent.Models
         public DbSet<TransactionGroup> TransactionGroups { get; set; }
         public DbSet<TransactionGroupPaymentAttempt> TransactionGroupPaymentAttempts { get; set; }
         public DbSet<TransactionNote> TransactionNotes { get; set; }
+        public DbSet<LoginHistory> LoginHistories { get; set; }
 
         public static ApplicationDbContext Create()
         {

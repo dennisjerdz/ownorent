@@ -1,0 +1,63 @@
+﻿@model Ownorent.Models.Payment
+@using Ownorent.Models
+@{
+    ViewBag.Title = "Edit Payout";
+    ViewBag.bgColor = "#f8fafc";
+}
+
+<div class="row">
+    <div class="col-md-offset-3 col-md-6">
+        <div class="account-card">
+
+            <div class="ownorent-header-internal">
+                Edit Payout Bank Info: OWNO-OR-<text>@Model.TransactionId</text> - @Model.Description
+            </div>
+
+            <!--<center>
+                <img src="~/Content/Images/logo.png" style="width:300px; transform:translate(0px)" />
+            </center>-->
+
+            @using (Html.BeginForm("EditPayout", "Account", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+            {
+                @Html.AntiForgeryToken()
+                @Html.ValidationSummary("", new { @class = "text-danger" })
+                @Html.HiddenFor(s => s.PaymentId)
+
+                <div class="form-group">
+                    <div class="col-md-12">
+                        @Html.LabelFor(m => m.Bank, new { @class = "control-label" })
+                        <select name="Bank" class="form-control">
+                            <option value="BPI">BPI</option>
+                            <option value="SECB">SECB</option>
+                            <option value="BDO">BDO</option>
+                            <option value="CITI">CITI</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <label class="control-label">Account Number (No Dashes)</label>
+                        @Html.TextBoxFor(m => m.AccountNumber, new { @class = "form-control", @step="1", @type="number" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <br />
+                        <input type="submit" class="btn btn-info btn-block" value="Save" />
+                        <br />
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script>
+        $(document).ready(function () {
+
+        });
+    </script>
+}
