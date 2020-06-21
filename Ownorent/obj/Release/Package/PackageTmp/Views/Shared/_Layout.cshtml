@@ -50,6 +50,7 @@
                         }
                         @if (User.IsInRole("Admin"))
                         {
+                            <li>@Html.ActionLink("DASHBOARD", "Index", "Admin")</li>
                             <li>@Html.ActionLink("ACCOUNTS", "Accounts", "Account")</li>
                             <li>@Html.ActionLink("PRODUCTS", "Products", "Admin")</li>
                             <li>@Html.ActionLink("ORDERS", "Orders", "Admin")</li>
