@@ -645,4 +645,43 @@ namespace Ownorent.Models
         public string SellerFirstName { get; set; }
         public List<ProductTemplateAttachment> Attachments { get; set; }
     }
+
+    public class AdminDashboardModel
+    {
+        public List<IGrouping<DateTime, IGrouping<string, LoginHistory>>> LoginsByRolePast5Days { get; set; }
+        public List<IGrouping<Category, TransactionCategoryModel>> CategoriesWithMostTransactions { get; set; }
+        public List<CategoryCountModel> CategoriesWithMostItems { get; set; }
+        public List<IGrouping<ProductTemplate, TransactionPTemplateModel>> ProductsWithMostItemsSold { get; set; }
+        public List<ProductTemplateIncomeModel> ProductsWithMostIncome { get; set; }
+        public List<TransactionsDatetimeCountModel> TransactionsPast30Days { get; set; }
+
+        public class TransactionCategoryModel
+        {
+            public Transaction Transaction { get; set; }
+            public Category Category { get; set; }
+        }
+
+        public class CategoryCountModel
+        {
+            public Category Category { get; set; }
+            public int Count { get; set; }
+        }
+
+        public class TransactionPTemplateModel
+        {
+            public Transaction Transaction { get; set; }
+            public ProductTemplate ProductTemplate { get; set; }
+        }
+
+        public class ProductTemplateIncomeModel {
+            public IGrouping<ProductTemplate, TransactionPTemplateModel> ProductTemplate { get; set; }
+            public float Income { get; set; }
+        }
+
+        public class TransactionsDatetimeCountModel
+        {
+            public DateTime Date { get; set; }
+            public int Count { get; set; }
+        }
+    }
 }

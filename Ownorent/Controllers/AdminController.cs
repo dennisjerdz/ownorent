@@ -21,6 +21,101 @@ namespace Ownorent.Controllers
     {
         private ApplicationDbContext db = new ApplicationDbContext();
 
+        public async Task<ActionResult> Index()
+        {
+            DateTime today = DateTime.UtcNow.AddHours(8).AddDays(1).Date;
+            DateTime daysAgo = DateTime.UtcNow.AddHours(8).AddDays(-29).Date;
+
+            AdminDashboardModel dashboard = new AdminDashboardModel();
+
+            #region logins by role for the past 5 days
+            var loginHistories =
+                await db.LoginHistories
+                .Where(h => h.DateCreated <= today && h.DateCreated >= daysAgo).ToListAsync();
+
+            var loginHistoriesGroupedByDate =
+                loginHistories
+                .GroupBy(h => h.DateCreated.Date);
+
+            dashboard.LoginsByRolePast5Days =
+                (from h in loginHistories
+                group h by h.DateCreated.Date into groupedByDate
+                from groupedByDateAndRole in
+                    (from l in groupedByDate
+                     group l by l.Role)
+                group groupedByDateAndRole by groupedByDate.Key)
+                .OrderByDescending(t=>t.Key).ToList();
+            #endregion
+
+            #region categoryWithMostTransactions
+            dashboard.CategoriesWithMostTransactions = await db.Transactions
+                .Where(t => t.TransactionStatus != TransactionStatusConstant.PENDING)
+                .Select(t => new AdminDashboardModel.TransactionCategoryModel { Transaction = t, Category = t.Product.ProductTemplate.Category })
+                .GroupBy(t => t.Category)
+                .OrderByDescending(p => p.Count())
+                .Take(5)
+                .ToListAsync();
+            #endregion
+
+            #region categoryWithMostItems
+            dashboard.CategoriesWithMostItems = await db.Categories
+                .Select(c => new AdminDashboardModel.CategoryCountModel { Category = c, Count = c.ProductTemplates.Count })
+                .ToListAsync();
+            #endregion
+
+            #region productWithMostItemsSold
+            dashboard.ProductsWithMostItemsSold = await db.Transactions
+                .Where(t => t.TransactionStatus != TransactionStatusConstant.PENDING)
+                .Select(t=> new AdminDashboardModel.TransactionPTemplateModel { Transaction = t, ProductTemplate = t.Product.ProductTemplate })
+                .GroupBy(t=>t.ProductTemplate)
+                .OrderByDescending(p=>p.Count())
+                .Take(5)
+                .ToListAsync();
+            #endregion
+
+            #region productWithMostIncome
+            dashboard.ProductsWithMostIncome = await db.Transactions
+                .Include(t=>t.Payments)
+                .Where(t => t.TransactionStatus != TransactionStatusConstant.PENDING)
+                .Select(t => new AdminDashboardModel.TransactionPTemplateModel { Transaction = t, ProductTemplate = t.Product.ProductTemplate })
+                .GroupBy(t => t.ProductTemplate)
+                .Select(t => new AdminDashboardModel.ProductTemplateIncomeModel {
+                    ProductTemplate = t,
+                    Income = t.Sum(s => s.Transaction.Payments
+                        .Where(p=>p.TransactionGroupPaymentAttempt.Status == TransactionGroupPaymentStatusConstant.SUCCESS)
+                        .Sum(p=>p.Amount)) })
+                .OrderByDescending(t => t.Income)
+                .Take(5)
+                .ToListAsync();
+            #endregion
+
+            #region dailyTransactions
+            dashboard.TransactionsPast30Days = new List<AdminDashboardModel.TransactionsDatetimeCountModel>();
+            for (var dt = daysAgo; dt <= today; dt = dt.AddDays(1))
+            {
+                dashboard.TransactionsPast30Days.Add(new AdminDashboardModel.TransactionsDatetimeCountModel { Date = dt, Count = 0 });
+            }
+            
+            var transactionsPast30DaysDB = db.Transactions
+                .Where(t => 
+                    t.TransactionStatus != TransactionStatusConstant.PENDING && 
+                    (t.DateCreated <= today && t.DateCreated >= daysAgo)
+                ).ToList()
+                .GroupBy(t=>t.DateCreated.Date)
+                .ToList();
+
+            foreach (var item in transactionsPast30DaysDB)
+            {
+                if(dashboard.TransactionsPast30Days.FirstOrDefault(x=>x.Date == item.Key) != null)
+                {
+                    dashboard.TransactionsPast30Days.FirstOrDefault(x => x.Date == item.Key).Count = item.Count();
+                }
+            }
+            #endregion
+
+            return View(dashboard);
+        }
+
         public async Task<ActionResult> Payouts()
         {
             if (TempData["Error"] != null)

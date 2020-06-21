@@ -104,3 +104,4 @@ C:\Users\Jerdz\Documents\Visual Studio 2015\Projects\Ownorent\Ownorent\obj\Relea
 C:\Users\Jerdz\Documents\Visual Studio 2015\Projects\Ownorent\Ownorent\obj\Release\Ownorent.Migrations.transactionshippingstatus.resources
 C:\Users\Jerdz\Documents\Visual Studio 2015\Projects\Ownorent\Ownorent\obj\Release\Ownorent.Migrations.sellerpaymentstatusforpayment.resources
 C:\Users\Jerdz\Documents\Visual Studio 2015\Projects\Ownorent\Ownorent\obj\Release\Ownorent.Migrations.payoutupdatepaymenttable.resources
+C:\Users\Jerdz\Documents\Visual Studio 2015\Projects\Ownorent\Ownorent\obj\Release\Ownorent.Migrations.loginhistory.resources

@@ -6,6 +6,15 @@
     Dark Gray #1b222c
 */
 
+.overflowX{
+    overflow-x:auto;
+    overflow-y:hidden;
+}
+
+.padding0{
+    padding:0px !important;
+}
+
 .product-view-trigger{
     cursor: pointer;
 }

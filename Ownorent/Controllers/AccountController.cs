@@ -87,6 +87,11 @@ namespace Ownorent.Controllers
             return View(payments);
         }
 
+        public ActionResult SellerIndex()
+        {
+            return View();
+        }
+
         public ActionResult EditPayout(int id)
         {
             string userId = User.Identity.GetUserId();
@@ -215,6 +220,13 @@ namespace Ownorent.Controllers
 
         public async Task<ActionResult> Pay(List<PaymentPayModel> payments)
         {
+            if (payments == null)
+            {
+                TempData["Error"] = "1";
+                TempData["Message"] = "<strong>Pay now failed.</strong> No pending payment selected.";
+                return RedirectToAction("Orders");
+            }
+
             List<int> paymentIds = new List<int>();
             payments.Where(p=>p.Include == true).ToList().ForEach(p => paymentIds.Add(p.PaymentId));
 
@@ -757,7 +769,23 @@ namespace Ownorent.Controllers
                             return View(model);
                         }
                     }
-                    return RedirectToLocal(returnUrl);
+
+                    if (string.IsNullOrEmpty(returnUrl))
+                    {
+                        switch (user.AccountType)
+                        {
+                            case AccountTypeConstant.SELLER:
+                                return RedirectToAction("SellerIndex", "Account");
+                            case AccountTypeConstant.ADMIN:
+                                return RedirectToAction("Index", "Admin");
+                            default:
+                                return RedirectToAction("Index", "Home");
+                        }
+                    }
+                    else
+                    {
+                        return RedirectToLocal(returnUrl);
+                    }
                 case SignInStatus.LockedOut:
                     return View("Lockout");
                 case SignInStatus.RequiresVerification:

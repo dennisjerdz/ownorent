@@ -351,6 +351,7 @@
     <None Include="Properties\PublishProfiles\ownorent - ReadOnly - FTP.pubxml" />
     <None Include="Properties\PublishProfiles\ownorent - Web Deploy.pubxml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
+    <Content Include="Scripts\googlecharts.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
     <Content Include="Scripts\jquery-1.10.2.min.js" />
     <None Include="Scripts\jquery.validate-vsdoc.js" />
@@ -433,6 +434,7 @@
     <Content Include="Views\Account\EditPayout.cshtml" />
     <Content Include="Views\Admin\EditPayout.cshtml" />
     <Content Include="Views\Admin\Payouts.cshtml" />
+    <Content Include="Views\Account\SellerIndex.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

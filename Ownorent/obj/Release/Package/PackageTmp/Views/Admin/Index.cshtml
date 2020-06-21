@@ -1,153 +1,317 @@
-﻿@model IEnumerable<Ownorent.Models.ProductTemplate>
+﻿@model Ownorent.Models.AdminDashboardModel
 
 @{
-    ViewBag.Title = "Index";
+    ViewBag.Title = "Dashboard";
+    ViewBag.bgColor = "#f8fafc";
 }
 
-<h2>Index</h2>
+<div class="row">
+    <div class="col-md-4">
+        <div class="ownorent-panel ownorent-panel-white marginTop15">
+            <div class="ownorent-panel-header" style="background-color:#71cd14; color:white;">
+                LOGINS FOR THE PAST 5 DAYS
+            </div>
 
-<p>
-    @Html.ActionLink("Create New", "Create")
-</p>
-<table class="table">
-    <tr>
-        <th>
-            @Html.DisplayNameFor(model => model.Category.CategoryName)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.User.FirstName)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Warehouse.WarehouseName)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.ProductName)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.ProductDescription)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.ProductTemplateStatus)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.ProductPriceToUse)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.TrackingNumber)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Quantity)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Price)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.DailyRentPrice)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.ComputedPrice)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.ComputedDailyRentPrice)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.AdminDefinedPrice)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.AdminDefinedDailyRentPrice)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.ShippingFee)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.ShippingFeeProvincial)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.DatePurchased)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.LastModifiedBy)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.DateCreated)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.DateLastModified)
-        </th>
-        <th></th>
-    </tr>
+            <div class="ownorent-panel-body padding0 overflowX">
+                <div id="loginsByRoleChart"></div>
+            </div>
+        </div>
+    </div>
 
-@foreach (var item in Model) {
-    <tr>
-        <td>
-            @Html.DisplayFor(modelItem => item.Category.CategoryName)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.User.FirstName)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Warehouse.WarehouseName)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.ProductName)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.ProductDescription)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.ProductTemplateStatus)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.ProductPriceToUse)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.TrackingNumber)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Quantity)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Price)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.DailyRentPrice)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.ComputedPrice)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.ComputedDailyRentPrice)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.AdminDefinedPrice)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.AdminDefinedDailyRentPrice)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.ShippingFee)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.ShippingFeeProvincial)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.DatePurchased)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.LastModifiedBy)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.DateCreated)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.DateLastModified)
-        </td>
-        <td>
-            @Html.ActionLink("Edit", "Edit", new { id=item.ProductTemplateId }) |
-            @Html.ActionLink("Details", "Details", new { id=item.ProductTemplateId }) |
-            @Html.ActionLink("Delete", "Delete", new { id=item.ProductTemplateId })
-        </td>
-    </tr>
-}
+    <div class="col-md-8">
+        <div class="ownorent-panel ownorent-panel-white marginTop15">
+            <div class="ownorent-panel-header" style="background-color:#71cd14; color:white;">
+                TRANSACTIONS FOR THE PAST 30 DAYS
+            </div>
 
-</table>
+            <div class="ownorent-panel-body padding0 overflowX">
+                <div id="transactionsPerDayChart"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="ownorent-panel ownorent-panel-white marginTop15">
+            <div class="ownorent-panel-header" style="background-color:#71cd14; color:white;">
+                MOST BOUGHT PRODUCTS
+            </div>
+
+            <div class="ownorent-panel-body padding0 overflowX">
+                <div id="mostProductSoldChart"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="ownorent-panel ownorent-panel-white marginTop15">
+            <div class="ownorent-panel-header" style="background-color:#71cd14; color:white;">
+                PRODUCTS W/ MOST EARNINGS
+            </div>
+
+            <div class="ownorent-panel-body padding0 overflowX">
+                <div id="productIncomeChart"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="ownorent-panel ownorent-panel-white marginTop15">
+            <div class="ownorent-panel-header" style="background-color:#71cd14; color:white;">
+                MOST BOUGHT CATEGORIES
+            </div>
+
+            <div class="ownorent-panel-body padding0 overflowX">
+                <div id="categoryTransactionsChart"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="ownorent-panel ownorent-panel-white marginTop15">
+            <div class="ownorent-panel-header" style="background-color:#71cd14; color:white;">
+                CATEGORIES W/ MOST PRODUCTS
+            </div>
+
+            <div class="ownorent-panel-body padding0 overflowX">
+                <div id="categoryMostProductsChart"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="ownorent-panel ownorent-panel-white marginTop15">
+            <div class="ownorent-panel-header" style="background-color:#71cd14; color:white;">
+                PRODUCTS PER CATEGORY
+            </div>
+
+            <div class="ownorent-panel-body padding0 overflowX">
+                <div id="productsPerCategoryChart"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script src="~/Scripts/googlecharts.js"></script>
+
+    <script>
+        function generateColor(ranges) {
+            if (!ranges) {
+                ranges = [
+                    [150, 256],
+                    [0, 190],
+                    [0, 30]
+                ];
+            }
+            var g = function () {
+                //select random range and remove
+                var range = ranges.splice(Math.floor(Math.random() * ranges.length), 1)[0];
+                //pick a random number from within the range
+                return Math.floor(Math.random() * (range[1] - range[0])) + range[0];
+            }
+            return "rgb(" + g() + "," + g() + "," + g() + ")";
+        };
+
+        // Load the Visualization API and the piechart package.
+        google.charts.load('current', { 'packages': ['corechart'] });
+        // Set a callback to run when the Google Visualization API is loaded.
+        google.charts.setOnLoadCallback(drawChart);
+
+        // Callback that creates, instantiates chart, and draw chart
+        function drawChart() {
+            var chartHeight = 320;
+
+            /*
+            *
+            * Logins per Role
+            *
+            */
+
+            var loginsByRoleData = google.visualization.arrayToDataTable([
+                ['Date', 'ADMIN', 'SELLER', 'CUSTOMER'],
+                @foreach (var item in Model.LoginsByRolePast5Days.OrderBy(x=>x.Key).Take(5))
+                {
+                    <text>
+                    [
+                        '@item.Key.ToString("MM-dd-yyyy")',
+                        @item.Where(i => i.Key == "ADMIN").Sum(s=>s.Count()),
+                        @item.Where(i => i.Key == "SELLER").Sum(s => s.Count()),
+                        @item.Where(i => i.Key == "CUSTOMER").Sum(s => s.Count())
+                    ],</text>
+                }
+            ]);
+            var loginsByRoleOptions = {
+                height: chartHeight,
+                legend: { position: 'top', maxLines: 5 },
+                bar: { groupWidth: '75%' },
+                isStacked: true
+            };
+            var loginsByRoleChart = new google.visualization.ColumnChart(document.getElementById('loginsByRoleChart'));
+            loginsByRoleChart.draw(loginsByRoleData, loginsByRoleOptions);
+
+            /*
+            *
+            * Most Bought Categories
+            *
+            */
+
+            var categoryTransactionsData = google.visualization.arrayToDataTable([
+                ['Category', '', { role: 'style' }],
+                 @foreach (var item in Model.CategoriesWithMostTransactions)
+                {
+                    <text>['@item.Key.CategoryName',@item.Count(), generateColor()],</text>
+                }
+            ]);
+            var categoryTransactionsOptions = {
+                title: 'Transactions per Category',
+                chartArea: { width: '50%' },
+                hAxis: {
+                    title: 'Transactions',
+                    minValue: 0
+                },
+                vAxis: {
+                    title: 'Category'
+                },
+                legend: { position:'none' },
+                height: chartHeight
+            };
+            var categoryTransactionsChart = new google.visualization.BarChart(document.getElementById('categoryTransactionsChart'));
+            categoryTransactionsChart.draw(categoryTransactionsData, categoryTransactionsOptions);
+
+            /*
+            *
+            * Category w/ Most Products
+            *
+            */
+
+            var categoryMostProductsData = google.visualization.arrayToDataTable([
+                ['Category', '', { role: 'style' }],
+                 @foreach (var item in Model.CategoriesWithMostItems.OrderByDescending(x=>x.Count).Take(5))
+                {
+                    <text>['@item.Category.CategoryName',@item.Count, generateColor()],</text>
+                }
+            ]);
+            var categoryMostProductsOptions = {
+                title: 'Products per Category',
+                chartArea: { width: '50%' },
+                hAxis: {
+                    title: 'Products',
+                    minValue: 0
+                },
+                vAxis: {
+                    title: 'Category'
+                },
+                legend : { position: 'none' },
+                height: chartHeight
+            };
+            var categoryMostProductsChart = new google.visualization.BarChart(document.getElementById('categoryMostProductsChart'));
+            categoryMostProductsChart.draw(categoryMostProductsData, categoryMostProductsOptions);
+
+            /*
+            *
+            * Number of Products per Category
+            *
+            */
+
+            var productsPerCategoryData = google.visualization.arrayToDataTable([
+                ['Category', '', { role: 'style' }],
+                 @foreach (var item in Model.CategoriesWithMostItems.OrderByDescending(x=>x.Count))
+                {
+                    <text>['@item.Category.CategoryName',@item.Count, ''],</text>
+                }
+            ]);
+            var productsPerCategoryOptions = {
+                title: 'Products per Category',
+                height: chartHeight,
+                pieHole: 0.3
+            };
+            var productsPerCategoryChart = new google.visualization.PieChart(document.getElementById('productsPerCategoryChart'));
+            productsPerCategoryChart.draw(productsPerCategoryData, productsPerCategoryOptions);
+
+            /*
+            *
+            * Transactions Per Day
+            *
+            */
+
+            var transactionsPerDayData = google.visualization.arrayToDataTable([
+                ['Date', 'Transactions'],
+                @foreach (var item in Model.TransactionsPast30Days)
+                {
+                    <text>['@item.Date.ToString("MM-dd-yyyy")',@item.Count],</text>
+                }
+            ]);
+            var transactionsPerDayOptions = {
+                title: 'Transactions Per Day',
+                curveType: 'function',
+                vAxis: { minValue:0, baseline:0 },
+                legend: { position: 'in' },
+                height: chartHeight
+            };
+            var transactionsPerDayChart = new google.visualization.LineChart(document.getElementById('transactionsPerDayChart'));
+            transactionsPerDayChart.draw(transactionsPerDayData, transactionsPerDayOptions);
+
+            /*
+            *
+            * Most Products Sold
+            *
+            */
+
+            var mostProductSoldData = google.visualization.arrayToDataTable([
+                ['Product', '', { role: 'annotation' }, { role: 'style' }],
+                 @foreach (var item in Model.ProductsWithMostItemsSold.OrderByDescending(p=>p.Count()))
+                {
+                    <text>['@item.Key.ProductName',@item.Count(), 'Sold by: @item.Key.User.Email', generateColor()],</text>
+                }
+            ]);
+            var mostProductSoldOptions = {
+                title: 'Number of Products Sold',
+                chartArea: { width: '50%' },
+                hAxis: {
+                    title: 'Units Sold',
+                    minValue: 0
+                },
+                vAxis: {
+                    title: 'Product'
+                },
+                legend: {position: 'none'},
+                height: chartHeight
+            };
+            var mostProductSoldChart = new google.visualization.BarChart(document.getElementById('mostProductSoldChart'));
+            mostProductSoldChart.draw(mostProductSoldData, mostProductSoldOptions);
+
+            /*
+            *
+            * Product Income Chart
+            *
+            */
+
+            var productIncomeData = google.visualization.arrayToDataTable([
+                ['Product', '', { role: 'annotation' }, { role: 'style' }],
+                 @foreach (var item in Model.ProductsWithMostIncome.OrderByDescending(p=>p.Income))
+                {
+                    <text>['@item.ProductTemplate.Key.ProductName',@item.Income, 'Sold by: @item.ProductTemplate.Key.User.Email', generateColor()],</text>
+                }
+            ]);
+            var productIncomeOptions = {
+                title: 'Products with Most Earnings',
+                chartArea: { width: '50%' },
+                hAxis: {
+                    title: 'Earnings',
+                    minValue: 0
+                },
+                vAxis: {
+                    title: 'Product'
+                },
+                legend: {position: 'none'},
+                height: chartHeight
+            };
+            var productIncomeChart = new google.visualization.BarChart(document.getElementById('productIncomeChart'));
+            productIncomeChart.draw(productIncomeData, productIncomeOptions);
+        }
+    </script>    
+} 
