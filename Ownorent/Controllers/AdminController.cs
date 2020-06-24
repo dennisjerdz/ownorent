@@ -116,6 +116,103 @@ namespace Ownorent.Controllers
             return View(dashboard);
         }
 
+        public ActionResult ApproveCancellationRequest(int id)
+        {
+            string userId = User.Identity.GetUserId();
+
+            var tr = db.Transactions.FirstOrDefault(p => p.TransactionId == id);
+
+            if (tr != null)
+            {
+                tr.TransactionStatus = TransactionStatusConstant.CANCELLED;
+                db.SaveChanges();
+                TempData["Message"] = "<strong>Cancellation approved successfully.</strong> Customer will be notified. Please contact the customer to arrange shipment back to the warehouse and refunds if any.";
+
+                try
+                {
+                    string msg = $"Your cancellation request for Transaction; OWNO-OR-{tr.TransactionId} has been approved. Please contact us to arrange shipment back to the warehouse and refunds if any. An Admin will also contact you for this matter.";
+                    OwnorentHelper.SendEmail(tr.TransactionGroup.User.Email, tr.TransactionGroup.User.FirstName, msg);
+                }
+                catch (Exception e)
+                {
+
+                }
+                
+                return RedirectToAction("ManageOrder", new { id = tr.TransactionGroupId });
+            }
+            else
+            {
+                TempData["Error"] = "1";
+                TempData["Message"] = "<strong>Cancellation failed.</strong> Transaction ID does not exist in the DB.";
+                return RedirectToAction("Orders");
+            }
+        }
+
+        public ActionResult RejectCancellationRequest(int id)
+        {
+            string userId = User.Identity.GetUserId();
+
+            var tr = db.Transactions.FirstOrDefault(p => p.TransactionId == id);
+
+            if (tr != null)
+            {
+                tr.TransactionStatus = TransactionStatusConstant.PARTIALLY_PAID;
+                db.SaveChanges();
+                TempData["Message"] = "<strong>Cancellation rejected successfully.</strong> Customer will be notified. Please contact the customer to explain further.";
+
+                try
+                {
+                    string msg = $"Your cancellation request for Transaction; OWNO-OR-{tr.TransactionId} has been rejected. Please contact us for clarifications.";
+                    OwnorentHelper.SendEmail(tr.TransactionGroup.User.Email, tr.TransactionGroup.User.FirstName, msg);
+                }
+                catch (Exception e)
+                {
+
+                }
+
+                return RedirectToAction("ManageOrder", new { id = tr.TransactionGroupId });
+            }
+            else
+            {
+                TempData["Error"] = "1";
+                TempData["Message"] = "<strong>Reject cancellation failed.</strong> Transaction ID does not exist in the DB.";
+                return RedirectToAction("Orders");
+            }
+        }
+
+        public ActionResult ConfirmCancelledReturned(int id)
+        {
+            string userId = User.Identity.GetUserId();
+
+            var tr = db.Transactions.FirstOrDefault(p => p.TransactionId == id);
+
+            if (tr != null)
+            {
+                tr.TransactionStatus = TransactionStatusConstant.CANCELLED_RETURNED;
+                tr.Product.ProductStatus = ProductStatusConstant.AVAILABLE;
+                db.SaveChanges();
+                TempData["Message"] = "<strong>Product return confirmed successfully.</strong> Customer will be notified. Please proceed with issuing refunds if there are any.";
+
+                try
+                {
+                    string msg = $"The product associated with Transaction; OWNO-OR-{tr.TransactionId} has been returned successfully. An admin will process refunds if there are any. Please expect it in 2 business days.";
+                    OwnorentHelper.SendEmail(tr.TransactionGroup.User.Email, tr.TransactionGroup.User.FirstName, msg);
+                }
+                catch (Exception e)
+                {
+
+                }
+
+                return RedirectToAction("ManageOrder", new { id = tr.TransactionGroupId });
+            }
+            else
+            {
+                TempData["Error"] = "1";
+                TempData["Message"] = "<strong>Product return confirmation failed.</strong> Transaction ID does not exist in the DB.";
+                return RedirectToAction("Orders");
+            }
+        }
+
         public async Task<ActionResult> Payouts()
         {
             if (TempData["Error"] != null)

@@ -125,6 +125,9 @@ namespace Ownorent.Models
         public const int PENDING = 0;
         public const int PARTIALLY_PAID = 1;
         public const int PAID = 2;
+        public const int CANCEL_REQUESTED = 3;
+        public const int CANCELLED = 4;
+        public const int CANCELLED_RETURNED = 5;
     }
 
     public class ShippingStatusConstant

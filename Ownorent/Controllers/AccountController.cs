@@ -62,7 +62,49 @@ namespace Ownorent.Controllers
                 _userManager = value;
             }
         }
-        
+
+        public ActionResult RequestCancellation(int id)
+        {
+            string userId = User.Identity.GetUserId();
+
+            var tr = db.Transactions.FirstOrDefault(p => p.TransactionId == id);
+
+            if (tr != null)
+            {
+                tr.TransactionStatus = TransactionStatusConstant.CANCEL_REQUESTED;
+                db.SaveChanges();
+                TempData["Message"] = "<strong>Request sent successfully.</strong> Please wait for an admin to review.";
+                return RedirectToAction("ViewOrder", new { id = tr.TransactionGroupId });
+            }
+            else
+            {
+                TempData["Error"] = "1";
+                TempData["Message"] = "<strong>Request cancellation failed.</strong> Transaction ID does not exist in the DB.";
+                return RedirectToAction("Orders");
+            }
+        }
+
+        public ActionResult CancelRequestCancellation(int id)
+        {
+            string userId = User.Identity.GetUserId();
+
+            var tr = db.Transactions.FirstOrDefault(p => p.TransactionId == id);
+
+            if (tr != null)
+            {
+                tr.TransactionStatus = TransactionStatusConstant.PARTIALLY_PAID;
+                db.SaveChanges();
+                TempData["Message"] = "<strong>Request cancelled successfully.</strong>";
+                return RedirectToAction("ViewOrder", new { id = tr.TransactionGroupId });
+            }
+            else
+            {
+                TempData["Error"] = "1";
+                TempData["Message"] = "<strong>Cancellation failed.</strong> Transaction ID does not exist in the DB.";
+                return RedirectToAction("Orders");
+            }
+        }
+
         public async Task<ActionResult> Wallet()
         {
             if (TempData["Error"] != null)

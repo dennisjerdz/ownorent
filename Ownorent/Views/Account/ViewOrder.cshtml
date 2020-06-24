@@ -57,7 +57,7 @@
                                             <td style="text-align:center;">@transaction.TransactionId</td>
                                             <td>@transaction.Product.ProductName</td>
                                             <td style="text-align:right;">
-                                                @switch(transaction.TransactionStatus)
+                                                @switch (transaction.TransactionStatus)
                                                 {
                                                     case TransactionStatusConstant.PAID:
                                                         <span class="ownorent-text-ygreen">PAID</span>
@@ -67,6 +67,15 @@
                                                         break;
                                                     case TransactionStatusConstant.PENDING:
                                                         <span class="ownorent-text-gray">PENDING</span>
+                                                        break;
+                                                    case TransactionStatusConstant.CANCEL_REQUESTED:
+                                                        <span class="ownorent-text-orange">CANCELLATION REQUESTED</span>
+                                                        break;
+                                                    case TransactionStatusConstant.CANCELLED:
+                                                        <span class="ownorent-text-red">CANCELLED</span>
+                                                        break;
+                                                    case TransactionStatusConstant.CANCELLED_RETURNED:
+                                                        <span class="ownorent-text-red">RETURNED</span>
                                                         break;
                                                 }
                                             </td>
@@ -194,6 +203,15 @@
                                                     case TransactionStatusConstant.PENDING:
                                                         <span class="ownorent-text-gray">PENDING</span>
                                                         break;
+                                                    case TransactionStatusConstant.CANCEL_REQUESTED:
+                                                        <span class="ownorent-text-orange">CANCELLATION REQUESTED</span>
+                                                        break;
+                                                    case TransactionStatusConstant.CANCELLED:
+                                                        <span class="ownorent-text-red">CANCELLED</span>
+                                                        break;
+                                                    case TransactionStatusConstant.CANCELLED_RETURNED:
+                                                        <span class="ownorent-text-red">RETURNED</span>
+                                                        break;
                                                 }
                                             </td>
                                             <td style="text-align:right;"></td>
@@ -318,9 +336,27 @@
                                                     case TransactionStatusConstant.PENDING:
                                                         <span class="ownorent-text-gray">PENDING</span>
                                                         break;
+                                                    case TransactionStatusConstant.CANCEL_REQUESTED:
+                                                        <span class="ownorent-text-orange">CANCELLATION REQUESTED</span>
+                                                        break;
+                                                    case TransactionStatusConstant.CANCELLED:
+                                                        <span class="ownorent-text-red">CANCELLED</span>
+                                                        break;
+                                                    case TransactionStatusConstant.CANCELLED_RETURNED:
+                                                        <span class="ownorent-text-red">RETURNED</span>
+                                                        break;
                                                 }
                                             </td>
-                                            <td style="text-align:right;"></td>
+                                            <td style="text-align:right;">
+                                                @if (transaction.TransactionStatus == TransactionStatusConstant.PARTIALLY_PAID)
+                                                {
+                                                    @Html.ActionLink("Request Cancellation","RequestCancellation", "Account", new { id = transaction.TransactionId }, new { @class = "btn btn-xs btn-danger" });
+                                                }
+                                                else if (transaction.TransactionStatus == TransactionStatusConstant.CANCEL_REQUESTED)
+                                                {
+                                                    @Html.ActionLink("Undo Cancellation","CancelRequestCancellation", "Account", new { id = transaction.TransactionId }, new { @class = "btn btn-xs btn-default" });
+                                                }
+                                            </td>
                                         </tr>
                                     </tbody>
                                 </table>
