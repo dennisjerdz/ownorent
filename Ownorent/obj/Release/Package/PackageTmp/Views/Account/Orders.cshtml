@@ -80,7 +80,7 @@
                                     {
                                         <span class="ownorent-text-ygreen">DELIVERED </span>
                                     }
-                                    @if (item.Transactions.Any(t => t.ShippingStatus == ShippingStatusConstant.DELIVERED))
+                                    @if (item.Transactions.Any(t => t.ShippingStatus == ShippingStatusConstant.FAILED_DELIVERY))
                                     {
                                         <span class="ownorent-text-red">FAILED </span>
                                     }

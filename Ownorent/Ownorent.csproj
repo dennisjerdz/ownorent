@@ -25,6 +25,7 @@
     <UseGlobalApplicationHostFile />
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <Use64BitIISExpress />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -207,6 +208,7 @@
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Controllers\ProductsController.cs" />
+    <Compile Include="Controllers\RentToOwnPaymentTermsController.cs" />
     <Compile Include="Controllers\SMSController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -435,6 +437,11 @@
     <Content Include="Views\Admin\EditPayout.cshtml" />
     <Content Include="Views\Admin\Payouts.cshtml" />
     <Content Include="Views\Account\SellerIndex.cshtml" />
+    <Content Include="Views\RentToOwnPaymentTerms\Create.cshtml" />
+    <Content Include="Views\RentToOwnPaymentTerms\Delete.cshtml" />
+    <Content Include="Views\RentToOwnPaymentTerms\Details.cshtml" />
+    <Content Include="Views\RentToOwnPaymentTerms\Edit.cshtml" />
+    <Content Include="Views\RentToOwnPaymentTerms\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
